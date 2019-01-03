@@ -299,25 +299,45 @@ void RenderScene()
 
 void RenderShadow()
 {
+	// 스텐실 모드 켠다
 	Device->SetRenderState(D3DRS_STENCILENABLE,    true);
+	// 스텐실 테스트 조건을 equal 조건으로 해준다
     Device->SetRenderState(D3DRS_STENCILFUNC,      D3DCMP_EQUAL);
+	// 스텐실 레퍼런스 값을 지정
     Device->SetRenderState(D3DRS_STENCILREF,       0x0);
+
+	// 마스크에서 걸리지 않는다.
+	// 마스크 테스트는 무조건 통과하게 된다.
     Device->SetRenderState(D3DRS_STENCILMASK,      0xffffffff);
     Device->SetRenderState(D3DRS_STENCILWRITEMASK, 0xffffffff);
+
+	// 깊이 테스트 실패했을때 유지
     Device->SetRenderState(D3DRS_STENCILZFAIL,     D3DSTENCILOP_KEEP);
+	// 스텐실 테스트 실패했을때 유지
     Device->SetRenderState(D3DRS_STENCILFAIL,      D3DSTENCILOP_KEEP);
+
+	// 스텐실 테스트 성공했을때 레퍼런스 값을 증가시킨다.
+	// 이로인해 그림자의 더블블렌딩을 막을 수 있게 된다.
     Device->SetRenderState(D3DRS_STENCILPASS,      D3DSTENCILOP_INCR); // increment to 1
 
 	// position shadow
+	// 라이트의 방향을 정해주는데 마지막값이 0이기 때문에 조명의 방향을 나타낸다.(directional light)
 	D3DXVECTOR4 lightDirection(0.707f, -0.707f, 0.707f, 0.0f);
+
+	// 그림자가 만들어질 플레인을 지정해준다.
+	// 플레인을 지정할 때
+	// n dot p + d = 0에서 법선벡터인 n값과 일정한 값인 d값이 사용된다.
 	D3DXPLANE groundPlane(0.0f, -1.0f, 0.0f, 0.0f);
 
+
+	// shadow matrix를 만드는 함수를 이용해서 만들어준다.
 	D3DXMATRIX S;
 	D3DXMatrixShadow(
 		&S,
 		&lightDirection,
 		&groundPlane);
 
+	// 물체의 위치를 만드는 행렬을 만들어준다.
 	D3DXMATRIX T;
 	D3DXMatrixTranslation(
 		&T,
@@ -325,6 +345,7 @@ void RenderShadow()
 		TeapotPosition.y,
 		TeapotPosition.z);
 
+	// 물체의 위치 > 그림자를 차례대로 곱해서 그림자가 위치할 곳을 찾아준다.
 	D3DXMATRIX W = T * S;
 	Device->SetTransform(D3DTS_WORLD, &W);
 
@@ -338,12 +359,18 @@ void RenderShadow()
 
 	// Disable depth buffer so that z-fighting doesn't occur when we
 	// render the shadow on top of the floor.
+
+	// 깊이 테스팅을 비활성화 한다음 그림자를 렌더링 하였다.
+	// 그 이유는 Z 쟁탈을 막기 위해서이다.
+	// Z 쟁탈은 두개의 다른 표면이 깊이 버퍼 내의 동일한 깊이 값을 가질 때 발생하는 현상이다. 깜박이는 현상이 발생한다.
+	// 근데 그림자와 바닥은 동일한 평면에 위치하므로 대부분 Z 쟁탈이 일어난다.
 	Device->SetRenderState(D3DRS_ZENABLE, false);
 
 	Device->SetMaterial(&mtrl);
 	Device->SetTexture(0, 0);
 	Teapot->DrawSubset(0);
 
+	// 다시 깊이테스팅을 켜준다.
 	Device->SetRenderState(D3DRS_ZENABLE, true);
 	Device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 	Device->SetRenderState(D3DRS_STENCILENABLE,    false);
