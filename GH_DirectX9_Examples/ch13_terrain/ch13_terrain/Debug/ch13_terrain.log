@@ -1,0 +1,23 @@
+﻿  terrainDriver.cpp
+  terrain.cpp
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(50): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(51): warning C4244: '*=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(351): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(353): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(383): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(384): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(385): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(390): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(393): warning C4244: '인수': 'int'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(442): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(483): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(483): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(484): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(484): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(485): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(485): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(486): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch13_terrain\ch13_terrain\terrain.cpp(486): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다...
+  ch13_terrain.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch13_terrain\Debug\ch13_terrain.exe
+  ch13_terrain.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch13_terrain\Debug\ch13_terrain.pdb (Full PDB)
