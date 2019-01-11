@@ -181,11 +181,20 @@ void Camera::getViewMatrix(D3DXMATRIX* V)
 	float z = -D3DXVec3Dot(&_look, &_pos);
 
 	// 계산된 행렬의 값을 넣어준다.
-	// 이런식으로 현재 카메라 위치 기준 뷰포트변환 행렬을 만들어준다.
+	// 이런식으로 현재 카메라 위치 기준 뷰스페이스 변환 행렬을 만들어준다.
+	// 원래 뷰스페이스 변환행렬에 필요한 것은 다음과 같다
+	// D3DXMatrixLookAtLH(반환행렬, 월드내 카메라 위치, 카메라가 보는 지점, 윌드의 업벡터)
+	D3DXVECTOR3 a{ 0,1,0 };
+	D3DXMatrixLookAtLH(V, &_pos, &_look, &a);
+
+	/*
 	(*V)(0,0) = _right.x; (*V)(0, 1) = _up.x; (*V)(0, 2) = _look.x; (*V)(0, 3) = 0.0f;
 	(*V)(1,0) = _right.y; (*V)(1, 1) = _up.y; (*V)(1, 2) = _look.y; (*V)(1, 3) = 0.0f;
 	(*V)(2,0) = _right.z; (*V)(2, 1) = _up.z; (*V)(2, 2) = _look.z; (*V)(2, 3) = 0.0f;
 	(*V)(3,0) = x;        (*V)(3, 1) = y;     (*V)(3, 2) = z;       (*V)(3, 3) = 1.0f;
+	*/
+
+	
 }
 
 void Camera::setCameraType(CameraType cameraType)

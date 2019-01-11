@@ -47,6 +47,10 @@ bool Setup()
 			(float)Width / (float)Height,
 			1.0f,
 			1000.0f);
+
+	// 투영행렬
+	// 이는 절면체를 정의하고,
+	// 줄두체 내의 기하물체를 투영 윈도우에 투영하는 과정을 담당한다.
 	Device->SetTransform(D3DTS_PROJECTION, &proj);
 
 	return true;
