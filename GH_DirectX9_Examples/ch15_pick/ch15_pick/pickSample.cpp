@@ -49,6 +49,7 @@ d3d::BoundingSphere BSphere;
 // D3DXMatrixPerspectiveFovLH(proj, 시야각, 종횡비, 각 절단면까지의 거리) >> Device->SetTransform(D3DTS_PROJECTION, &proj)
 
 -> 뷰 포트 변환을 통해 투영 윈도우의 기하물체가 뷰포트로 변환 // 이때 z값이 날아간다.
+// proj의 proj(0,0)이 x의 배율을 proj(1,1)이 y의 배율을 조절해서 뷰포트로 변환한다.
 // D3DVIEWPORT vp = {X(시작지점), Y(시작지점), 너비, 높이, 깊이버퍼 최소, 깊이버퍼 최대} >> Device->SetViewPort(&vp)
 
  */
@@ -78,9 +79,6 @@ d3d::Ray CalcPickingRay(int x, int y)
 
 
 	// 뷰포트로 변환하는 행렬을 구해보자
-
-
-
 	/*
 	Width/2		0			0			0
 	0			-Height/2	0			0
@@ -128,6 +126,9 @@ d3d::Ray CalcPickingRay(int x, int y)
 
 	D3DXMATRIX proj;
 	Device->GetTransform(D3DTS_PROJECTION, &proj);
+
+	//  proj(0, 0) : 뷰포트로 변환할때 x좌표에 곱해지는 배율
+	//  proj(1, 1) : 뷰포트로 변환할때 y좌표에 곱해지는 배율
 	temp.x /= proj(0, 0);
 	temp.y /= proj(1, 1);
 
@@ -171,7 +172,7 @@ d3d::Ray CalcPickingRay(int x, int y)
 	// 투영창의 좌표 - 광선의 원점 = 방향
 	//ray._direction = D3DXVECTOR3(px, py, 1.0f);
 
-	
+	// 직접 행렬계산으로 만들어본것
 	ray._direction = D3DXVECTOR3(temp.x, temp.y, 1.0f/*temp.z*/);
 	return ray;
 }
