@@ -54,16 +54,37 @@ bool Setup()
 	ID3DXBuffer* errorBuffer = 0;
 
 	hr = D3DXCompileShaderFromFile(
+		// 셰이더 파일명
 		"transform.txt",
+		
 		0,
-		0,
-		"Main",  // entry point function name
-		"vs_1_1",// shader version to compile to
-		D3DXSHADER_DEBUG, 
-		&shader,
-		&errorBuffer,
-		&TransformConstantTable);
 
+		// 디폴트 포함 동작을 오버라이딩 할 수 있도록 해준다
+		// 여기선 디폴트를 사용한다.
+		0,
+
+		// 진업점 함수이름을 지정하는 문자열
+		"Main",   // entry point function name
+
+		// 소스 코드를 컴파일할 셰이더 버전을 지정하는 문자열
+		// 여러가지 셰이더 버전으로 컴파일이 가능하다.
+		// 만약 어셈블리를 시용한다면 직접 손으로 포팅과정을 거쳐야한다.
+		"vs_1_1", // shader version to compile to
+
+		// 선택적인 컴파일링 플래그
+		// 여기서는 컴파일러가 디버그 정보를 생성하도록 하였다.
+		D3DXSHADER_DEBUG, 
+
+		// 컴파일된 셰이더 코드를 포함하는 ID3DXBuffer로의 포인터를 리턴한다.
+		// 컴파일로 만들어진 셰이더 코드는 실제로 버텍스 픽셀 셰이더를 만드는 다른함수에 전달하는 인자로 이용
+		&shader,
+
+		// 오류코드와 메시지 문자열을 포함하는 ID3DXBuffer로의 포인터를 리턴한다.
+		&errorBuffer,
+
+		// 셰이더의 상수테이블 데이터를 포함하는 포인터 리턴
+		&TransformConstantTable);
+		
 	// output any error messages
 	if( errorBuffer )
 	{
@@ -91,20 +112,24 @@ bool Setup()
 
 	// 
 	// Get Handles.
-	//
-
+	// 
+	// 상수테이블에서 현재 셰이더 코드상에 있는 ViewProjMatrix를 받아온다.
+	// 첫번째 인자에 핸들을 넣으면 그핸들을 가진 구조체의 멤버변수에접근할 수 있다.
+	// 최상위 변수로의 핸들을 얻고자 한다면 이 인자에 0 을 전달한다.
 	TransformViewProjHandle = TransformConstantTable->GetConstantByName(0, "ViewProjMatrix");
 
 	//
 	// Set shader constants:
 	//
-
+	// 상수가 선언될 때 초기화 되는 값인 디폴트 값으로 상수 값을 지정하였다.
+	// 세팅할때 한번만 호출되어야 한다.
 	TransformConstantTable->SetDefaults(Device);
- 
+	 
 	//
 	// Set Projection Matrix.
 	//
 
+	// 투영행렬 정의
 	D3DXMatrixPerspectiveFovLH(
 			&ProjMatrix, D3DX_PI * 0.25f, 
 			(float)Width / (float)Height, 1.0f, 1000.0f);
@@ -133,6 +158,7 @@ bool Display(float timeDelta)
 		// Update the scene: Allow user to rotate around scene.
 		//
 		
+		// 한번만 초기화된다.
 		static float angle  = (3.0f * D3DX_PI) / 2.0f;
 		static float height = 5.0f;
 	
@@ -152,11 +178,16 @@ bool Display(float timeDelta)
 		D3DXVECTOR3 target(0.0f, 0.0f, 0.0f);
 		D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
 		D3DXMATRIX V;
+
+		// 뷰스페이스 변환 행렬 설정
 		D3DXMatrixLookAtLH(&V, &position, &target, &up);
 
 		// combine view and projection transformations
+		// 
+		// 투영행렬이랑 곱해서 
 		D3DXMATRIX ViewProj = V * ProjMatrix;
 
+		// 셰이더코드에 있는 변수를 핸들을 통해서 세팅시켜준다.
 		TransformConstantTable->SetMatrix(
 			Device,
 			TransformViewProjHandle, 
