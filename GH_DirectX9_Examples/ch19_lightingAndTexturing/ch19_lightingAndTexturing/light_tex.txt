@@ -1,0 +1,161 @@
+////////////////////////////////////////////////////////////////////////////
+// 
+// File: light_tex.txt
+// 
+// Author: Frank Luna (C) All Rights Reserved
+//
+// System: AMD Athlon 1800+ XP, 512 DDR, Geforce 3, Windows XP, MSVC++ 7.0 
+//
+// Desc: Effect file that handles device states for lighting and texturing
+//       a 3D model.
+//          
+////////////////////////////////////////////////////////////////////////////
+/*
+장점
+이펙트 구현의 모든 버전을 하나의 이펙트 파일에 보관할 수 있게되어 저반적인 효과의 완전한 캡슐화가 가능
+
+특징
+각각의 테크닉은 하나 이상의 렌더링 패스를 포함가능 
+렌더링 패스는 장치 상태, 샘플러, 특정 패스의 기하물체를 렌더링하는데 필요한 셰이더 캡슐화
+
+*/
+//
+// Globals
+//
+
+matrix WorldMatrix;
+matrix ViewMatrix;
+matrix ProjMatrix;
+
+// HLSL의 texture형은 IDirect3DTexture9객체를 나타내기 때문에 바로 매핑가능
+texture Tex;
+
+// 이와같이 변수에 주석을 달아놓는것도 가능하다 이는 HLSL코드 내에서는 사용하지 않지만
+// 애플리케이션내에서 Effect->GetAnnotationByName(정보를 받을 핸들, 주석의 이름)으로 사용가능하다.
+// textur tex0 < string name = "abc.bmp"; >;
+
+//
+// Sampler
+//
+
+// sampler_state키워드를 사용하면 이펙트 파일내에서 직접 샘플러 상태를 지정할 수 있다.
+// 원래 셰이더 코딩을 할때는 샘플러의 핸들을 받고, 그 핸들에서 정보를 얻어서 그 정보기반으로 연결시켜주었다.
+sampler S0 = sampler_state 
+{
+    // 훨씬 간결하다.
+	Texture   = (Tex);
+	
+    MinFilter = LINEAR; 
+    MagFilter = LINEAR; 
+    MipFilter = LINEAR;
+};
+
+
+// 
+// Effect
+//
+
+technique LightAndTexture
+{
+	//pixelshader ps = compile ps_2_0 Main();
+	// 이런식으로 셰이더를 초기화한 다음에 특정패스마다 연결할 수도있다.
+	// 패스내부에서 pixelshader ps_0 = ps;
+	
+	// 각패스는 독립적인 렌더링 상태를 갖는다고 볼 수 있다.
+
+    pass P0
+    {
+        //
+        // Set Misc render states.
+
+		// 각각 버텍스셰이더와 픽셀셰이더를 나타낸다.
+        // Effect->SetXXXXShader(VS or PS Handle, VS or PS)
+		// 이와같은 형식으로 나타낼 수 있다.
+		// 이펙트객체를 통해서 셰이더 객체로 VS PS(현재 여기서 vertexshader pixelshader)를 초기화 가능하다.
+
+		// 특수한 컴파일 구문을 이용해서 셰이더 변수를 지정할 수도 있다
+		// ex. pixelshader ps = compile ps_2_0 Main();
+		// 단 이와같은 객체 초기화를 이용할시 이펙트파일내에 Main함수를 정의해야한다.
+		pixelshader      = null;
+        vertexshader     = null;
+		
+
+		// 버텍스 포멧지정
+        fvf              = XYZ | Normal | Tex1;
+        
+		// 조명 사용
+		Lighting         = true;
+
+		// 법선의 재졍규화
+        NormalizeNormals = true;
+
+		// 반사광 비활성화
+        SpecularEnable   = false;
+
+
+        //
+        // Set Transformation States
+
+		// 앞서 전역변수로 지정해서 애플리케이션내에서 초기화시켰던 것들로 세팅해준다.
+        WorldTransform[0]   = (WorldMatrix);
+        ViewTransform       = (ViewMatrix);
+        ProjectionTransform = (ProjMatrix);
+
+
+        //
+        // Set a light source at light index 0.  We fill out all the 
+        // components for light[0] because  The Direct3D
+        // documentation recommends us to fill out all components
+        // for best performance.
+
+		// 조명에 대한 세팅을 해준다.
+        LightType[0]         = Directional;
+        LightAmbient[0]      = {0.2f,  0.2f, 0.2f, 1.0f};
+        LightDiffuse[0]      = {1.0f,  1.0f, 1.0f, 1.0f};
+        LightSpecular[0]     = {0.0f,  0.0f, 0.0f, 1.0f};
+        LightDirection[0]    = {1.0f, -1.0f, 1.0f, 0.0f};
+        LightPosition[0]     = {0.0f,  0.0f, 0.0f, 0.0f};
+        LightFalloff[0]      = 0.0f;
+        LightRange[0]        = 0.0f;
+        LightTheta[0]        = 0.0f;
+        LightPhi[0]          = 0.0f;
+        LightAttenuation0[0] = 1.0f;
+        LightAttenuation1[0] = 0.0f;
+        LightAttenuation2[0] = 0.0f;
+
+        // Finally, enable the light:
+
+		// 조명활성화
+        LightEnable[0] = true;
+
+
+        //
+        // Set Material components.  This is like calling
+        // IDirect3DDevice9::SetMaterial.
+
+		// 이는 Device->SetMaterial호출하는 것과 같다.
+		// Device에서 호출하는 재질 설정은 재질 객체에 아래에있는 값들을 넣어서 초기화한후, 
+		// SetMaterial 입력파라미터에 넣어준다.
+        MaterialAmbient  = {1.0f, 1.0f, 1.0f, 1.0f};
+        MaterialDiffuse  = {1.0f, 1.0f, 1.0f, 1.0f};
+        MaterialEmissive = {0.0f, 0.0f, 0.0f, 0.0f};
+        MaterialPower    = 1.0f;
+        MaterialSpecular = {1.0f, 1.0f, 1.0f, 1.0f};
+
+
+        //
+        // Hook up the sampler object to sampler stage 0,
+        // which is given by Sampler[0].
+		/*
+
+		state = ...;
+
+		// 채우는 모드 선택가능
+		FillMode = ...;
+		*/
+
+		// 샘플러 상태를 지정한다 // S0를 통해서 어떻게 텍스처이미지를 지정하고 어떤 방식으로 매핑할지 결정해준다.
+        Sampler[0] = (S0);
+
+    }
+}
