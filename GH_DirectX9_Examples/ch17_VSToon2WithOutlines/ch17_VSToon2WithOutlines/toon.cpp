@@ -303,6 +303,8 @@ bool Display(float timeDelta)
 			worldView = WorldMatrices[i] * view;
 			worldViewProj = WorldMatrices[i] * view * ProjMatrix;
 
+			// 중단점 찍어서 핸들 정보 보려고했지만 읽을수없었다.
+			// auto a =ToonWorldViewHandle;
 			// 셰이더 월드변환 행렬 세팅
 			ToonConstTable->SetMatrix(
 				Device, 
