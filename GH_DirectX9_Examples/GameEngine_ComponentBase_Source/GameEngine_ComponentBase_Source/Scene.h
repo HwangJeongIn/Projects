@@ -35,7 +35,15 @@ private :
 	Scene(string name = "default")
 		: name(name)
 	{
-		//gameObjects.push_back(new GameObject());
+		gameObjects.push_back(new GameObject("player name","player"));
+		
+		gameObjects[0]->addComponent<MoveScript>();
+
+		// 계속 반복되는 현상
+		// 이 함수는(addChild) 내부적으로 getInstance()함수를 포함하고 있는데
+		// 이는아직 생성이 완료된 상황이 아니여서 nullptr이기 때문에
+		// Scene객체를 또 생성하게 되고, 재귀적으로 무한루프에 빠지게 된다.
+		// gameObjects[0]->addChild("player name1", "player1");
 	}
 
 	static Scene * instance;
@@ -63,31 +71,66 @@ public :
 
 	void gameLoop()
 	{
-
+		//gameObjects[0]->addChild("player name1", "player1");
+		//gameObjects[1]->addComponent<MoveScript>();
 		while (1)
 		{
 			// esc키 입력 확인
 
 			// 업데이트
+			update();
 
 			// 렌더링
 
 
 			// 프레임 일정하게 딜레이
-
+			Sleep(66);
 		}
 
 	}
 
+	// 현재 게임오브젝트 리스트를 업데이트 시킨다.
+	void update()
+	{
+		for (auto it : gameObjects)
+		{
+			it->update();
+		}
+	}
 
 
 	// GameObject(Transform * transform, const string & name = "default GO name", const string & tag = "default GO tag",
 	//	vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr)
 
+	GameObject * Instantiate(GameObject * other)
+	{
+		// 만약에 같은 부모를 가진 객체중 중복된 이름이 있다면
+		// 이름을 바꿔준다.
+
+
+
+
+
+
+
+
+		// 게임오브젝트 리스트에 추가하고
+		getInstance()->gameObjects.push_back(other);
+
+		// 나중에 관리하기 편하기 위해서 만든 map에 추가한다. // find함수에서 사용
+
+		// 맵등록
+		registerGameObject(other);
+
+
+		return getInstance()->gameObjects.back();
+	}
+
 	GameObject * Instantiate
 	(const string & name = "default GO name", const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
-		vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr)
+		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr, 
+		vector<Component *> * components = nullptr)
 	{
 		/*
 		객체가 초기화되는 과정
@@ -108,7 +151,7 @@ public :
 		*/
 
 		// 객체를 생성해준다.
-		GameObject * tempGameObject = new GameObject(name, tag, position, rotation, scale, children, components);
+		GameObject * tempGameObject = new GameObject(name, tag, position, rotation, scale, parent, children, components);
 
 		// 만약에 같은 부모를 가진 객체중 중복된 이름이 있다면
 		// 이름을 바꿔준다.
@@ -138,6 +181,8 @@ public :
 
 		int gameObjectsSize = gameObjects.size();
 
+		// 나중에 좀더 빠르게 수정할 예정
+		// 현재 선형적으로 설계
 		for (auto it = gameObjects.begin(); it < gameObjects.end(); ++it)
 		{
 			if (other == *it)

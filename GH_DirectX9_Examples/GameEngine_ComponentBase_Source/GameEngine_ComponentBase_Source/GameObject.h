@@ -13,18 +13,24 @@ private:
 	vector<Component *> components;
 	vector<GameObject *> children;
 	Transform * transform;
+	GameObject * parent;
 
 public:
 	GameObject(const string & name = "default GO name",const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
-		vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr)
-		: name(name), tag(tag), transform(new Transform(this, position, rotation, scale)) //, gameObject(this)
+		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr,
+		vector<Component *> * components = nullptr)
+		: name(name), tag(tag), transform(new Transform(this, position, rotation, scale)), parent(parent) //, gameObject(this)
 	{
 		//// Transform초기화
 		//// Transform은 필수 컴포넌트 / 파라미터로 잘못들어오면 객체생성에 실패한것이기 때문에 리턴한다.
 		//if (!transform) return;
 
 		this->components.push_back(transform);
+
+
+		// 나중에 안쓸수도 있음 아래에있는것들
+		// 아예 컴포넌트와 자식객체를 생성하기 위해서 함수로 분리할 예정
 
 		// 들어온 파라미터에 자식객체가 있으면 초기화
 		if (children != nullptr)
@@ -44,39 +50,6 @@ public:
 			}
 		}
 	}
-	/*
-		GameObject(GameObject * other)
-		// 각 항목들을 복사해준다.
-		: name(other->name), tag(other->tag)
-	{
-		// 들어온 파라미터에 자식객체가 있으면 초기화
-
-		for (int i = 0; i < other->children.size(); ++i)
-		{
-			// 여기서도 독립적인 객체가 생성되어야 하기 때문에
-			// 복사생성자를 호출해서 만들어준다.
-			// child안에 또 child목록이 있으면 그것도 연쇄적으로 초기화된다.
-			this->children.push_back(new GameObject(other->children[i]));
-		}
-
-
-		// 들어온 파라미터에 컴포넌트가 있으면 초기화
-
-		for (int i = 0; i < other->components.size(); ++i)
-		{
-			// 초기화 순서
-			
-
-			1. 실제로 어떤 Component인지 확인을 한다.
-			2. 
-
-			
-
-			this->components.push_back(new Component(other->components[i]));
-		}
-
-	}
-	*/
 
 
 	virtual ~GameObject()
@@ -109,7 +82,47 @@ public:
 	void setName(const string & name) { this->name = name; }
 	
 	Transform * getTransform() { return transform; }
-	
+	GameObject * getParent() { return parent; }
+
+	// Transform은 고정적으로 GameObject와 함께하기 때문에 따로 set해줄필요는없다.
+	void setParent(GameObject * parent) 
+	{
+		if (!parent) return;
+		this->parent = parent;
+	}
+
+	// 현재 깊이를 반환하고 / 파라미터로 string 객체를 레퍼런스형으로 받아서 내부에서 초기화시켜준다.
+	// 깊이는 0기준 부모객체가 없는것이다.
+	int getPath(string & path)
+	{
+		int depth = -1;
+		GameObject * currentGO = this;
+		path = "";
+
+		while (currentGO != nullptr)
+		{
+			path = "/"+ currentGO->name + path;
+			++depth;
+			currentGO = currentGO->parent;
+		}
+
+		return depth;
+	}
+
+	// children과 components를 각각 최신화 시켜야한다.
+	void update()
+	{
+		for (auto it : components)
+		{
+			it->update();
+		}
+
+		for (auto it : children)
+		{
+			it->update();
+		}
+	}
+
 	//vector<Component *> components;
 
 	template <typename T>
@@ -152,6 +165,16 @@ public:
 
 		components.push_back(temp);
 	}
+
+	GameObject * getChild(const string & name);
+	void removeChild(GameObject * child);
+	void addChild(GameObject * child);
+	void addChild(const string & name = "default GO name", const string & tag = "default GO tag",
+		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
+		vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr);
+	//void addChild(const string & name, const string & tag,
+	//	const Vector3 & position, const Vector3 & rotation, const Vector3 & scale,
+	//	vector<GameObject *> *children, vector<Component *> * components);
 
 };
 
