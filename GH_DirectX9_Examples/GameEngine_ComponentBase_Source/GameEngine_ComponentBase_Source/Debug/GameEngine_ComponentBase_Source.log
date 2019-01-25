@@ -1,2 +1,25 @@
-﻿  GameEngine_ComponentBase_Source.vcxproj -> D:\GitHub\Projects\GH_DirectX9_Examples\GameEngine_ComponentBase_Source\Debug\GameEngine_ComponentBase_Source.exe
+﻿  Component.cpp
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(38): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(62): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(70): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  main.cpp
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(38): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(62): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(70): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Scene.cpp
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(38): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(62): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(70): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  GameObject.cpp
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(38): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(62): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\gameengine_componentbase_source\gameengine_componentbase_source\gameobject.h(70): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  코드를 생성하고 있습니다...
+  GameEngine_ComponentBase_Source.vcxproj -> D:\GitHub\Projects\GH_DirectX9_Examples\GameEngine_ComponentBase_Source\Debug\GameEngine_ComponentBase_Source.exe
   GameEngine_ComponentBase_Source.vcxproj -> D:\GitHub\Projects\GH_DirectX9_Examples\GameEngine_ComponentBase_Source\Debug\GameEngine_ComponentBase_Source.pdb (Full PDB)

@@ -74,8 +74,16 @@ public :
 
 	void gameLoop()
 	{
-		gameObjects[0]->addChild("player name1", "player1");
-		gameObjects[1]->addComponent<MoveScript>();
+		GameObject * temp = nullptr;
+		temp = gameObjects[0]->addChild("player name1", "player1");
+		temp->addComponent<MoveScript>();
+
+		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
+		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
+		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
+		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
+		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
+		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
 		while (1)
 		{
 			// esc키 입력 확인
