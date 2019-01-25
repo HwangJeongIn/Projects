@@ -43,7 +43,7 @@ void GameObject::removeChild(GameObject * child)
 	// 내부적으로 완전히 삭제
 	Scene::getInstance()->Destroy(child);
 }
-void GameObject::addChild(GameObject * child)
+GameObject * GameObject::addChild(GameObject * child)
 {
 	child->parent = this;
 	// 먼저 객체 children에 등록해주고
@@ -51,6 +51,8 @@ void GameObject::addChild(GameObject * child)
 
 	// 여러가지 관리를 위한 등록을 해준다.
 	Scene::getInstance()->Instantiate(child);
+
+	return child;
 }
 
 
@@ -59,7 +61,7 @@ void GameObject::addChild(GameObject * child)
 //	vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr) 
 
 
-void GameObject::addChild(const string & name, const string & tag,
+GameObject * GameObject::addChild(const string & name, const string & tag,
 	const Vector3 & position, const Vector3 & rotation, const Vector3 & scale,
 	vector<GameObject *> *children, vector<Component *> * components)
 {
@@ -67,5 +69,7 @@ void GameObject::addChild(const string & name, const string & tag,
 	this->children.push_back(tempGameObject);
 
 	Scene::getInstance()->Instantiate(tempGameObject);
+
+	return tempGameObject;
 }
 

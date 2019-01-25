@@ -117,10 +117,14 @@ public:
 			it->update();
 		}
 
+		// 어차피 자식객체들도 모두 Scene에서 등록되기 때문에 여기서 안해줘도 된다.
+		/*
 		for (auto it : children)
 		{
 			it->update();
 		}
+		*/
+
 	}
 
 	//vector<Component *> components;
@@ -168,8 +172,8 @@ public:
 
 	GameObject * getChild(const string & name);
 	void removeChild(GameObject * child);
-	void addChild(GameObject * child);
-	void addChild(const string & name = "default GO name", const string & tag = "default GO tag",
+	GameObject *  addChild(GameObject * child);
+	GameObject *  addChild(const string & name = "default GO name", const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
 		vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr);
 	//void addChild(const string & name, const string & tag,

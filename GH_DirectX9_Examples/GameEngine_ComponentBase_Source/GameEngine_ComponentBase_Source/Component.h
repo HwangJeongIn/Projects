@@ -91,10 +91,7 @@ class MoveScript : public Component
 private :
 
 protected :
-	virtual void update()
-	{
-		//cout << "movescript update" << endl;
-	}
+	virtual void update();
 	virtual void start();
 
 public :
