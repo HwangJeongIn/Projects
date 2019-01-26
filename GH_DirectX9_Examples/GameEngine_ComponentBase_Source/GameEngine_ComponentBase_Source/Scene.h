@@ -9,6 +9,7 @@
 #include "Component.h"
 #include "GameObject.h"
 #include "InputManager.h"
+#include "Trace.h"
 
 
 // 전체적인 게임루프가 돌아가는 클래스
@@ -42,11 +43,20 @@ private :
 		
 		gameObjects[0]->addComponent<MoveScript>();
 
+
 		// 계속 반복되는 현상
 		// 이 함수는(addChild) 내부적으로 getInstance()함수를 포함하고 있는데
 		// 이는아직 생성이 완료된 상황이 아니여서 nullptr이기 때문에
 		// Scene객체를 또 생성하게 되고, 재귀적으로 무한루프에 빠지게 된다.
 		// gameObjects[0]->addChild("player name1", "player1");
+
+
+		Trace::LoadFileNames();
+		Trace::Write("TAG_DEBUG", "hello");
+		Trace::Write("TAG_DEBUG", "my");
+		Trace::Write("TAG_DEBUG", "name");
+		Trace::Write("TAG_DEBUG", "is");
+		Trace::Write("TAG_DEBUG", "Init_Scene class", "jeongin", true);
 	}
 
 	static Scene * instance;
@@ -74,6 +84,7 @@ public :
 
 	void gameLoop()
 	{
+		/*
 		GameObject * temp = nullptr;
 		temp = gameObjects[0]->addChild("player name1", "player1");
 		temp->addComponent<MoveScript>();
@@ -84,6 +95,8 @@ public :
 		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
 		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
 		temp->addChild("player name1", "player1")->addComponent<MoveScript>();
+		*/
+
 		while (1)
 		{
 			// esc키 입력 확인

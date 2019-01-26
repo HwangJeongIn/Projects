@@ -147,6 +147,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Trace.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +155,14 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Trace.h" />
     <ClInclude Include="Utility.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DEBUG.txt" />
+    <Text Include="INFO1.txt" />
+    <Text Include="INFO2.txt" />
+    <Text Include="TextFileNamesList.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

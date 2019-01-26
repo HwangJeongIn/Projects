@@ -33,6 +33,9 @@
     <ClCompile Include="InputManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Trace.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObject.h">
@@ -50,5 +53,22 @@
     <ClInclude Include="InputManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Trace.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="TextFileNamesList.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
+    <Text Include="DEBUG.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
+    <Text Include="INFO1.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
+    <Text Include="INFO2.txt">
+      <Filter>소스 파일</Filter>
+    </Text>
   </ItemGroup>
 </Project>
