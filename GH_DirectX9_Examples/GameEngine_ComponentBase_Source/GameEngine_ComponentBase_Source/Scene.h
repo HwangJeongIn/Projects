@@ -56,7 +56,8 @@ private :
 		Trace::Write("TAG_DEBUG", "my");
 		Trace::Write("TAG_DEBUG", "name");
 		Trace::Write("TAG_DEBUG", "is");
-		Trace::Write("TAG_DEBUG", "Init_Scene class", "jeongin", true);
+		Trace::Write("TAG_DEBUG", "Init_Scene class", "jeongin");
+		//Trace::Clear("TAG_DEBUG");
 	}
 
 	static Scene * instance;
@@ -99,16 +100,26 @@ public :
 
 		while (1)
 		{
+
+
+			// 일정시간 간격마다 업데이트 되는 함수이다
+			// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
+
+
+			// 업데이트 / 렌더링
+			// 업데이트는 매 프레임당 실행되는데 MeshRenderer 컴포넌트에 의해 렌더링과 커플링 되어있다.
+
+			// 이때문에 일정시간 마다 호출할 수 있는 FixedUpdate를 추가한다.
+			// 업데이트 내에서 활용되는 계산들은 컴퓨터 성능에 따라 영향을 받을 수 있기 때문에,
+			// 프레임간 간격 deltaTime을 한 프레임당 업데이트 함으로써 일정한 계산을 할 수 있도록 제공해줄 생각이다.
+			update();
+
+
 			// esc키 입력 확인
 			if (InputManager::GetKeyDown(KeyCode::Esc))
 				break;
 
-			// 업데이트
-			update();
 
-			// 렌더링
-
-			
 
 			// 프레임 일정하게 딜레이
 			Sleep(1500);
@@ -124,6 +135,15 @@ public :
  			it->update();
 		}
 	}
+
+	void fixedUpdate()
+	{
+		for (auto it : gameObjects)
+		{
+			it->update();
+		}
+	}
+
 
 	void changeNameIfItExists(GameObject * other)
 	{

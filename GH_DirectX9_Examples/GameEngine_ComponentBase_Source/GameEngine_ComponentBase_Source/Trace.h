@@ -52,8 +52,9 @@ public :
 
 	}
 
-	static bool Write(const string & fileTagName, const string & info, bool appMode = true)
+	static bool Write(const string & fileTagName, const string & info/*, bool appMode = true*/)
 	{
+		bool appMode = true;
 		// 먼저 태그로 검색해서 등록되어있는지 확인한다.
 		// 만약 등록되어있지 않다면 리턴한다.
 		if (TextFileTable.find(fileTagName) == TextFileTable.end()) return false;
@@ -76,8 +77,9 @@ public :
 		file.close();
 	}
 
-	static bool Write(const string & fileTagName, const string & tag, const string & info, bool appMode = true)
+	static bool Write(const string & fileTagName, const string & tag, const string & info/*, bool appMode = true*/)
 	{
+		bool appMode = true;
 		// 먼저 태그로 검색해서 등록되어있는지 확인한다.
 		// 만약 등록되어있지 않다면 리턴한다.
 		if (TextFileTable.find(fileTagName) == TextFileTable.end()) return false;
@@ -98,6 +100,13 @@ public :
 		file << tag << " :: " << info << endl;
 
 		file.close();
+	}
+
+	static void Clear(const string & fileTagName)
+	{
+		if (TextFileTable.find(fileTagName) == TextFileTable.end()) return;
+
+		ofstream file(TextFileTable[fileTagName]); file.close();
 	}
 };
 
