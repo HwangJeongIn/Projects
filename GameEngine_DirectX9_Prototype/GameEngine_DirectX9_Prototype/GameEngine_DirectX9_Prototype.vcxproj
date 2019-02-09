@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="Locator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="d3dUtility.cpp" />
@@ -152,11 +153,13 @@
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audio.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="d3dUtility.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Locator.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Trace.h" />
     <ClInclude Include="Utility.h" />

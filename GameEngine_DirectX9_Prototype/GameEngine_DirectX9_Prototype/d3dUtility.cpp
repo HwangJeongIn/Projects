@@ -144,7 +144,7 @@ bool d3d::InitD3D(
 	return true;
 }
 
-int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void) )
+int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void), Scene & scene)
 {
 	MSG msg;
 	::ZeroMemory(&msg, sizeof(MSG));
@@ -164,7 +164,7 @@ int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void) )
 			//float currTime  = (float)timeGetTime();
 			//float timeDelta = (currTime - lastTime);// *0.001f;
 			
-			(Scene::getInstance()->*ptr_display)();
+			(scene.*ptr_display)();
 
 			//char t[100]{};
 			////_itoa_s(timeDelta, t, 10);

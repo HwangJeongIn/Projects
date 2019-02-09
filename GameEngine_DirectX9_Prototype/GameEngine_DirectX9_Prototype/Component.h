@@ -11,8 +11,8 @@ class GameObject;
 class Component
 {
 private:
-	GameObject * gameObject;
-	Transform * transform;
+	// 외부에서 삽입삭제가 일어 날 수 있기 때문에 레퍼런스형으로 하지 않았다. // 좀더 알아봐야함
+
 
 protected:
 	// GameObject클래스내에서 Components를 계속해서 업데이트 시켜줘야 하기 때문에 friend 등록하였다.
@@ -21,6 +21,9 @@ protected:
 	virtual void fixedUpdate() {}
 	virtual void start() { cout << "Component start" << endl; }
 	virtual void onDestroy(){}
+
+	GameObject * gameObject;
+	Transform * transform;
 
 public:
 	Component(GameObject * go, Transform * tf)
@@ -36,8 +39,7 @@ public:
 
 	// 내부적으로 계속해서 바꿔야 하기 때문에 const선언을 해주지 않았다.
 	// ex) 위치정보 변경 > GameObject정보변경 + Transform정보변경
-	Transform * getTransform() { return transform; }
-	GameObject * getGameObject() { return gameObject; }
+
 
 	// read only version
 	/*
@@ -69,7 +71,7 @@ public:
 	// 여기서 const객체를 입력파라미터로 받아올 수 없는 이유는 Component객체를 초기화할때 필요한정보는 계속해서 변경되는 정보이기 때문에
 	// const Transform & other로 받으면 Component를 초기화할때 Transform내부의 GameObject와 Transform를 read only로 밖에 받아올 수 없다.
 	Transform(Transform & other)
-		: position(other.position), rotation(other.rotation), scale(other.scale), Component(other.getGameObject(), this) {}
+		: position(other.position), rotation(other.rotation), scale(other.scale), Component(other.gameObject, this) {}
 
 	virtual ~Transform()
 	{

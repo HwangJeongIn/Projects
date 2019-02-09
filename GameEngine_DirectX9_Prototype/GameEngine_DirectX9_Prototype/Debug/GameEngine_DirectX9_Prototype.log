@@ -1,28 +1,37 @@
-﻿  Component.cpp
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(112): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(134): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(189): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(38): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(62): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(70): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-  코드를 생성하고 있습니다...
-  컴파일하고 있습니다...
-  d3dUtility.cpp
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(112): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(134): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(189): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(38): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(62): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.h(70): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\administrator\documents\visual studio projects\gameengine_directx9_prototype\gameengine_directx9_prototype\d3dutility.cpp(175): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\stdio.h(1769): note: 'sprintf' 선언을 참조하십시오.
-  코드를 생성하고 있습니다...
-  건너뛰고 있습니다... (관련된 변경 내용 없음)
-  main.cpp
+﻿  Utility.cpp
   Trace.cpp
   Scene.cpp
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(114): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(136): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(191): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\scene.cpp(41): warning C4477: 'sprintf' : 서식 문자열 '%f'에 'double' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'clock_t'입니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\scene.cpp(41): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\stdio.h(1769): note: 'sprintf' 선언을 참조하십시오.
   GameObject.cpp
-  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\Administrator\Documents\Visual Studio Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
-  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\Administrator\Documents\Visual Studio Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(114): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(136): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(191): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.cpp(23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.cpp(32): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.cpp(50): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\gameobject.cpp(58): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  d3dUtility.cpp
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(114): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(136): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(191): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Component.cpp
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(114): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(136): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(191): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  main.cpp
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(114): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(136): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(191): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Locator.cpp
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(114): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(136): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(191): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  camera.cpp
+  코드를 생성하고 있습니다...
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)

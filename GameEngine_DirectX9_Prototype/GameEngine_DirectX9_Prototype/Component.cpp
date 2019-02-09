@@ -13,12 +13,12 @@ void MoveScript::start()
 
 void MoveScript::update()
 {
-	string temp; getGameObject()->getPath(temp);
-	cout << "MS update :: " << getGameObject()->getName() << " : " << temp << endl;
+	//string temp; gameObject->getPath(temp);
+	//cout << "MS update :: " << gameObject->getName() << " : " << temp << endl;
 
-	if (InputManager::GetKeyDown(KeyCode::Space))
-	{
-  		if (getGameObject()->getTag() == "player1")
-			Scene::getInstance()->Destroy(getGameObject());
-	}
+	//if (InputManager::GetKeyDown(KeyCode::Space))
+	//{
+ // 		if (gameObject->getTag() == "player1")
+	//		gameObject->getScene().Destroy(gameObject);
+	//}
 }

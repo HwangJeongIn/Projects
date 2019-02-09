@@ -12,13 +12,12 @@
 
 #include "d3dUtility.h"
 #include "camera.h"
+#include "Locator.h"
 #include "Scene.h"
-
 //
 // Globals
 //
 
-IDirect3DDevice9* Device = 0; 
 
 const int Width  = 640;
 const int Height = 480;
@@ -28,7 +27,7 @@ Camera TheCamera(Camera::LANDOBJECT);
 //
 // Framework functions
 //
-bool Setup()
+/*bool Setup()
 {
 	//
 	// Setup a basic scene.  The scene will be created the
@@ -51,19 +50,20 @@ bool Setup()
 	Device->SetTransform(D3DTS_PROJECTION, &proj);
 
 
-	Scene::getInstance();
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
 
+
+
 	return true;
-}
+}*/
 
 void Cleanup()
 {
 	// pass 0 for the first parameter to instruct cleanup.
 	d3d::DrawBasicScene(0, 0.0f);
 }
-
+/*
 bool Display(float timeDelta)
 {
 	if( Device )
@@ -128,7 +128,7 @@ bool Display(float timeDelta)
 	}
 	return true;
 }
-
+*/
 //
 // WndProc
 //
@@ -157,27 +157,60 @@ int WINAPI WinMain(HINSTANCE hinstance,
 				   PSTR cmdLine,
 				   int showCmd)
 {
+	IDirect3DDevice9* device = 0;
+
+
 	if(!d3d::InitD3D(hinstance,
-		Width, Height, true, D3DDEVTYPE_HAL, &Device))
+		Width, Height, true, D3DDEVTYPE_HAL, &device))
 	{
 		::MessageBox(0, "InitD3D() - FAILED", 0, 0);
 		return 0;
 	}
 		
-	if(!Setup())
-	{
-		::MessageBox(0, "Setup() - FAILED", 0, 0);
-		return 0;
-	}
+	//if(!Setup())
+	//{
+	//	::MessageBox(0, "Setup() - FAILED", 0, 0);
+	//	return 0;
+	//}
+
+
+	d3d::DrawBasicScene(device, 0.0f);
+
+	D3DXMATRIX proj;
+	D3DXMatrixPerspectiveFovLH(
+		&proj,
+		D3DX_PI * 0.25f, // 45 - degree
+		(float)Width / (float)Height,
+		1.0f,
+		1000.0f);
+	device->SetTransform(D3DTS_PROJECTION, &proj);
+
+
+	Trace::LoadFileNames();
+	Trace::Clear("TAG_DEBUG");
+
+	/*
+	서비스 등록
+	: Scene / Device
+	*/
+	Locator::provideScene();
+	Locator::provideDevice(device);
+	GameObject * camera1 = GameObject::Instantiate();
+	Scene & scene = camera1->getScene();
+	
+	/*
+	Scene의 카메라와 기본 월드 세팅을 해준다.
+	*/
+	//scene.Instantiate
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
-	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/ );
+	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/,scene );
 
 	// void(*ptr_display)(void)
 	Cleanup();
 
-	Device->Release();
+	device->Release();
 
 	return 0;
 }

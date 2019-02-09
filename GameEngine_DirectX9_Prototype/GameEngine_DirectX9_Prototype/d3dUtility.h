@@ -31,7 +31,7 @@ namespace d3d
 		D3DDEVTYPE deviceType,     // [in] HAL or REF
 		IDirect3DDevice9** device);// [out]The created device.
 
-	int EnterMsgLoop(void(Scene::*ptr_display)(void));
+	int EnterMsgLoop(void(Scene::*ptr_display)(void), Scene & scene);
 
 	LRESULT CALLBACK WndProc(
 		HWND hwnd,
