@@ -195,7 +195,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	*/
 	Locator::provideScene();
 	Locator::provideDevice(device);
-	GameObject * camera1 = GameObject::Instantiate();
+	GameObject * camera1 = GameObject::Instantiate("mainCamera","Camera");
 	Scene & scene = camera1->getScene();
 	
 	/*

@@ -11,7 +11,10 @@ GameObject::GameObject(const string & name, const string & tag,
 	//// Transform은 필수 컴포넌트 / 파라미터로 잘못들어오면 객체생성에 실패한것이기 때문에 리턴한다.
 	//if (!transform) return;
 
-	this->components.push_back(transform);
+	// transform은 따로 작업해주고 싶어서 넣어주지 않았다.
+	// 렌더링해야하는 객체는 Transform 컴포넌트에서 월드좌표계 포지션을 받아서 렌더링한다.
+
+	// this->components.push_back(transform);
 
 
 	// 나중에 안쓸수도 있음 아래에있는것들
@@ -114,6 +117,10 @@ int GameObject::getPath(string & path)
 
 	return depth;
 }
+
+
+
+
 
 void GameObject::update()
 {

@@ -23,7 +23,11 @@ private:
 
 	virtual ~GameObject();
 
+
 public:
+	/*
+	중개자를 이용하여 사용할 시스템 포워딩
+	*/
 	Scene & getScene();
 	IDirect3DDevice9 & getDevice();
 
@@ -41,7 +45,7 @@ public:
 
 	// Transform은 고정적으로 GameObject와 함께하기 때문에 따로 set해줄필요는없다.
 	void setParent(GameObject * parent);
-
+	vector<GameObject *> & getChildren() { return children; }
 
 	// 현재 깊이를 반환하고 / 파라미터로 string 객체를 레퍼런스형으로 받아서 내부에서 초기화시켜준다.
 	// 깊이는 0기준 부모객체가 없는것이다.
@@ -109,6 +113,11 @@ public:
 			delete temp;
 			return;
 		}
+		// 수정됨 :: 외부에서 컴포넌트를 생성할 수 없다. protected이기 때문에
+		// 외부에서 생성이 필요한 경우도 있을 것 같아서 다시 풀었다.
+		// 여러가지 컴포넌트를 모아놨다가 생성하고 싶을때? 객체 자체는 필요없고 컴포넌트만 필요한경우?
+		
+		// 컴포넌트를 추가한다. 
 
 		components.push_back(temp);
 	}

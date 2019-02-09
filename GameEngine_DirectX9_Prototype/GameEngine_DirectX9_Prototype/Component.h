@@ -25,13 +25,11 @@ protected:
 	GameObject * gameObject;
 	Transform * transform;
 
+
 public:
 	Component(GameObject * go, Transform * tf)
-		: gameObject(go), transform(tf) 
-	{
-		start();
-	}
-
+		: gameObject(go), transform(tf)
+	{}
 	virtual ~Component()
 	{
 		onDestroy();
@@ -56,13 +54,14 @@ private:
 	Vector3 position;
 	Vector3 rotation;
 	Vector3 scale;
-
+	// 현재 위치의 최신화 여부를 알기 위한 더티플래그
+	bool dirty = false;
 protected:
-	virtual void start() { cout << "Transform start" << endl; }
+	// virtual void start() { cout << "Transform start" << endl; }
 
 public:
-	Transform(GameObject * go, 
-		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One )
+	Transform(GameObject * go,
+		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One)
 		: position(position), rotation(rotation), scale(scale), Component(go, this)
 	{
 		start();
@@ -82,21 +81,23 @@ public:
 	const Vector3 & getRotation() const { return rotation; }
 	const Vector3 & getScale() const { return scale; }
 
-	void setPostition(const Vector3 & other) { position = other; }
-	void setRotation(const Vector3 & other) { rotation = other; }
+	void transformUpdate(bool dirty);
+
+	void setPostition(const Vector3 & other) { position = other; dirty = true; }
+	void setRotation(const Vector3 & other) { rotation = other; dirty = true; }
 	void setScale(const Vector3 & other) { scale = other; }
 	void setTransform(const Vector3 & position, const Vector3 & rotation, const Vector3 & scale)
 	{
-		this->position = position;
-		this->rotation = rotation;
-		this->scale = scale;
+		setPostition(position);
+		setRotation(rotation);
+		setScale(scale);
 	}
 
 	void setTransform(const Transform & other)
 	{
-		position = other.position;
-		rotation = other.rotation;
-		scale = other.scale;
+		setPostition(other.position);
+		setRotation(other.rotation);
+		setScale(other.scale);
 	}
 
 };
