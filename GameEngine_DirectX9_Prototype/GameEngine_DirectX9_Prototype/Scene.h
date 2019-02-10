@@ -10,6 +10,7 @@
 #include "Trace.h"
 #include "d3dUtility.h"
 #include <chrono>
+#include <ctime>
 
 
 // 전체적인 게임루프가 돌아가는 클래스
@@ -20,6 +21,13 @@ class Locator;
 
 class Scene
 {
+public :
+	enum MainObjTag
+	{
+		MOT_MAINCAMERA,
+		MOT_LIGHT
+	};
+
 private :
 	string name;
 	vector<GameObject *> rootGameObjects;
@@ -33,6 +41,11 @@ private :
 	map<string, GameObject *> gameObjectsTable;
 
 	// 부모객체가 있는 객체들을 저장하기 위한 table
+
+
+	// 주요한 값들을 빠르게 얻어오기 위한 테이블이다
+	// 카메라, 빛 등등
+	map<MainObjTag, GameObject *> mainObjectsTable;
 
 	// 60프레임일때 1프레임당 시간
 	static const DWORD MS_PER_FRAME = 16;
@@ -50,6 +63,7 @@ protected :
 	virtual ~Scene(){}
 
 public :
+
 	friend class Locator;
 	virtual void gameLoop();
 	virtual void update();
@@ -59,6 +73,10 @@ public :
 	virtual void unregisterGameObject(GameObject * other);
 	virtual void baseInstantiate(GameObject * other, bool rootObj);
 	virtual void baseDestroy(GameObject * other, bool rootObj);
+
+	void registerMainObject(GameObject * other, MainObjTag tag);
+	void unregisterMainObject(GameObject * other, MainObjTag tag);
+
 
 };
 

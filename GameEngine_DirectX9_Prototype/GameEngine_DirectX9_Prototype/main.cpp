@@ -174,7 +174,21 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//}
 
 
-	d3d::DrawBasicScene(device, 0.0f);
+	//d3d::DrawBasicScene(device, 0.0f);
+	D3DXVECTOR3 pos(4.0f, 4.0f, -13.0f);
+	D3DXVECTOR3 target(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
+
+	D3DXMATRIX V;
+	D3DXMatrixLookAtLH(
+		&V,
+		&pos,
+		&target,
+		&up);
+
+	device->SetTransform(D3DTS_VIEW, &V);
+
+
 
 	D3DXMATRIX proj;
 	D3DXMatrixPerspectiveFovLH(
@@ -193,15 +207,16 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	서비스 등록
 	: Scene / Device
 	*/
-	Locator::provideScene();
+	Locator::provideScene(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
-	GameObject * camera1 = GameObject::Instantiate("mainCamera","Camera");
-	Scene & scene = camera1->getScene();
 	
 	/*
 	Scene의 카메라와 기본 월드 세팅을 해준다.
 	*/
-	//scene.Instantiate
+	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
+	mainCamera->addComponent<MainCamera>();
+
+	Scene & scene = mainCamera->getScene();
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용

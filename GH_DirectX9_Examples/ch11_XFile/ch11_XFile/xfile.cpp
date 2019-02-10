@@ -228,7 +228,7 @@ bool Display(float timeDelta)
 		// Render
 		//
 
-		Device->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0);
+		Device->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
 		Device->BeginScene();
 
 		for(int i = 0; i < Mtrls.size(); i++)

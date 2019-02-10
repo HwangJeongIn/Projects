@@ -254,7 +254,7 @@ public:
 		// 생성되는 과정이기 때문에 오버라이딩이 적용되지 않는다 // 부모생성완료(이과정에서 자식의 재정의함수를 찾을수없다.) > 자식생성완료
 		start();
 	}
-
+	
 	virtual ~MoveScript()
 	{
 		onDestroy();
@@ -262,7 +262,19 @@ public:
 
 };
 
-
+//class Scene;
+//enum MainObjTag;
+// 메인 카메라 오브젝트가 가지는 컴포넌트로 생성과 삭제시 메인 오브젝트 테이블에 등록 삭제를 해준다.
+class MainCamera : public Component
+{
+private :
+	/*Scene::MainObjTag*/unsigned char mainObjTag;
+protected :
+public :
+	MainCamera(GameObject * go, Transform * tf);
+	virtual ~MainCamera();
+	void getViewMatrix(D3DXMATRIX * V);
+};
 
 
 #endif

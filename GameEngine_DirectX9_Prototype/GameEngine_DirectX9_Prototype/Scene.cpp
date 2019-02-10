@@ -14,8 +14,18 @@
 		// gameObjects[0]->addChild("player name1", "player1");
 
 	}
+
 	void Scene::gameLoop()
 	{
+		// 카메라는 씬이 시작하기 전에 등록해주었다.
+		// 만약 등록된 카메라가 없으면 게임 루프는 돌지 않는다.
+		if (mainObjectsTable.find(MOT_MAINCAMERA) == mainObjectsTable.end()) return;
+		IDirect3DDevice9 & device_s = mainObjectsTable[MOT_MAINCAMERA]->getDevice();
+
+		/*
+		기본적인 월드를 계산해서 그린다.
+		*/
+
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
 		if (previousTime == 0)
 			previousTime = clock();
@@ -29,7 +39,41 @@
 		// 프레임간 간격 deltaTime을 한 프레임당 업데이트 함으로써 일정한 계산을 할 수 있도록 제공해줄 생각이다.
 		// 그러면 빠른 컴퓨터에서는 deltaTime의 값이 적게 나와서 적은 값을 계산하게 되고
 		// 느린 컴퓨터에서는 deltaTime의 값이 크게나와서 큰 값을 계산하게 된다.
+
+
+		//D3DXVECTOR3 position(0.0f, 0.0f, -3.0f);
+		//D3DXVECTOR3 target(0.0f, 0.0f, 0.0f);
+		//D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
+		//D3DXMATRIX V;
+		//D3DXMatrixLookAtLH(&V, &position, &target, &up);
+
+		////TheCamera.getViewMatrix(&V);
+		//device_s.SetTransform(D3DTS_VIEW, &V);
+
+
+		ID3DXMesh* Teapot = 0;
+		D3DXCreateTeapot(&device_s, &Teapot, 0);
+		// 화면을 지워준다.
+		device_s.Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xf0f00f, 1.0f, 0);
+
+		// 바라볼 방향 정하기
+
+
+		// 중간에 렌더링 작업도 들어가기 때문에 씬을 그리는 작업을 해준다.
+		device_s.BeginScene();
+
+		Teapot->DrawSubset(0);
+
 		update();
+
+
+		device_s.EndScene();
+
+		device_s.Present(0, 0, 0, 0);
+
+		Sleep(30);
+
+		return;
 
 		clock_t temp = currentTime - previousTime;
 		FrameTime::setDeltaTime(temp);
@@ -185,5 +229,23 @@
 		}
 	}
 
+	void Scene::registerMainObject(GameObject * other, MainObjTag tag)
+	{
+		// 널포인터가 아닐때만 작업
+		if (!other) return;
 
+		// 맵에서 확인해보고 등록되지 않았다면 등록한다.
+		if(mainObjectsTable.find(tag) == mainObjectsTable.end())
+			mainObjectsTable[tag] = other;
+	}
+
+	void Scene::unregisterMainObject(GameObject * other, MainObjTag tag)
+	{
+		// 널포인터가 아닐때만 작업
+		if (!other) return;
+		
+		// 맵에서 확인해보고 등록되어 있으면 삭제한다.
+		if (mainObjectsTable.find(tag) != mainObjectsTable.end())
+			mainObjectsTable.erase(tag);
+	}
 
