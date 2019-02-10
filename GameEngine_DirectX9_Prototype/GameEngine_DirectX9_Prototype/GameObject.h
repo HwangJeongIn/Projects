@@ -103,7 +103,7 @@ public:
 	// Transform 컴포넌트 제외 모든 컴포넌트는 생성자에서 입력파라미터로
 	// GameObject * / Transform * 차례로 받도록 해주어야한다.
 	template <typename T>
-	void addComponent()
+	T * addComponent()
 	{
 		T* temp = new T(this, this->getTransform());
 
@@ -111,7 +111,7 @@ public:
 		if (dynamic_cast<Component*>(temp) == nullptr)
 		{
 			delete temp;
-			return;
+			return nullptr;
 		}
 		// 수정됨 :: 외부에서 컴포넌트를 생성할 수 없다. protected이기 때문에
 		// 외부에서 생성이 필요한 경우도 있을 것 같아서 다시 풀었다.
@@ -120,6 +120,7 @@ public:
 		// 컴포넌트를 추가한다. 
 
 		components.push_back(temp);
+		return temp;
 	}
 
 

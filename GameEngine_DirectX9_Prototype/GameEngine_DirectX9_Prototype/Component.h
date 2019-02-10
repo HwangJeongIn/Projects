@@ -54,17 +54,32 @@ private:
 	Vector3 position;
 	Vector3 rotation;
 	Vector3 scale;
+
+
+
+	Vector3 right;
+	Vector3 up;
+	Vector3 forward;
+
+	static const D3DXVECTOR3 WorldRight_DX;
+	static const D3DXVECTOR3 WorldUp_DX;
+	static const D3DXVECTOR3 WorldForward_DX;
+
+
 	// 현재 위치의 최신화 여부를 알기 위한 더티플래그
-	bool dirty = false;
+	bool dirty;
 protected:
 	// virtual void start() { cout << "Transform start" << endl; }
 
 public:
 	Transform(GameObject * go,
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One)
-		: position(position), rotation(rotation), scale(scale), Component(go, this)
+		: position(position), rotation(rotation), scale(scale), right{1,0,0}, up{ 0,1,0 }, forward{ 0,0,1 }, dirty(true), Component(go, this)
 	{
 		start();
+		// 절댓값 360 * n 날린다 + 이객체의 right up forward 벡터 계산
+		setRotation(rotation);
+
 	}
 
 	// 여기서 const객체를 입력파라미터로 받아올 수 없는 이유는 Component객체를 초기화할때 필요한정보는 계속해서 변경되는 정보이기 때문에
@@ -81,21 +96,158 @@ public:
 	const Vector3 & getRotation() const { return rotation; }
 	const Vector3 & getScale() const { return scale; }
 
+	const Vector3 & getRight() const { return right; }
+	const Vector3 & getForward() const { return forward; }
+	const Vector3 & getUp() const { return up; }
+
+	Vector3 forword() const
+	{
+		D3DXVECTOR3 forward_DX{ 0,0,1 };
+	}
+
 	void transformUpdate(bool dirty);
 
-	void setPostition(const Vector3 & other) { position = other; dirty = true; }
-	void setRotation(const Vector3 & other) { rotation = other; dirty = true; }
+	void setDirectionVectorWithRotation_DX()
+	{
+		D3DXMATRIX T;
+
+		D3DXVECTOR3 right_DX{ 1,0,0 };
+		D3DXVECTOR3 up_DX{ 0,1,0 };
+		D3DXVECTOR3 forward_DX{ 0,0,1 };
+
+
+		// 월드 방향 벡터기준으로 각도만큼 각각을 회전시켜서 객체의 방향벡터를 구해준다.
+		// 월드벡터 기준 pitch
+		D3DXMatrixRotationAxis(&T, &WorldRight_DX, rotation.getX());
+		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
+		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
+
+		// 월드벡터 기준 yaw
+		D3DXMatrixRotationAxis(&T, &WorldUp_DX, rotation.getY());
+		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
+		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
+
+		// 월드벡터 기준 roll
+		D3DXMatrixRotationAxis(&T, &WorldForward_DX, rotation.getZ());
+		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
+		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
+
+		Vector3::ToVector3(right, right_DX);
+		Vector3::ToVector3(up, up_DX);
+		Vector3::ToVector3(forward, forward_DX);
+
+	}
+
+	/*
+		void pitch_DX(float angle)
+	{
+		D3DXMATRIX T;
+		D3DXVECTOR3 right_DX;
+		D3DXVECTOR3 up_DX;
+		D3DXVECTOR3 forward_DX;
+
+		Vector3::ToD3DXVECTOR3(right_DX, right);
+		Vector3::ToD3DXVECTOR3(up_DX, up);
+		Vector3::ToD3DXVECTOR3(forward_DX, forward);
+
+		D3DXMatrixRotationAxis(&T, &right_DX, angle);
+
+		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
+		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
+
+		Vector3::ToVector3(up, up_DX);
+		Vector3::ToVector3(forward, forward_DX);
+	}
+
+	void yaw_DX(float angle)
+	{
+		D3DXMATRIX T;
+		D3DXVECTOR3 right_DX;
+		D3DXVECTOR3 up_DX;
+		D3DXVECTOR3 forward_DX;
+
+		Vector3::ToD3DXVECTOR3(right_DX, right);
+		Vector3::ToD3DXVECTOR3(up_DX, up);
+		Vector3::ToD3DXVECTOR3(forward_DX, forward);
+
+		D3DXMatrixRotationAxis(&T, &up_DX, angle);
+
+		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
+		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
+
+		Vector3::ToVector3(right, right_DX);
+		Vector3::ToVector3(forward, forward_DX);
+	}
+
+	void roll_DX(float angle)
+	{
+		D3DXMATRIX T;
+		D3DXVECTOR3 right_DX;
+		D3DXVECTOR3 up_DX;
+		D3DXVECTOR3 forward_DX;
+
+		Vector3::ToD3DXVECTOR3(right_DX, right);
+		Vector3::ToD3DXVECTOR3(up_DX, up);
+		Vector3::ToD3DXVECTOR3(forward_DX, forward);
+
+		D3DXMatrixRotationAxis(&T, &forward_DX, angle);
+
+		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
+		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
+
+		Vector3::ToVector3(up, up_DX);
+		Vector3::ToVector3(right, right_DX);
+	}
+	*/
+
+
+
+	float constrainLessThan360(float num)
+	{
+		// 절댓값이 360이 넘어가면 제한한다.
+		int quotient = num / 360;
+		num += -(360 * quotient);
+		return num;
+	}
+
+	void setPosition(const Vector3 & other) { position = other; dirty = true; }
+	void setRotation(const Vector3 & other) 
+	{
+		rotation.setX(constrainLessThan360(other.getX())); 
+		rotation.setY(constrainLessThan360(other.getY()));
+		rotation.setZ(constrainLessThan360(other.getZ()));
+		setDirectionVectorWithRotation_DX();
+		dirty = true;
+	}
 	void setScale(const Vector3 & other) { scale = other; }
+
+	void setPosition(float x, float y, float z) 
+	{ 
+		position.setX(constrainLessThan360(x));
+		position.setY(constrainLessThan360(y));
+		position.setZ(constrainLessThan360(z));
+		dirty = true;
+	}
+	void setRotation(float x, float y, float z)
+	{
+		rotation.setX(constrainLessThan360(x));
+		rotation.setY(constrainLessThan360(y)); 
+		rotation.setZ(constrainLessThan360(z));
+		setDirectionVectorWithRotation_DX();
+		dirty = true;
+	}
+	void setScale(float x, float y, float z) { scale = { x,y,z }; }
+
 	void setTransform(const Vector3 & position, const Vector3 & rotation, const Vector3 & scale)
 	{
-		setPostition(position);
+		setPosition(position);
 		setRotation(rotation);
 		setScale(scale);
 	}
 
 	void setTransform(const Transform & other)
 	{
-		setPostition(other.position);
+		setPosition(other.position);
 		setRotation(other.rotation);
 		setScale(other.scale);
 	}
@@ -269,10 +421,12 @@ class MainCamera : public Component
 {
 private :
 	/*Scene::MainObjTag*/unsigned char mainObjTag;
+	virtual void update();
 protected :
 public :
 	MainCamera(GameObject * go, Transform * tf);
 	virtual ~MainCamera();
+	void setViewSpace();
 	void getViewMatrix(D3DXMATRIX * V);
 };
 

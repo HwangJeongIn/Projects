@@ -215,6 +215,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	*/
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
+	mainCamera->getTransform()->setPosition(0, 0, -30);
 
 	Scene & scene = mainCamera->getScene();
 
