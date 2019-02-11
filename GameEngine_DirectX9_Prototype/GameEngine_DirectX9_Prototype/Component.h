@@ -51,15 +51,20 @@ public:
 class Transform : public Component
 {
 private:
+	// 3개의 값은 만약에 root객체라면 월드좌표계 기준으로 설정되어있고
+	// child객체라면 parent객체기준으로 설정되어있다.
 	Vector3 position;
 	Vector3 rotation;
 	Vector3 scale;
 
-
-
 	Vector3 right;
 	Vector3 up;
 	Vector3 forward;
+
+
+	D3DXMATRIX transformMatrix_DX;
+	D3DXMATRIX rotationMatrix_DX;
+	D3DXMATRIX positionMatrix_DX;
 
 	static const D3DXVECTOR3 WorldRight_DX;
 	static const D3DXVECTOR3 WorldUp_DX;
@@ -69,7 +74,14 @@ private:
 	// 현재 위치의 최신화 여부를 알기 위한 더티플래그
 	bool dirty;
 protected:
-	// virtual void start() { cout << "Transform start" << endl; }
+	virtual void start()
+	{ 		
+		// 절댓값 360 * n 날린다 + 이객체의 right up forward 벡터 계산
+		setRotation(rotation);
+		D3DXMatrixIdentity(&transformMatrix_DX);
+		D3DXMatrixIdentity(&rotationMatrix_DX);
+		D3DXMatrixIdentity(&positionMatrix_DX);
+	}
 
 public:
 	Transform(GameObject * go,
@@ -77,20 +89,22 @@ public:
 		: position(position), rotation(rotation), scale(scale), right{1,0,0}, up{ 0,1,0 }, forward{ 0,0,1 }, dirty(true), Component(go, this)
 	{
 		start();
-		// 절댓값 360 * n 날린다 + 이객체의 right up forward 벡터 계산
-		setRotation(rotation);
-
 	}
 
 	// 여기서 const객체를 입력파라미터로 받아올 수 없는 이유는 Component객체를 초기화할때 필요한정보는 계속해서 변경되는 정보이기 때문에
 	// const Transform & other로 받으면 Component를 초기화할때 Transform내부의 GameObject와 Transform를 read only로 밖에 받아올 수 없다.
 	Transform(Transform & other)
-		: position(other.position), rotation(other.rotation), scale(other.scale), Component(other.gameObject, this) {}
+		: position(other.position), rotation(other.rotation), scale(other.scale), Component(other.gameObject, this) 
+	{
+		start();		
+	}
 
 	virtual ~Transform()
 	{
 		onDestroy();
 	}
+
+	static const D3DXMATRIX IdentityMatrix_DX;
 
 	const Vector3 & getPosition() const { return position; }
 	const Vector3 & getRotation() const { return rotation; }
@@ -100,13 +114,60 @@ public:
 	const Vector3 & getForward() const { return forward; }
 	const Vector3 & getUp() const { return up; }
 
-	Vector3 forword() const
+	bool getDirty() const { return dirty; }
+
+	void transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix);
+
+	const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
+	void setTransformMatrix_DX()
 	{
-		D3DXVECTOR3 forward_DX{ 0,0,1 };
+		transformMatrix_DX = rotationMatrix_DX * positionMatrix_DX;
+	}
+	
+	const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
+	void setRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
+	{
+		rotationMatrix_DX = parentRotationMatrix * calcLocalRotationMatrix_DX();
 	}
 
-	void transformUpdate(bool dirty);
+	const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
+	void setPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
+	{
+		positionMatrix_DX = parentPositionMatrix * calcLocalPositionMatrix_DX();
+	}
 
+	// 아마로테이션과 포지션을 나누어야 할것같은데 그냥 한번 해보겠음
+	// 그 이유는 부모의 로테이션 > 포지션이동 > 자식의 로테이션 > 포지션이동 
+	// 자식의 로테이션에서 월드 0지점 중심으로 회전할듯하다
+	// 부모의 로테이션 행렬값의 곱과 부모의 포지션 행렬값의 곱을 받아와야한다.
+	D3DXMATRIX calcLocalRotationMatrix_DX()
+	{
+		// 이 함수가 필요한 이유는 로컬기준으로 계산을 해주고 월드기준으로 계산하기 위해서
+		// WorldMatrix = 부모객체의 Matrix * LocalMatrix 해주면 된다.
+
+		// 만약에 루트 객체라면
+		// WorldMatrix = 단위행렬 * LocalMatrix = LocalMatrix
+
+		// 로테이션 > 포지션
+
+		D3DXMATRIX T;
+		D3DXMATRIX temp;
+		D3DXMatrixIdentity(&T);
+		D3DXMatrixMultiply(&T, &T, D3DXMatrixRotationX(&temp, rotation.getX()));
+		D3DXMatrixMultiply(&T, &T, D3DXMatrixRotationY(&temp, rotation.getY()));
+		D3DXMatrixMultiply(&T, &T, D3DXMatrixRotationZ(&temp, rotation.getZ()));
+
+		return T;
+	}
+
+	D3DXMATRIX calcLocalPositionMatrix_DX()
+	{
+		D3DXMATRIX T;
+		D3DXMatrixTranslation(&T, getPosition().getX(), getPosition().getY(), getPosition().getZ());
+		return T;
+	}
+
+	// 로테이션이 바뀔때마다 최신화 된다.
 	void setDirectionVectorWithRotation_DX()
 	{
 		D3DXMATRIX T;
@@ -115,6 +176,9 @@ public:
 		D3DXVECTOR3 up_DX{ 0,1,0 };
 		D3DXVECTOR3 forward_DX{ 0,0,1 };
 
+		/*
+		로테이션 순서 생각해보기
+		*/
 
 		// 월드 방향 벡터기준으로 각도만큼 각각을 회전시켜서 객체의 방향벡터를 구해준다.
 		// 월드벡터 기준 pitch
@@ -254,32 +318,29 @@ public:
 
 };
 
+// X파일을 통한 메쉬생성 컴포넌트
+// 나중에 FBX를 통해 받아올수 있게 만들예정 FBX SDK 학습중
 class MeshRenderer : public Component
 {
 private:
 	ID3DXMesh*  mesh;
 	vector<D3DMATERIAL9> mtrls;
 	vector<IDirect3DTexture9*> textures;
-	IDirect3DDevice9* Device;
-
-	void draw()
-	{
-		for (int i = 0; i < mtrls.size(); ++i)
-		{
-			Device->SetMaterial(&mtrls[i]);
-			Device->SetTexture(0, textures[i]);
-			mesh->DrawSubset(i);
-		}
-
-	}
+	IDirect3DDevice9 * device;
+	string fileName;
 
 	// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
 	static const unsigned long DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
 
+	void render();
+	void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag);
+	void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls);
+
+
 protected:
 	virtual void update()
 	{
-		draw();
+		render();
 	}
 	virtual void onDestroy()
 	{
@@ -293,101 +354,15 @@ protected:
 
 public:
 
-	MeshRenderer(GameObject * go, Transform * tf, IDirect3DDevice9* Device, const string & fbxFileName)
-		: Component(go, tf)
-	{
-		if (!Device) return;
-
-		HRESULT hr = 0;
-
-		ID3DXBuffer* adjBuffer = 0;
-		ID3DXBuffer* mtrlBuffer = 0;
-		unsigned long numMtrls = 0;
-
-		// X파일을 읽는다.
-		hr = D3DXLoadMeshFromX(
-			fbxFileName.c_str(),
-			D3DXMESH_MANAGED,
-			Device,
-			&adjBuffer,
-			&mtrlBuffer,
-			0,
-			&numMtrls,
-			&mesh);
-
-		if (FAILED(hr))
-		{
-			::MessageBox(0, "GenMesh - FAILED", 0, 0);
-			return;
-		}
-
-		// 재질이 있을때 내부적으로 처리
-		setMtrlsAndTextures(mtrlBuffer, numMtrls);
-
-		// 사용되었던 재질버퍼를 비워준다.
-		d3d::Release<ID3DXBuffer*>(mtrlBuffer);
-
-		optimizeMesh(adjBuffer);
-
-		// 사용완료한 인접버퍼 릴리즈
-		d3d::Release<ID3DXBuffer*>(adjBuffer); // done w/ buffer
-	}
-
-	void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls)
-	{
-		if (mtrlBuffer == 0 || numMtrls == 0) return;
-
-
-		// D3DXMATERAL 형식으로 읽으려면 타입캐스팅이 필요하다.
-		D3DXMATERIAL* pMtrls = (D3DXMATERIAL*)mtrlBuffer->GetBufferPointer();
-
-		for (int i = 0; i < numMtrls; i++)
-		{
-			// 로드될때 ambient값을 가지지 않으므로 이를 지정한다.
-			pMtrls[i].MatD3D.Ambient = pMtrls[i].MatD3D.Diffuse;
-
-			mtrls.push_back(pMtrls[i].MatD3D);
-
-			if (pMtrls[i].pTextureFilename != 0)
-			{
-				// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
-				IDirect3DTexture9* tex = 0;
-				D3DXCreateTextureFromFile(
-					Device,
-					pMtrls[i].pTextureFilename,
-					&tex);
-
-				// 텍스처가 있을때 그 텍스처를 넣어주고
-				textures.push_back(tex);
-			}
-			else
-			{
-				// 없을때도 서브셋과 같은 인덱스 번호를 맞춰주기 위해서 널값을 넣어준다.
-				textures.push_back(0);
-			}
-		}
-
-	}
-
-	void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag)
-	{
-		HRESULT hr;
-		hr = mesh->OptimizeInplace(
-			optimizeFlag,
-			(unsigned long*)adjBuffer->GetBufferPointer(),
-			0, 0, 0);
-
-		if (FAILED(hr))
-			::MessageBox(0, "OptimizeMesh - FAILED", 0, 0);
-			
-		
-	}
-
+	MeshRenderer(GameObject * go, Transform * tf);
 
 	virtual ~MeshRenderer()
 	{
 		onDestroy();
 	}
+
+
+	void loadXFile(const string & fileName);
 };
 
 class MoveScript : public Component
@@ -396,7 +371,6 @@ private:
 
 protected:
 	virtual void update();
-	virtual void start();
 
 public:
 	MoveScript(GameObject * go, Transform * tf)
@@ -408,6 +382,29 @@ public:
 	}
 	
 	virtual ~MoveScript()
+	{
+		onDestroy();
+	}
+
+};
+
+class MoveScript_C : public Component
+{
+private:
+
+protected:
+	virtual void update();
+
+public:
+	MoveScript_C(GameObject * go, Transform * tf)
+		: Component(go, tf)
+	{
+		// 만약에 그냥 Component 클래스 생성자 함수바디에서 start()함수 호출?
+		// 생성되는 과정이기 때문에 오버라이딩이 적용되지 않는다 // 부모생성완료(이과정에서 자식의 재정의함수를 찾을수없다.) > 자식생성완료
+		start();
+	}
+
+	virtual ~MoveScript_C()
 	{
 		onDestroy();
 	}

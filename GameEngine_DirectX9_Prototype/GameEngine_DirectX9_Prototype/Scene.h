@@ -68,6 +68,8 @@ public :
 	virtual void gameLoop();
 	virtual void update();
 	virtual void fixedUpdate();
+	virtual void transformUpdate();
+
 	virtual void changeNameIfItExists(GameObject * other);
 	virtual void registerGameObject(GameObject * other);
 	virtual void unregisterGameObject(GameObject * other);

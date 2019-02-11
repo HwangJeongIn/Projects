@@ -4,51 +4,85 @@
 #include "Utility.h"
 
 
-void MoveScript::start()
-{
-	//cout << "Movescript start" << endl;
-	//string temp; getGameObject()->getPath(temp);
-	//cout<<"MS start :: "<<getGameObject()->getName()<<" : " << temp << endl;
-}
-
 void MoveScript::update()
 {
-	//string temp; gameObject->getPath(temp);
-	//cout << "MS update :: " << gameObject->getName() << " : " << temp << endl;
+	//if (::GetAsyncKeyState('Q') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+	//if (::GetAsyncKeyState('E') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
 
-	//if (InputManager::GetKeyDown(KeyCode::Space))
-	//{
- // 		if (gameObject->getTag() == "player1")
-	//		gameObject->getScene().Destroy(gameObject);
-	//}
+
+	//if (::GetAsyncKeyState('Z') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
+	//if (::GetAsyncKeyState('C') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
+
+
+	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
+		transform->setPosition(transform->getPosition() + (transform->getForward()));
+	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
+		transform->setPosition(transform->getPosition() + (-1)*(transform->getForward()));
+
+	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+		transform->setPosition(transform->getPosition() + (transform->getRight()));
+
+	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
+		transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
+
+
+
+	if (::GetAsyncKeyState('N') & 0x8000f)
+			transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+
+	if (::GetAsyncKeyState('M') & 0x8000f)
+			transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+}
+
+void MoveScript_C::update()
+{
+	if (::GetAsyncKeyState('K') & 0x8000f)
+		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+
+	if (::GetAsyncKeyState('L') & 0x8000f)
+		transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
 }
 
 const D3DXVECTOR3 Transform::WorldRight_DX{ 1,0,0 };
 const D3DXVECTOR3 Transform::WorldUp_DX{ 0,1,0 };
 const D3DXVECTOR3 Transform::WorldForward_DX{ 0, 0, 1 };
 
-void Transform::transformUpdate(bool dirty)
+const D3DXMATRIX Transform::IdentityMatrix_DX
+{
+	1,0,0,0,
+	0,1,0,0,
+	0,0,1,0,
+	0,0,0,1
+};
+
+
+void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix)
 {
 	// 비트 연산으로 최종적으로 위에서 최신화 메시지를 받았거나, 
-	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화 하라고 말해준다.
+	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화를 전달해준다.
 
 	dirty |= this->dirty;
 	if (dirty)
 	{
 		// 현재 변환을 부모 변환과 결합해서 계산한다.
+		// 로테이션행렬과 포지션 행렬을 따로 계산해주어야 한다.
+		setRotationMatrix_DX(parentRotationMatrix);
+		setPositionMatrix_DX(parentPositionMatrix);
+		// 최종 transformMatrix = 계산한 로테이션 * 포지션
+		setTransformMatrix_DX();
 		this->dirty = false;
 	}
-	else
-	{
-		// 만약에 더이상 최신화시켜도 되지 않으면 빠져나간다.
-		return;
-	}
+
 
 	vector<GameObject*> & children = gameObject->getChildren();
 
 	for (auto it : children)
 	{
-		it->getTransform()->transformUpdate(dirty);
+		it->getTransform()->transformUpdate(dirty, getRotationMatrix_DX(), getPositionMatrix_DX());
 	}
 
 }
@@ -163,3 +197,114 @@ void MainCamera::getViewMatrix(D3DXMATRIX* v)
 
 }
 
+MeshRenderer::MeshRenderer(GameObject * go, Transform * tf)
+	: Component(go, tf), mesh(nullptr)
+{
+	device = &(gameObject->getDevice());
+}
+
+void MeshRenderer::loadXFile(const string & fileName)
+{
+	this->fileName = fileName;
+
+	HRESULT hr = 0;
+
+	ID3DXBuffer* adjBuffer = 0;
+	ID3DXBuffer* mtrlBuffer = 0;
+	unsigned long numMtrls = 0;
+
+	// X파일을 읽는다.
+	hr = D3DXLoadMeshFromX(
+		this->fileName.c_str(),
+		D3DXMESH_MANAGED,
+		device,
+		&adjBuffer,
+		&mtrlBuffer,
+		0,
+		&numMtrls,
+		&mesh);
+
+	if (FAILED(hr))
+	{
+		::MessageBox(0, "GenMesh - FAILED", 0, 0);
+		return;
+	}
+
+	// 재질이 있을때 내부적으로 처리
+	setMtrlsAndTextures(mtrlBuffer, numMtrls);
+
+	// 사용되었던 재질버퍼를 비워준다.
+	d3d::Release<ID3DXBuffer*>(mtrlBuffer);
+
+	optimizeMesh(adjBuffer);
+
+	// 사용완료한 인접버퍼 릴리즈
+	d3d::Release<ID3DXBuffer*>(adjBuffer); // done w/ buffer
+}
+
+void MeshRenderer::render()
+{
+	if (!mesh) return;
+
+	// 현재 transform행렬로 적용시킨다.
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix_DX());
+
+	// 파일이 로드되어서 값이 있는 경우만 그려준다.
+	for (int i = 0; i < mtrls.size(); ++i)
+	{
+		device->SetMaterial(&mtrls[i]);
+		device->SetTexture(0, textures[i]);
+		mesh->DrawSubset(i);
+	}
+
+}
+
+void MeshRenderer::optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag)
+
+{
+	HRESULT hr;
+	hr = mesh->OptimizeInplace(
+		optimizeFlag,
+		(unsigned long*)adjBuffer->GetBufferPointer(),
+		0, 0, 0);
+
+	if (FAILED(hr))
+		::MessageBox(0, "OptimizeMesh - FAILED", 0, 0);
+
+}
+
+
+void MeshRenderer::setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls)
+{
+	if (mtrlBuffer == 0 || numMtrls == 0) return;
+
+	// D3DXMATERAL 형식으로 읽으려면 타입캐스팅이 필요하다.
+	D3DXMATERIAL* pMtrls = (D3DXMATERIAL*)mtrlBuffer->GetBufferPointer();
+
+	for (int i = 0; i < numMtrls; i++)
+	{
+		// 로드될때 ambient값을 가지지 않으므로 이를 지정한다.
+		pMtrls[i].MatD3D.Ambient = pMtrls[i].MatD3D.Diffuse;
+
+		mtrls.push_back(pMtrls[i].MatD3D);
+
+		if (pMtrls[i].pTextureFilename != 0)
+		{
+			// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
+			IDirect3DTexture9* tex = 0;
+			D3DXCreateTextureFromFile(
+				device,
+				pMtrls[i].pTextureFilename,
+				&tex);
+
+			// 텍스처가 있을때 그 텍스처를 넣어주고
+			textures.push_back(tex);
+		}
+		else
+		{
+			// 없을때도 서브셋과 같은 인덱스 번호를 맞춰주기 위해서 널값을 넣어준다.
+			textures.push_back(0);
+		}
+	}
+
+}

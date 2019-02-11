@@ -152,6 +152,12 @@ void GameObject::fixedUpdate()
 
 }
 
+/*
+Scene의 base작업은 
+루트객체 :: 루트객체 리스트 추가 / 삭제 + 맵에 등록 / 해제
+루트객체X :: 맵에 등록 / 해제
+*/
+
 GameObject * GameObject::getChild(const string & name)
 {
 	/*
@@ -181,7 +187,8 @@ void GameObject::removeChild(GameObject * child)
 {
 	if (!child) return;
 	// 시간복잡도 고려해서 바꿀수있으면 바꿀예정
-	for (auto it = children.begin(); it != children.end(); ++it)
+	auto it = children.begin();
+	for (; it != children.end(); ++it)
 	{
 		// 순회하다가 만약 발견하면 지운다.
 		if (child == *it)
@@ -191,6 +198,13 @@ void GameObject::removeChild(GameObject * child)
 		}
 	}
 
+	// 만약에 발견하지 못한경우라면 그냥 빠져나온다
+	if (it == children.end())return;
+
+	// 발견한경우 맵에 등록된것을 삭제하고
+	child->getScene().baseDestroy(child, child->isRootObj());
+
+	// 실제로 지워준다.
 	delete child;
 
 	// 현재는 루트 객체 기준으로 씬의 오브젝트들이 들어가 있으므로 바로 삭제하면 된다.
@@ -205,9 +219,7 @@ GameObject * GameObject::addChild(GameObject * child)
 	// 먼저 객체 children에 등록해주고
 	children.push_back(child);
 
-	// 현재는 루트 객체 기준으로 씬의 오브젝트들이 들어가 있으므로 바로 등록하면 된다.
-	// 여러가지 관리를 위한 등록을 해준다.
-	// Scene::getInstance()->Instantiate(child);
+	child->getScene().baseInstantiate(child, child->isRootObj());
 
 	return child;
 }
@@ -222,6 +234,7 @@ GameObject * GameObject::addChild(const string & name, const string & tag,
 	this->children.push_back(tempGameObject);
 
 
+	tempGameObject->getScene().baseInstantiate(tempGameObject, tempGameObject->isRootObj());
 	//Scene::getInstance()->Instantiate(tempGameObject);
 
 	return tempGameObject;

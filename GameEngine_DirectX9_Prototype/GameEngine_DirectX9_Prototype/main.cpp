@@ -19,8 +19,8 @@
 //
 
 
-const int Width  = 640;
-const int Height = 480;
+const int Width  = 1280;
+const int Height = 720;
 
 Camera TheCamera(Camera::LANDOBJECT);
 
@@ -167,29 +167,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 		return 0;
 	}
 		
-	//if(!Setup())
-	//{
-	//	::MessageBox(0, "Setup() - FAILED", 0, 0);
-	//	return 0;
-	//}
-
-
-	//d3d::DrawBasicScene(device, 0.0f);
-	D3DXVECTOR3 pos(4.0f, 4.0f, -13.0f);
-	D3DXVECTOR3 target(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
-
-	D3DXMATRIX V;
-	D3DXMatrixLookAtLH(
-		&V,
-		&pos,
-		&target,
-		&up);
-
-	device->SetTransform(D3DTS_VIEW, &V);
-
-
-
 	D3DXMATRIX proj;
 	D3DXMatrixPerspectiveFovLH(
 		&proj,
@@ -199,6 +176,17 @@ int WINAPI WinMain(HINSTANCE hinstance,
 		1000.0f);
 	device->SetTransform(D3DTS_PROJECTION, &proj);
 
+	device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+	D3DXVECTOR3 dir(1.0f, -1.0f, 1.0f);
+	D3DXCOLOR col(1.0f, 1.0f, 1.0f, 1.0f);
+	D3DLIGHT9 light = d3d::InitDirectionalLight(&dir, &col);
+
+	device->SetLight(0, &light);
+	device->LightEnable(0, true);
+	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
+	device->SetRenderState(D3DRS_SPECULARENABLE, true);
 
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
@@ -217,7 +205,29 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -30);
 
+	GameObject * bigShip1 = GameObject::Instantiate("bigShip1", "BigShip");
+	bigShip1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	bigShip1->getTransform()->setPosition(0, 0, 0);
+
+	GameObject * car1 = GameObject::Instantiate("car1", "Car");
+	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
+	car1->addComponent<MoveScript>();
+
+	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
+	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	car1Child1->getTransform()->setPosition(0, 3, 0);
+	car1Child1->addComponent<MoveScript_C>();
+
+	GameObject * car1Child1Child1 = car1Child1->addChild("car1", "Car");
+	car1Child1Child1->addComponent<MeshRenderer>()->loadXFile("car.x");
+	car1Child1Child1->getTransform()->setPosition(0, 3, 0);
+
+	car1->getTransform()->setPosition(0, 0, 5);
+
+
 	Scene & scene = mainCamera->getScene();
+
+
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용

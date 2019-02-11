@@ -14,6 +14,49 @@
 		// gameObjects[0]->addChild("player name1", "player1");
 
 	}
+	ID3DXMesh* Teapot = 0;
+
+	void drawScene(IDirect3DDevice9 & device_s)
+	{
+
+
+		D3DXCreateTeapot(&device_s, &Teapot, 0);
+		D3DXMATRIX W;
+		D3DXMatrixIdentity(&W);
+		device_s.SetTransform(D3DTS_WORLD, &W);
+
+		Teapot->DrawSubset(0);
+
+		D3DXMatrixTranslation(&W, 5, 0, 0);
+
+		device_s.SetTransform(D3DTS_WORLD, &W);
+
+		Teapot->DrawSubset(0);
+
+		D3DXMatrixTranslation(&W, 0, 0, 5);
+
+		device_s.SetTransform(D3DTS_WORLD, &W);
+
+		Teapot->DrawSubset(0);
+
+		D3DXMatrixTranslation(&W, -5, 0, 0);
+
+		device_s.SetTransform(D3DTS_WORLD, &W);
+
+		Teapot->DrawSubset(0);
+
+		D3DXMatrixTranslation(&W, 0, 0, -5);
+
+		device_s.SetTransform(D3DTS_WORLD, &W);
+
+		Teapot->DrawSubset(0);
+
+		D3DXMatrixTranslation(&W, 0, 5, 0);
+
+		device_s.SetTransform(D3DTS_WORLD, &W);
+
+		Teapot->DrawSubset(0);
+	}
 
 	void Scene::gameLoop()
 	{
@@ -52,66 +95,20 @@
 		//mainCamera->getComponent<MainCamera>()->getViewMatrix(&V);
 		//device_s.SetTransform(D3DTS_VIEW, &V);
 
-
-		ID3DXMesh* Teapot = 0;
-		D3DXCreateTeapot(&device_s, &Teapot, 0);
+		
+		// transform 행렬 최신화
+		transformUpdate();
 
 
 		// 화면을 지워준다.
-		device_s.Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xf0f00f, 1.0f, 0);
-
-		// 바라볼 방향 정하기
-
+		device_s.Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0);
 
 		// 중간에 렌더링 작업도 들어가기 때문에 씬을 그리는 작업을 해준다.
 		device_s.BeginScene();
 
-		//Vector3 o{ 1,1,1 };
-		//Vector3 r{ 0,0,1 };
-		//Vector3 f{ 1,0,0 };
-		//Vector3 u;
 
-		//Vector3::Normalized(o,o);
-		//float ttt = Vector3::Dot(o, r);
-		//ttt = Vector3::Dot(f, r);
-		//Vector3::Cross(u, r, f);
-
-		D3DXMATRIX W;
-		D3DXMatrixIdentity(&W);
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-
-		D3DXMatrixTranslation(&W, 5, 0, 0);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 0, 0, 5);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, -5, 0, 0);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 0, 0, -5);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 0, 5, 0);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
+		// 임시
+		//drawScene(device_s);
 
 
 		update();
@@ -122,7 +119,8 @@
 		device_s.Present(0, 0, 0, 0);
 		Sleep(30);
 
-		Teapot->Release();
+		if(Teapot)
+			Teapot->Release();
 
 		return;
 
@@ -168,6 +166,14 @@
 		for (auto it : rootGameObjects)
 		{
 			it->fixedUpdate();
+		}
+	}
+
+	void Scene::transformUpdate()
+	{
+		for (auto it : rootGameObjects)
+		{
+			it->getTransform()->transformUpdate(it->getTransform()->getDirty(),Transform::IdentityMatrix_DX, Transform::IdentityMatrix_DX);
 		}
 	}
 
