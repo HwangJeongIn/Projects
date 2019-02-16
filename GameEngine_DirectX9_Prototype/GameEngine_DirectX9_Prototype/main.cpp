@@ -205,24 +205,35 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -30);
 
-	GameObject * bigShip1 = GameObject::Instantiate("bigShip1", "BigShip");
-	bigShip1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	bigShip1->getTransform()->setPosition(0, 0, 0);
+	//GameObject * bigShip1 = GameObject::Instantiate("bigShip1", "BigShip");
+	//bigShip1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//bigShip1->getTransform()->setPosition(0, 0, 0);
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
 
+	//GameObject * car2 = GameObject::Instantiate("car2", "Car");
+	//car2->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//car2->getTransform()->setPosition(20, 0, 0);
+
 	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
 	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	car1Child1->getTransform()->setPosition(0, 3, 0);
+	car1Child1->getTransform()->setPosition(3, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
 
-	GameObject * car1Child1Child1 = car1Child1->addChild("car1", "Car");
+	GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
+	car1Child2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	car1Child2->getTransform()->setPosition(10, 0, 0);
+
+	//GameObject * car1Child3 = car1->addChild("bigShip3", "BigShip");
+	//car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//car1Child1->getTransform()->setPosition(-7, 0, 0);
+
+	GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
 	car1Child1Child1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child1->getTransform()->setPosition(0, 3, 0);
 
-	car1->getTransform()->setPosition(0, 0, 5);
 
 
 	Scene & scene = mainCamera->getScene();

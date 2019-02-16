@@ -116,25 +116,27 @@ public:
 
 	bool getDirty() const { return dirty; }
 
-	void transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix);
+	//void transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix);
+
+	void transformUpdate(bool dirty, const D3DXMATRIX & parentMatrix);
 
 	const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
-	void setTransformMatrix_DX()
+	void setTransformMatrix_DX(const D3DXMATRIX & parentMatrix)
 	{
-		transformMatrix_DX = rotationMatrix_DX * positionMatrix_DX;
+		transformMatrix_DX = calcLocalRotationMatrix_DX() * parentMatrix * calcLocalPositionMatrix_DX();
 	}
 	
-	const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
-	void setRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
-	{
-		rotationMatrix_DX = parentRotationMatrix * calcLocalRotationMatrix_DX();
-	}
+	//const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
+	//void setRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
+	//{
+	//	rotationMatrix_DX = parentRotationMatrix * calcLocalRotationMatrix_DX();
+	//}
 
-	const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
-	void setPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
-	{
-		positionMatrix_DX = parentPositionMatrix * calcLocalPositionMatrix_DX();
-	}
+	//const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
+	//void setPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
+	//{
+	//	positionMatrix_DX = parentPositionMatrix * calcLocalPositionMatrix_DX();
+	//}
 
 	// 아마로테이션과 포지션을 나누어야 할것같은데 그냥 한번 해보겠음
 	// 그 이유는 부모의 로테이션 > 포지션이동 > 자식의 로테이션 > 포지션이동 
@@ -316,6 +318,7 @@ public:
 		setScale(other.scale);
 	}
 
+
 };
 
 // X파일을 통한 메쉬생성 컴포넌트
@@ -427,5 +430,61 @@ public :
 	void getViewMatrix(D3DXMATRIX * V);
 };
 
+
+// AABB를 이용한 BoxCollider
+// 컴포넌트를 추가하면 좌표를 중심으로 X Y Z 방향
+/*
+Width 가로	X방향
+Depth 세로	Z방향
+Height 높이	Y방향
+으로 정의
+*/
+
+// 고려 사항 
+/*
+1. 충돌처리는 모든 객체에 대해서 Collider를 찾고 객체의 수의 제곱만큼 수행해야할까?
+	충돌체를 가진 객체에 대해서만 처리?
+	충돌체를 가진 객체중 가까운 객체에서만? // 나중에 공간분할(쿼드트리)을 해서 그 공간안에 있는 객체에 대해서만 검사해준다면?
+
+2. max min값은 항상 유지해야할까? 아니면 충돌검사를 할때만 해줘야할까?
+	항상 : 전체적인 연산량은 많아지지만 값을 유지하기 때문에 충돌검사는 빠르다.(transform최신화 더티플래그랑 연계)
+	충돌했을때만 : 전체적인 평소연산량은 별로없지만 충돌시에 max와 min값을 계산을 실시간으로 해줘야 하기 때문에 충돌검사는 느리다.
+
+
+현재 : 충돌체를 가진 객체(루트객체)에 대해서만 처리를 해준다 / 충돌체를
+       min max값을 구하는데 많은 연산이 필요한것이 아니므로 그냥 충돌처리시 계산한다.
+*/
+class BoxCollider : public Component
+{
+private :
+	float width;
+	float height;
+	float depth;
+
+protected :
+public :
+	BoxCollider(GameObject * go, Transform * tf)
+		: Component(go, tf)
+	{
+		start();
+	}
+
+	float calcXMax() const { return transform->getPosition().getX() + width; }
+	float calcXMin() const { return transform->getPosition().getX() - width; }
+	float calcYMax() const { return transform->getPosition().getY() + height; }
+	float calcYMin() const { return transform->getPosition().getY() - height; }
+	float calcZMax() const { return transform->getPosition().getZ() + depth; }
+	float calcZMin() const { return transform->getPosition().getZ() - depth; }
+
+	const bool isCollided(const BoxCollider & other) const
+	{
+		// 중간에 하나라도 한 축에대해서 충돌하지 않았다면 빠져나간다.
+		if (calcXMax() < other.calcXMin() || calcXMin() > other.calcXMax()) return 0;
+		if (calcYMax() < other.calcYMin() || calcYMin() > other.calcYMax()) return 0;
+		if (calcZMax() < other.calcZMin() || calcZMin() > other.calcZMax()) return 0;
+		return 1;
+	}
+
+};
 
 #endif

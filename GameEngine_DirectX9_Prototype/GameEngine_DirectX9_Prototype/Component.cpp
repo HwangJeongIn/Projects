@@ -45,6 +45,11 @@ void MoveScript_C::update()
 
 	if (::GetAsyncKeyState('L') & 0x8000f)
 		transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+
+
+
+	if (::GetAsyncKeyState('P') & 0x8000f)
+		GameObject::Destroy(gameObject);
 }
 
 const D3DXVECTOR3 Transform::WorldRight_DX{ 1,0,0 };
@@ -60,7 +65,7 @@ const D3DXMATRIX Transform::IdentityMatrix_DX
 };
 
 
-void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix)
+void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentMatrix/*, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix*/)
 {
 	// 비트 연산으로 최종적으로 위에서 최신화 메시지를 받았거나, 
 	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화를 전달해준다.
@@ -70,19 +75,22 @@ void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMat
 	{
 		// 현재 변환을 부모 변환과 결합해서 계산한다.
 		// 로테이션행렬과 포지션 행렬을 따로 계산해주어야 한다.
-		setRotationMatrix_DX(parentRotationMatrix);
-		setPositionMatrix_DX(parentPositionMatrix);
+		//setRotationMatrix_DX(parentRotationMatrix);
+		//setPositionMatrix_DX(parentPositionMatrix);
 		// 최종 transformMatrix = 계산한 로테이션 * 포지션
-		setTransformMatrix_DX();
+		setTransformMatrix_DX(parentMatrix);
 		this->dirty = false;
 	}
 
 
 	vector<GameObject*> & children = gameObject->getChildren();
 
+
+	// 현재는 더티플래그가 꺼져있어도 중간 차일드에 켜져있을 가능성이 있기 때문에
+	// 모든 객체에 대해서 전달해준다.
 	for (auto it : children)
 	{
-		it->getTransform()->transformUpdate(dirty, getRotationMatrix_DX(), getPositionMatrix_DX());
+		it->getTransform()->transformUpdate(dirty, getTransformMatrix_DX());
 	}
 
 }

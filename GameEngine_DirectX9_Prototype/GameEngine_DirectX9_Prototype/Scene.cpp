@@ -110,13 +110,14 @@
 		// 임시
 		//drawScene(device_s);
 
-
 		update();
 
-
 		device_s.EndScene();
-
 		device_s.Present(0, 0, 0, 0);
+
+		// 업데이트 되고난후 삭제처리
+		destroyUpdate();
+
 		Sleep(30);
 
 		if(Teapot)
@@ -173,7 +174,37 @@
 	{
 		for (auto it : rootGameObjects)
 		{
-			it->getTransform()->transformUpdate(it->getTransform()->getDirty(),Transform::IdentityMatrix_DX, Transform::IdentityMatrix_DX);
+			it->getTransform()->transformUpdate(it->getTransform()->getDirty(),Transform::IdentityMatrix_DX);
+		}
+	}
+
+	// 일단 충돌되면 안겹치게 움직이는 걸로 하자.
+	void Scene::colliderUpdate()
+	{
+		for (auto it1 : rootGameObjects)
+		{
+			
+			for (auto it2 : rootGameObjects)
+			{
+
+			}
+		}
+	}
+
+	void Scene::destroyUpdate()
+	{
+		auto it = rootGameObjects.begin();
+		auto end = rootGameObjects.end();
+		auto postIt = it;
+		// 자식객체가 삭제되었는지 알기 위한 플래그
+		while (it != end)
+		{
+			// 미리 다음걸 받아서 현재를 업데이트 시키고 나중에 최신화 시킨다
+			// 중간에 삭제된 반복자를 가리키고 있을 가능성이 있기 때문이다.
+			++postIt;
+			(*it)->destroyUpdate();
+
+			it = postIt;
 		}
 	}
 

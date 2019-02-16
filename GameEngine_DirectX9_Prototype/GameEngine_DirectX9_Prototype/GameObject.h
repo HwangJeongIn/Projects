@@ -16,6 +16,10 @@ private:
 	Transform * transform;
 	GameObject * parent;
 
+	// 각 게임 오브젝트를 업데이트 과정에서 이 플래그가 켜져있으면 업데이트를 시켜주지 않고 넘어간다.
+	// 업데이트가 모두 완료된다음에 수행된다.
+	bool destroyed;
+	void setWhetherDestroyed(bool destroyed) { this->destroyed = destroyed; }
 	GameObject(const string & name = "default GO name", const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
 		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr,
@@ -31,6 +35,8 @@ public:
 	Scene & getScene();
 	IDirect3DDevice9 & getDevice();
 
+	const bool isDestroyed() const { return destroyed; }
+ 
 	// read only
 	const string & getTag() const { return tag; }
 	const string & getName() const { return name; }
@@ -54,6 +60,8 @@ public:
 	void update();
 	void fixedUpdate();
 
+	void destroyUpdate();
+
 
 	//vector<Component *> components;
 
@@ -70,7 +78,7 @@ public:
 		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr,
 		vector<Component *> * components = nullptr);
 	static void Destroy(GameObject * other);
-
+	static void FinalDestroy(GameObject * other);
 	//void addChild(const string & name, const string & tag,
 	//	const Vector3 & position, const Vector3 & rotation, const Vector3 & scale,
 	//	vector<GameObject *> *children, vector<Component *> * components);

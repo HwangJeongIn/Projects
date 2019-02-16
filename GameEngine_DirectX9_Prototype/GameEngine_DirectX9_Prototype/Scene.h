@@ -69,6 +69,8 @@ public :
 	virtual void update();
 	virtual void fixedUpdate();
 	virtual void transformUpdate();
+	virtual void colliderUpdate();
+	virtual void destroyUpdate();
 
 	virtual void changeNameIfItExists(GameObject * other);
 	virtual void registerGameObject(GameObject * other);
@@ -78,6 +80,7 @@ public :
 
 	void registerMainObject(GameObject * other, MainObjTag tag);
 	void unregisterMainObject(GameObject * other, MainObjTag tag);
+
 
 
 };

@@ -5,7 +5,7 @@
 GameObject::GameObject(const string & name, const string & tag, 
 	const Vector3 & position, const Vector3 & rotation, const Vector3 & scale,
 	GameObject * parent, vector<GameObject*>* children, vector<Component*>* components)
-	: name(name), tag(tag), transform(new Transform(this, position, rotation, scale)), parent(parent) //, gameObject(this)
+	: name(name), tag(tag), transform(new Transform(this, position, rotation, scale)), parent(parent), destroyed(false) //, gameObject(this)
 {
 	//// Transform초기화
 	//// Transform은 필수 컴포넌트 / 파라미터로 잘못들어오면 객체생성에 실패한것이기 때문에 리턴한다.
@@ -56,14 +56,12 @@ GameObject::~GameObject()
 		}
 	}
 
-	if (children.size() != 0)
+	GameObject * temp = nullptr;
+	while (children.size() !=0)
 	{
-		for (int i = 0; i < children.size(); ++i)
-		{
-			delete children[i];
-		}
+		temp = children.back();
+		FinalDestroy(temp);
 	}
-
 }
 
 Scene & GameObject::getScene()
@@ -124,9 +122,13 @@ int GameObject::getPath(string & path)
 
 void GameObject::update()
 {
-	for (auto it : components)
+	// isDestroyed 플래그가 꺼져있을때만 컴포넌트들을 업데이트 해준다.
+	if (!destroyed)
 	{
-		it->update();
+		for (auto it : components)
+		{
+			it->update();
+		}
 	}
 
 
@@ -140,14 +142,71 @@ void GameObject::update()
 
 void GameObject::fixedUpdate()
 {
-	for (auto it : components)
+	if (!destroyed)
 	{
-		it->fixedUpdate();
+		for (auto it : components)
+		{
+			it->fixedUpdate();
+		}
 	}
 
 	for (auto it : children)
 	{
 		it->fixedUpdate();
+	}
+
+}
+
+
+// erase할때 반복자가 최신화된다.
+// 따라서 더이상 쓸수 없는 반복자.. 새롭게 바뀐 자료형에서의 end와 begin은 그전의 end와 begin과 다르다?
+// 해결책 : 바뀌기전의 리스트의 end를 미리 받아놓는다.
+// 기존 반복자에서 ++it을 할수가 없다.. 못쓰는듯 erase함수를 사용해야할듯
+
+// 차일드 객체를 순회하는 도중 차일드 객체 본인이 부모객체의 차일드리스트에서 삭제되어야 할경우
+// FinalDestroy에서 같이 해주는게 낫다고 생각했다.
+// 다른곳에서 호출을 해줘야 할 경우 잊어버리고 부모객체의 차일드리스트에서 삭제 안하는 경우가 생길 수 있기 때문이다.
+void GameObject::destroyUpdate()
+{
+	auto it = children.begin();
+
+	while (it != children.end())
+	{
+		// 미리 다음걸 받아서 현재를 업데이트 시키고 나중에 최신화 시킨다
+		// 중간에 삭제된 반복자를 가리키고 있을 가능성이 있기 때문이다.
+
+		if ((*it)->destroyed)
+		{
+			// 루트오브젝트라면 부모객체의 리스트에서 삭제할 필요가 없다.
+			if ((*it)->isRootObj() == true)
+			{
+				FinalDestroy(*it); continue;
+			}
+
+			vector<GameObject *>& childrenOfParent = (*it)->parent->children;
+			// 만약 자식객체라면 부모객체의 리스트에서도 삭제해줘야 한다.
+			// 시간복잡도 고려해서 바꿀수있으면 바꿀예정
+
+			for (auto it2 = childrenOfParent.begin(); it2 != childrenOfParent.end(); ++it2)
+			{
+				// 순회하다가 만약 발견하면 지운다.
+				if (*it2 == *it)
+				{
+					childrenOfParent.erase(it);
+					break;
+				}
+			}
+
+			// 최종적으로 삭제
+			FinalDestroy(*it);
+			
+		}
+		else
+		{
+			// 삭제되어야 하지 않는다면 자식객체를 확인해준다.
+			(*it)->destroyUpdate();
+			++it;
+		}
 	}
 
 }
@@ -186,30 +245,8 @@ GameObject * GameObject::getChild(const string & name)
 void GameObject::removeChild(GameObject * child)
 {
 	if (!child) return;
-	// 시간복잡도 고려해서 바꿀수있으면 바꿀예정
-	auto it = children.begin();
-	for (; it != children.end(); ++it)
-	{
-		// 순회하다가 만약 발견하면 지운다.
-		if (child == *it)
-		{
-			children.erase(it);
-			break;
-		}
-	}
 
-	// 만약에 발견하지 못한경우라면 그냥 빠져나온다
-	if (it == children.end())return;
-
-	// 발견한경우 맵에 등록된것을 삭제하고
-	child->getScene().baseDestroy(child, child->isRootObj());
-
-	// 실제로 지워준다.
-	delete child;
-
-	// 현재는 루트 객체 기준으로 씬의 오브젝트들이 들어가 있으므로 바로 삭제하면 된다.
-	// 내부적으로 완전히 삭제 
-	// getScene().Destroy(child);
+	child->setWhetherDestroyed(true);
 }
 GameObject * GameObject::addChild(GameObject * child)
 {
@@ -256,25 +293,6 @@ GameObject * GameObject::Instantiate
 	GameObject * parent, vector<GameObject *> *children,
 	vector<Component *> * components)
 {
-	/*
-	객체가 초기화되는 과정
-	1. GameObject 생성 // 부가적으로 transform 생성
-	2. 등록
-
-	// 문제점 : 동시에 생성하려니까 서로가 서로의 포인터를 필요로 하기 때문에 불가능하다.
-
-	해결책
-	1. transform을 nullptr로 초기화한다음에 나중에 초기화하는 방법을 사용한다.
-
-	2. 디폴트 값으로 GameObject 이니셜라이저에서 Transfrom 생성
-
-	3. GameObject 입력파라미터를 바꿔서 pos, rotation, scale을 추가한후
-	Transfrom객체를 GameObject 이니셜라이저에서 생성
-
-	// 3번 채택
-	*/
-
-	// 객체를 생성해준다.
 	GameObject * tempGameObject = new GameObject(name, tag, position, rotation, scale, parent, children, components);
 
 
@@ -288,11 +306,45 @@ GameObject * GameObject::Instantiate
 void GameObject::Destroy(GameObject * other)
 {
 	if (!other) return;
-	
-	other->getScene().baseDestroy( other, other->isRootObj() );
-	
+	other->setWhetherDestroyed(true);
 
-	// 등록되어있지 않다고 하더라도
-	// 마지막으로 삭제
+	//other->getScene().baseDestroy( other, other->isRootObj() );
+	//
+	//// 등록되어있지 않다고 하더라도
+	//// 마지막으로 삭제
+	//delete other;
+}
+
+// addChild와 removeChild같은 경우 부모객체에서 직관적으로 작업하기 위해서 만들었다.
+// 제공하다가 나중에 불필요하다고 판단되면 지울 에정이다.
+// 실제로 삭제된건지 알기 위해 bool형을 반환
+void GameObject::FinalDestroy(GameObject * other)
+{
+	// removeChild Destroy에서는 그냥 플래그만 켜준다.
+	if (!other) return;
+	bool rootObj = other->isRootObj();
+
+	//// 자식객체라면
+	//if (!rootObj)
+	//{
+	//	GameObject * parent = other->parent;
+	//	// 만약 자식객체라면 부모객체의 리스트에서도 삭제해줘야 한다.
+	//	// 시간복잡도 고려해서 바꿀수있으면 바꿀예정
+	//	auto it = parent->children.begin();
+	//	for (; it != parent->children.end(); ++it)
+	//	{
+	//		// 순회하다가 만약 발견하면 지운다.
+	//		if (other == *it)
+	//		{
+	//			parent->children.erase(it);
+	//			break;
+	//		}
+	//	}
+	//}
+	// 만약에 발견하지 못한경우라면 그냥 빠져나온다
+	//if ((it == parent->children.end()))
+
+	other->getScene().baseDestroy( other, rootObj);
+
 	delete other;
 }
