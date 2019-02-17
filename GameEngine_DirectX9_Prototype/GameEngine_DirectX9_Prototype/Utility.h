@@ -116,12 +116,12 @@ public:
 		return *this;
 	}
 
-	friend Vector3 operator*(const Vector3 & other, int num)
+	friend Vector3 operator*(const Vector3 & other, float num)
 	{
 		return{ other.x*num, other.y*num, other.z*num };
 	}
 
-	friend Vector3 operator*(int num, const Vector3 & other)
+	friend Vector3 operator*(float num, const Vector3 & other)
 	{
 		return{ other.x*num, other.y*num, other.z*num };
 	}

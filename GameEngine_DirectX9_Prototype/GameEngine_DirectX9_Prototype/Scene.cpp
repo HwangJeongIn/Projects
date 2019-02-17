@@ -118,7 +118,7 @@
 		// 업데이트 되고난후 삭제처리
 		destroyUpdate();
 
-		Sleep(30);
+		Sleep(20);
 
 		if(Teapot)
 			Teapot->Release();
@@ -174,7 +174,7 @@
 	{
 		for (auto it : rootGameObjects)
 		{
-			it->getTransform()->transformUpdate(it->getTransform()->getDirty(),Transform::IdentityMatrix_DX);
+			it->getTransform()->transformUpdate(it->getTransform()->getDirty(), Transform::IdentityMatrix_DX, Transform::IdentityMatrix_DX);
 		}
 	}
 

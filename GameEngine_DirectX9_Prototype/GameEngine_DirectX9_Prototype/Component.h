@@ -118,56 +118,26 @@ public:
 
 	//void transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix);
 
-	void transformUpdate(bool dirty, const D3DXMATRIX & parentMatrix);
 
+	void transformUpdate(bool dirty, const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix);
 	const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
-	void setTransformMatrix_DX(const D3DXMATRIX & parentMatrix)
+	void setTransformMatrix_DX(const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
 	{
-		transformMatrix_DX = calcLocalRotationMatrix_DX() * parentMatrix * calcLocalPositionMatrix_DX();
+		
+		// 중요 :: 부모에의해 부모의 로테이션만큼 더 돌게 되어있다. (부모 + 자식 로테이션) > 부모기준(forward up right) 자식 위치 + 부모위치
+		calcRotationMatrix_DX(parentRotationMatrix); calcPositionMatrix_DX(parentPositionMatrix);
+		transformMatrix_DX = rotationMatrix_DX* positionMatrix_DX;
 	}
+
 	
-	//const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
-	//void setRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
-	//{
-	//	rotationMatrix_DX = parentRotationMatrix * calcLocalRotationMatrix_DX();
-	//}
+	const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
+	void calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix);
 
-	//const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
-	//void setPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
-	//{
-	//	positionMatrix_DX = parentPositionMatrix * calcLocalPositionMatrix_DX();
-	//}
+	const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
+	void calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix);
 
-	// 아마로테이션과 포지션을 나누어야 할것같은데 그냥 한번 해보겠음
-	// 그 이유는 부모의 로테이션 > 포지션이동 > 자식의 로테이션 > 포지션이동 
-	// 자식의 로테이션에서 월드 0지점 중심으로 회전할듯하다
-	// 부모의 로테이션 행렬값의 곱과 부모의 포지션 행렬값의 곱을 받아와야한다.
-	D3DXMATRIX calcLocalRotationMatrix_DX()
-	{
-		// 이 함수가 필요한 이유는 로컬기준으로 계산을 해주고 월드기준으로 계산하기 위해서
-		// WorldMatrix = 부모객체의 Matrix * LocalMatrix 해주면 된다.
 
-		// 만약에 루트 객체라면
-		// WorldMatrix = 단위행렬 * LocalMatrix = LocalMatrix
 
-		// 로테이션 > 포지션
-
-		D3DXMATRIX T;
-		D3DXMATRIX temp;
-		D3DXMatrixIdentity(&T);
-		D3DXMatrixMultiply(&T, &T, D3DXMatrixRotationX(&temp, rotation.getX()));
-		D3DXMatrixMultiply(&T, &T, D3DXMatrixRotationY(&temp, rotation.getY()));
-		D3DXMatrixMultiply(&T, &T, D3DXMatrixRotationZ(&temp, rotation.getZ()));
-
-		return T;
-	}
-
-	D3DXMATRIX calcLocalPositionMatrix_DX()
-	{
-		D3DXMATRIX T;
-		D3DXMatrixTranslation(&T, getPosition().getX(), getPosition().getY(), getPosition().getZ());
-		return T;
-	}
 
 	// 로테이션이 바뀔때마다 최신화 된다.
 	void setDirectionVectorWithRotation_DX()
@@ -201,7 +171,6 @@ public:
 		Vector3::ToVector3(right, right_DX);
 		Vector3::ToVector3(up, up_DX);
 		Vector3::ToVector3(forward, forward_DX);
-
 	}
 
 	/*

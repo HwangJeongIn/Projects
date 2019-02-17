@@ -65,7 +65,7 @@ const D3DXMATRIX Transform::IdentityMatrix_DX
 };
 
 
-void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentMatrix/*, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix*/)
+void Transform::transformUpdate(bool dirty,  const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
 {
 	// 비트 연산으로 최종적으로 위에서 최신화 메시지를 받았거나, 
 	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화를 전달해준다.
@@ -78,7 +78,7 @@ void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentMatrix/*, c
 		//setRotationMatrix_DX(parentRotationMatrix);
 		//setPositionMatrix_DX(parentPositionMatrix);
 		// 최종 transformMatrix = 계산한 로테이션 * 포지션
-		setTransformMatrix_DX(parentMatrix);
+		setTransformMatrix_DX(parentPositionMatrix, parentRotationMatrix);
 		this->dirty = false;
 	}
 
@@ -90,9 +90,38 @@ void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentMatrix/*, c
 	// 모든 객체에 대해서 전달해준다.
 	for (auto it : children)
 	{
-		it->getTransform()->transformUpdate(dirty, getTransformMatrix_DX());
+		it->getTransform()->transformUpdate(dirty, getPositionMatrix_DX(),getRotationMatrix_DX());
 	}
 
+}
+
+void Transform::calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
+{
+	D3DXMATRIX temp;
+	D3DXMatrixIdentity(&rotationMatrix_DX);
+	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationX(&temp, rotation.getX()));
+	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationY(&temp, rotation.getY()));
+	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationZ(&temp, rotation.getZ()));
+	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, &parentRotationMatrix);
+}
+
+void Transform::calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
+{
+	Vector3 result{};
+	GameObject * parent = gameObject->getParent();
+	// 부모객체 기준으로 right up forward기준으로 계산해준다.
+	// 부모객체가 없는 루트 오브젝트인 경우 월드 right up forward를 사용한다.
+	if (!parent)
+		result = Vector3::Right * position.getX() + Vector3::Up * position.getY() + Vector3::Forward * position.getZ();
+	else
+		result = parent->getTransform()->getRight() * position.getX() + parent->getTransform()->getUp() * position.getY()
+		+ parent->getTransform()->getForward() * position.getZ();
+
+	D3DXMatrixIdentity(&positionMatrix_DX);
+
+	D3DXMatrixTranslation(&positionMatrix_DX, result.getX(), result.getY(), result.getZ());
+	// 마지막으로 부모객체의 위치만큼 이동시킨다.
+	D3DXMatrixMultiply(&positionMatrix_DX, &positionMatrix_DX, &parentPositionMatrix);
 }
 
 
