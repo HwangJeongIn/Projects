@@ -99,6 +99,9 @@
 		// transform 행렬 최신화
 		transformUpdate();
 
+		// 충돌처리
+		colliderUpdate();
+
 
 		// 화면을 지워준다.
 		device_s.Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0);
@@ -179,14 +182,21 @@
 	}
 
 	// 일단 충돌되면 안겹치게 움직이는 걸로 하자.
+	// 나중에 물리엔진을 적용시켜서 물리 현상을 정확하게 표현하는걸로 하자
 	void Scene::colliderUpdate()
 	{
+		BoxCollider * bc_obj1 = nullptr;
+		BoxCollider * bc_obj2 = nullptr;
 		for (auto it1 : rootGameObjects)
 		{
-			
+			bc_obj1 = (*it1).getComponent<BoxCollider>();
+			if (!bc_obj1) continue;
 			for (auto it2 : rootGameObjects)
 			{
-
+				bc_obj2 = (*it2).getComponent<BoxCollider>();
+				if (!bc_obj2) continue;
+				if (bc_obj1->checkCollided(*bc_obj2))
+					bc_obj1->physicalReaction(*bc_obj2);
 			}
 		}
 	}

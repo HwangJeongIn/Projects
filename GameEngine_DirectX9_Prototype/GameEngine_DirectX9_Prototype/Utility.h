@@ -50,7 +50,8 @@ public:
 	{
 		//if (!output || !input) return;
 		float norm = sqrtf(powf(input.x,2) + powf(input.y,2) + powf(input.z,2));
-		output.x = input.x /norm;
+		if (abs(norm) == 0) return;
+		output.x = input.x / norm;
 		output.y = input.y / norm;
 		output.z = input.z / norm;
 	}

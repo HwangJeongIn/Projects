@@ -205,31 +205,30 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -80);
 
-	//GameObject * bigShip1 = GameObject::Instantiate("bigShip1", "BigShip");
-	//bigShip1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//bigShip1->getTransform()->setPosition(0, 0, 0);
+
+	// 0단계
+	GameObject * car0 = GameObject::Instantiate("car0", "Car");
+	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
+	car0->addComponent<BoxCollider>();
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
+	car1->addComponent<BoxCollider>();
+	car1->getTransform()->setPosition(15, 0, 0);
 
-	//GameObject * car2 = GameObject::Instantiate("car2", "Car");
-	//car2->addComponent<MeshRenderer>()->loadXFile("car.x");
-	//car2->getTransform()->setPosition(20, 0, 0);
-
+	// 1단계
 	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
 	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	car1Child1->getTransform()->setPosition(0, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
 
-	GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
-	car1Child2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	car1Child2->getTransform()->setPosition(10, 0, 0);
+	//GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
+	//car1Child2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//car1Child2->getTransform()->setPosition(10, 0, 0);
 
-	//GameObject * car1Child3 = car1->addChild("bigShip3", "BigShip");
-	//car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//car1Child1->getTransform()->setPosition(-7, 0, 0);
-
+	// 2단계
+	/*
 	GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
 	car1Child1Child1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child1->getTransform()->setPosition(0, 5, 0);
@@ -237,12 +236,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * car1Child1Child2 = car1Child1->addChild("car4", "Car");
 	car1Child1Child2->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child2->getTransform()->setPosition(7, 0, 0);
-
-
+	*/
 
 	Scene & scene = mainCamera->getScene();
-
-
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용

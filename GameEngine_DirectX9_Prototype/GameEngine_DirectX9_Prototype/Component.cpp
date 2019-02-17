@@ -345,3 +345,6 @@ void MeshRenderer::setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long n
 	}
 
 }
+
+
+const float BoxCollider::DefaultSize = 2.5f;

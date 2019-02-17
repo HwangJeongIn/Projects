@@ -429,11 +429,11 @@ private :
 	float width;
 	float height;
 	float depth;
-
+	static const float DefaultSize;
 protected :
 public :
 	BoxCollider(GameObject * go, Transform * tf)
-		: Component(go, tf)
+		: Component(go, tf), width(DefaultSize), height(DefaultSize), depth(DefaultSize)
 	{
 		start();
 	}
@@ -445,14 +445,25 @@ public :
 	float calcZMax() const { return transform->getPosition().getZ() + depth; }
 	float calcZMin() const { return transform->getPosition().getZ() - depth; }
 
-	const bool isCollided(const BoxCollider & other) const
+	const bool checkCollided(const BoxCollider & other) const
 	{
 		// 중간에 하나라도 한 축에대해서 충돌하지 않았다면 빠져나간다.
-		if (calcXMax() < other.calcXMin() || calcXMin() > other.calcXMax()) return 0;
-		if (calcYMax() < other.calcYMin() || calcYMin() > other.calcYMax()) return 0;
-		if (calcZMax() < other.calcZMin() || calcZMin() > other.calcZMax()) return 0;
-		return 1;
+		if (calcXMax() < other.calcXMin() || calcXMin() > other.calcXMax()) return false;
+		if (calcYMax() < other.calcYMin() || calcYMin() > other.calcYMax()) return false;
+		if (calcZMax() < other.calcZMin() || calcZMin() > other.calcZMax()) return false;
+		
+		return true;
 	}
+	
+	void physicalReaction(const BoxCollider & other) const
+	{
+		// 반발하여 1만큼 반대방향으로 튀어나온다.
+		// 나중에 물리현상으로 수정할 예정
+		Vector3 direction = transform->getPosition() - other.transform->getPosition();
+		Vector3::Normalized(direction, direction);
+		transform->setPosition(transform->getPosition() + 1 * direction);
+	}
+
 
 };
 
