@@ -74,6 +74,11 @@ IDirect3DDevice9 & GameObject::getDevice()
 	return Locator::getDevice();
 }
 
+Audio & GameObject::getAudio()
+{
+	return Locator::getAudio();
+}
+
 
 void GameObject::setParent(GameObject * parent)
 {

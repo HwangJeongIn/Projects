@@ -34,6 +34,7 @@ public:
 	*/
 	Scene & getScene();
 	IDirect3DDevice9 & getDevice();
+	Audio & getAudio();
 
 	const bool isDestroyed() const { return destroyed; }
  

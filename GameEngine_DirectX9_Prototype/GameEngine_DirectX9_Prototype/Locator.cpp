@@ -9,20 +9,54 @@
 NullScene Locator::nullScene{};
 Scene * Locator::scene = &nullScene;
 
+NullAudio Locator::nullAudio{};
+Audio * Locator::audio = &nullAudio;
+
 //NullDeviceWrapper Locator::nullDeviceWrapper{};
 //DeviceWrapper * Locator::deviceWrapper = &nullDeviceWrapper;
 IDirect3DDevice9 * Locator::device = nullptr;
 
+void Locator::provideAudio(SystemType type)
+{
+	// 가장 처리 방식이 다른 경우는 Debug모드일때 이다. 먼저처리해준다.
+	if (type == SystemType::DEBUGTYPE)
+	{
+		// 현재 가지고 있는 Scene이 NullScene이거나 nullptr이면 바로적용시켜준다.
+		// 널자체를 데코레이션하는 디버깅 클래스 객체를 만든다.
+		if (audio == &nullAudio || audio == nullptr)
+		{
+			audio = new DebuggingAudio(nullAudio);
+			return;
+		}
+
+		audio = new DebuggingAudio(*audio);
+		return;
+	}
+
+	// 새롭게 할당해야 되기 때문에 널이 아닌 것들이 들어가 있으면 삭제한다.
+	if (audio != &nullAudio && audio != nullptr)
+		delete audio;
+
+	switch (type)
+	{
+	case SystemType::RELEASETYPE:
+		audio = new Audio();
+		break;
+
+	case SystemType::NULLTYPE: default:
+		audio = &nullAudio;
+		break;
+	}
+}
+
 void Locator::provideScene(SystemType type)
 {
-	//bool isNull = false;
 	// 가장 처리 방식이 다른 경우는 Debug모드일때 이다. 먼저처리해준다.
 	if (type == SystemType::DEBUGTYPE)
 	{
 		// 현재 가지고 있는 Scene이 NullScene이거나 nullptr이면 바로적용시켜준다.
 		if (scene == &nullScene || scene == nullptr)
 		{
-			//isNull = true;
 			scene = new DebuggingScene(nullScene);
 			return;
 		}
@@ -32,7 +66,6 @@ void Locator::provideScene(SystemType type)
 	}
 
 	// 새롭게 할당해야 되기 때문에 널이 아닌 것들이 들어가 있으면 삭제한다.
-	//if (!isNull)
 	if (scene != &nullScene && scene != nullptr)
 		delete scene;
 

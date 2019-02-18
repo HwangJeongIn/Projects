@@ -196,6 +196,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	: Scene / Device
 	*/
 	Locator::provideScene(Locator::SystemType::RELEASETYPE);
+	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
 	
 	/*

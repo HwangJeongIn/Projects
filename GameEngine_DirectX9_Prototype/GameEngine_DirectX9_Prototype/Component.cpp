@@ -1,6 +1,7 @@
 #include "Component.h"
 #include "GameObject.h"
 #include "Scene.h"
+#include "Audio.h"
 #include "Utility.h"
 
 
@@ -38,13 +39,45 @@ void MoveScript::update()
 			transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
 }
 
+void MoveScript::start()
+{
+	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
+	if (temp)
+	{
+		temp->play(false);
+		temp->setVolume(7.0f);
+	}
+}
+
+void MoveScript_C::start()
+{
+
+}
+
 void MoveScript_C::update()
 {
 	if (::GetAsyncKeyState('K') & 0x8000f)
+	{
+
 		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
+		if (temp)
+		{
+			temp->play(false);
+			temp->setVolume(2.0f);
+		}
+	}
 
 	if (::GetAsyncKeyState('L') & 0x8000f)
+	{
 		transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
+		if (temp)
+		{
+			temp->play(false);
+			temp->setVolume(2.0f);
+		}
+	}
 
 
 
@@ -128,6 +161,11 @@ void Transform::calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
 
 void MainCamera::update()
 {
+	// 메인카메라에서 오디오를 최신화 시킨다.
+	// 파일을 스트리밍하기 때문에 계속 업데이트가 필요하다
+	gameObject->getAudio().update();
+
+
 	setViewSpace();
 
 	if (::GetAsyncKeyState('E') & 0x8000f)

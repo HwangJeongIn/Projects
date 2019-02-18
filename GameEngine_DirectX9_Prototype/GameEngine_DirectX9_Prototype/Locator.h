@@ -4,6 +4,7 @@
 #include <cassert>
 //#include "DeviceWrapper.h"
 #include <d3d9.h>
+
 /*
 구현부가 아닌 여기서 여러가지를 인클루드 해버리면 
 이 중개자를 사용하는 곳에서 서로를 포함하는 관계가 생길 수 있다.
@@ -23,6 +24,7 @@
 class Scene;
 class NullScene;
 class Audio;
+class NullAudio;
 
 class Locator
 {
@@ -41,7 +43,7 @@ private :
 
 
 	static Audio * audio;
-	// static NullAudio nullAudio;
+	static NullAudio nullAudio;
 
 protected :
 	static Scene& getScene(){ return *scene; }
@@ -50,6 +52,7 @@ protected :
 	static IDirect3DDevice9& getDevice() 
 	{
 		// 만약 널포인터인데 포인터를 얻으려고 한다면 시스템을 종료한다.
+		// 디바이스를 등록하지 않았다면 아무것도 할 수 없다.
 		assert(Locator::device);
 
 		return *device;
@@ -64,17 +67,11 @@ public :
 	};
 
 	static void provideScene(SystemType type = SystemType::RELEASETYPE);
+	static void provideAudio(SystemType type = SystemType::RELEASETYPE);
 	//static void provideDeviceWrapper(IDirect3DDevice9 * device, SystemType type = SystemType::RELEASETYPE);
 	static void provideDevice(IDirect3DDevice9 * device);
 
-
-
 };
 
-
-//NullScene Locator::nullScene{};
-//Scene * Locator::scene = nullScene;
-//NullAudio Locator::nullAudio{};
-//Audio * Locator::audio = nullAdio;
 
 #endif

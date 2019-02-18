@@ -89,7 +89,10 @@ class NullScene : public Scene
 {
 private:
 
-	NullScene() {}
+	NullScene()
+		: Scene() {}
+	virtual ~NullScene() {}
+
 public :
 	friend class Locator;
 	/*
@@ -109,6 +112,8 @@ private :
 	Scene & wrapped;
 	DebuggingScene(Scene & scene)
 		: wrapped(scene) {}
+	virtual ~DebuggingScene() {}
+
 	void log(const char * message)
 	{
 		if (!message) return;

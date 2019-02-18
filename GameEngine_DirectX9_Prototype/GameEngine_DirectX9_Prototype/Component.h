@@ -343,6 +343,7 @@ private:
 
 protected:
 	virtual void update();
+	virtual void start();
 
 public:
 	MoveScript(GameObject * go, Transform * tf)
@@ -365,6 +366,7 @@ class MoveScript_C : public Component
 private:
 
 protected:
+	virtual void start();
 	virtual void update();
 
 public:
