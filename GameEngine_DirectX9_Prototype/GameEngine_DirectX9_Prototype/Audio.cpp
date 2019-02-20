@@ -18,6 +18,7 @@ void Audio::init()
 
 void Audio::initFilePathToLoadSoundFiles()
 {
+	/*
 	char tempPath[512];
 	GetModuleFileName(NULL, tempPath, 512);
 
@@ -40,7 +41,25 @@ void Audio::initFilePathToLoadSoundFiles()
 	// 2개의 역슬래쉬를 만났다.
 	filePathToLoadSoundFiles = filePathToLoadSoundFiles.substr(0, i + 1);
 	filePathToLoadSoundFiles += fileNameToLoadSoundFiles + '\\';
+	*/
+
 	
+	
+	// 하위디렉터리로 접근할때 쓰는 기호 / 와 \\ 는 같다.
+	//filePathToLoadSoundFiles = "C:/Users/user/Documents/GitHub/Projects/GameEngine_DirectX9_Prototype/Sound/";
+	//filePathToLoadSoundFiles = "C:\\Users\\user\\Documents\\GitHub/Projects\\GameEngine_DirectX9_Prototype\\Sound\\";
+
+
+	// 상대경로로 하는게 더편할듯하다.
+	/*
+	../ 로 현재 소스파일이 있는 디렉터리의 상위 디렉터리에 접근하고  
+	C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\GameEngine_DirectX9_Prototype의 상위는
+	C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype 이다
+	여기서 fileNameToLoadSoundFiles(Sound)에 접근
+	최종 경로는 C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Sound
+	*/
+	filePathToLoadSoundFiles = "../" + fileNameToLoadSoundFiles + '/'; //"../Sound/";
+
 }
 
 void Audio::initAudioSourcesWithBaseSoundFiles()
