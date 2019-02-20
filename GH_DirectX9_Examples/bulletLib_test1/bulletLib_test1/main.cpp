@@ -26,6 +26,7 @@ subject to the following restrictions:
 
 int main(int argc, char** argv)
 {
+	/*
 	///-----includes_end-----
 
 	int i;
@@ -182,4 +183,6 @@ int main(int argc, char** argv)
 
 	//next line is optional: it will be cleared by the destructor when the array goes out of scope
 	collisionShapes.clear();
+
+	*/
 }
