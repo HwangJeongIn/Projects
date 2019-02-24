@@ -22,11 +22,13 @@ subject to the following restrictions:
 
 #include <stdio.h>
 
+
+
 /// This is a Hello World program for running a basic Bullet physics simulation
 
 int main(int argc, char** argv)
 {
-	/*
+	
 	///-----includes_end-----
 
 	int i;
@@ -62,7 +64,6 @@ int main(int argc, char** argv)
 		btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
 
 		collisionShapes.push_back(groundShape);
-
 		btTransform groundTransform;
 		groundTransform.setIdentity();
 		groundTransform.setOrigin(btVector3(0, -56, 0));
@@ -184,5 +185,5 @@ int main(int argc, char** argv)
 	//next line is optional: it will be cleared by the destructor when the array goes out of scope
 	collisionShapes.clear();
 
-	*/
+	
 }

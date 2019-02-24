@@ -1,0 +1,2 @@
+﻿  main.cpp
+d:\github\projects\gh_directx9_examples\bulletlib_test1\bulletlib_test1\main.cpp(21): fatal error C1083: 포함 파일을 열 수 없습니다. 'btBulletDynamicsCommon.h': No such file or directory
