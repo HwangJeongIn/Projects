@@ -14,6 +14,8 @@
 #include "camera.h"
 #include "Locator.h"
 #include "Scene.h"
+
+#include "Physics.h"
 //
 // Globals
 //
@@ -190,6 +192,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
+
+	Physics::test();
 
 	/*
 	서비스 등록

@@ -58,7 +58,7 @@ void Audio::initFilePathToLoadSoundFiles()
 	여기서 fileNameToLoadSoundFiles(Sound)에 접근
 	최종 경로는 C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Sound
 	*/
-	filePathToLoadSoundFiles = "../" + fileNameToLoadSoundFiles + '/'; //"../Sound/";
+	filePathToLoadSoundFiles = "../Audio/Sound/"; //"../Sound/";
 
 }
 

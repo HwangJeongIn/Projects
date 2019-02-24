@@ -1,0 +1,51 @@
+﻿  Physics.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  main.cpp
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.h(243): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\trace.h(41): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  코드를 생성하고 있습니다...
+camera.obj : error LNK2019: D3DXVec3Normalize 외부 기호(참조 위치: "public: void __cdecl Camera::getViewMatrix(struct D3DXMATRIX *)" (?getViewMatrix@Camera@@QEAAXPEAUD3DXMATRIX@@@Z) 함수)에서 확인하지 못했습니다.
+camera.obj : error LNK2019: D3DXVec3TransformCoord 외부 기호(참조 위치: "public: void __cdecl Camera::pitch(float)" (?pitch@Camera@@QEAAXM@Z) 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2001: D3DXVec3TransformCoord 외부 기호를 확인할 수 없습니다.
+GameObject.obj : error LNK2001: D3DXVec3TransformCoord 외부 기호를 확인할 수 없습니다.
+camera.obj : error LNK2019: D3DXMatrixRotationY 외부 기호(참조 위치: "public: void __cdecl Camera::yaw(float)" (?yaw@Camera@@QEAAXM@Z) 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2001: D3DXMatrixRotationY 외부 기호를 확인할 수 없습니다.
+camera.obj : error LNK2019: D3DXMatrixRotationAxis 외부 기호(참조 위치: "public: void __cdecl Camera::pitch(float)" (?pitch@Camera@@QEAAXM@Z) 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2001: D3DXMatrixRotationAxis 외부 기호를 확인할 수 없습니다.
+GameObject.obj : error LNK2001: D3DXMatrixRotationAxis 외부 기호를 확인할 수 없습니다.
+main.obj : error LNK2019: __imp_DefWindowProcA 외부 기호(참조 위치: "__int64 __cdecl d3d::WndProc(struct HWND__ *,unsigned int,unsigned __int64,__int64)" (?WndProc@d3d@@YA_JPEAUHWND__@@I_K_J@Z) 함수)에서 확인하지 못했습니다.
+main.obj : error LNK2019: __imp_PostQuitMessage 외부 기호(참조 위치: "__int64 __cdecl d3d::WndProc(struct HWND__ *,unsigned int,unsigned __int64,__int64)" (?WndProc@d3d@@YA_JPEAUHWND__@@I_K_J@Z) 함수)에서 확인하지 못했습니다.
+main.obj : error LNK2019: __imp_DestroyWindow 외부 기호(참조 위치: "__int64 __cdecl d3d::WndProc(struct HWND__ *,unsigned int,unsigned __int64,__int64)" (?WndProc@d3d@@YA_JPEAUHWND__@@I_K_J@Z) 함수)에서 확인하지 못했습니다.
+main.obj : error LNK2019: __imp_MessageBoxA 외부 기호(참조 위치: WinMain 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2001: __imp_MessageBoxA 외부 기호를 확인할 수 없습니다.
+d3dUtility.obj : error LNK2001: __imp_MessageBoxA 외부 기호를 확인할 수 없습니다.
+main.obj : error LNK2019: D3DXMatrixPerspectiveFovLH 외부 기호(참조 위치: WinMain 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2019: __imp_GetAsyncKeyState 외부 기호(참조 위치: "private: virtual void __cdecl MainCamera::update(void)" (?update@MainCamera@@EEAAXXZ) 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2019: D3DXMatrixMultiply 외부 기호(참조 위치: "public: struct D3DXMATRIX __cdecl D3DXMATRIX::operator*(struct D3DXMATRIX const &)const " (??DD3DXMATRIX@@QEBA?AU0@AEBU0@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2001: D3DXMatrixMultiply 외부 기호를 확인할 수 없습니다.
+Component.obj : error LNK2019: D3DXMatrixTranslation 외부 기호(참조 위치: "public: void __cdecl Transform::calcPositionMatrix_DX(struct D3DXMATRIX const &)" (?calcPositionMatrix_DX@Transform@@QEAAXAEBUD3DXMATRIX@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2001: D3DXMatrixTranslation 외부 기호를 확인할 수 없습니다.
+Scene.obj : error LNK2001: D3DXMatrixTranslation 외부 기호를 확인할 수 없습니다.
+Component.obj : error LNK2019: D3DXMatrixRotationX 외부 기호(참조 위치: "public: void __cdecl Transform::calcRotationMatrix_DX(struct D3DXMATRIX const &)" (?calcRotationMatrix_DX@Transform@@QEAAXAEBUD3DXMATRIX@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2001: D3DXMatrixRotationX 외부 기호를 확인할 수 없습니다.
+Component.obj : error LNK2019: D3DXMatrixRotationZ 외부 기호(참조 위치: "public: void __cdecl Transform::calcRotationMatrix_DX(struct D3DXMATRIX const &)" (?calcRotationMatrix_DX@Transform@@QEAAXAEBUD3DXMATRIX@@@Z) 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2019: D3DXLoadMeshFromXA 외부 기호(참조 위치: "public: void __cdecl MeshRenderer::loadXFile(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &)" (?loadXFile@MeshRenderer@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z) 함수)에서 확인하지 못했습니다.
+Component.obj : error LNK2019: D3DXCreateTextureFromFileA 외부 기호(참조 위치: "private: void __cdecl MeshRenderer::setMtrlsAndTextures(struct ID3DXBuffer *,unsigned long)" (?setMtrlsAndTextures@MeshRenderer@@AEAAXPEAUID3DXBuffer@@K@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2001: D3DXCreateTextureFromFileA 외부 기호를 확인할 수 없습니다.
+d3dUtility.obj : error LNK2019: __imp_GetStockObject 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_TranslateMessage 외부 기호(참조 위치: "int __cdecl d3d::EnterMsgLoop(void (__cdecl Scene::*)(void),class Scene &)" (?EnterMsgLoop@d3d@@YAHP8Scene@@EAAXXZAEAV2@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_DispatchMessageA 외부 기호(참조 위치: "int __cdecl d3d::EnterMsgLoop(void (__cdecl Scene::*)(void),class Scene &)" (?EnterMsgLoop@d3d@@YAHP8Scene@@EAAXXZAEAV2@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_PeekMessageA 외부 기호(참조 위치: "int __cdecl d3d::EnterMsgLoop(void (__cdecl Scene::*)(void),class Scene &)" (?EnterMsgLoop@d3d@@YAHP8Scene@@EAAXXZAEAV2@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_RegisterClassA 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_CreateWindowExA 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_ShowWindow 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_UpdateWindow 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_LoadCursorA 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_LoadIconA 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: __imp_timeGetTime 외부 기호(참조 위치: "int __cdecl d3d::EnterMsgLoop(void (__cdecl Scene::*)(void),class Scene &)" (?EnterMsgLoop@d3d@@YAHP8Scene@@EAAXXZAEAV2@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: Direct3DCreate9 외부 기호(참조 위치: "bool __cdecl d3d::InitD3D(struct HINSTANCE__ *,int,int,bool,enum _D3DDEVTYPE,struct IDirect3DDevice9 * *)" (?InitD3D@d3d@@YA_NPEAUHINSTANCE__@@HH_NW4_D3DDEVTYPE@@PEAPEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: D3DXMatrixScaling 외부 기호(참조 위치: "bool __cdecl d3d::DrawBasicScene(struct IDirect3DDevice9 *,float)" (?DrawBasicScene@d3d@@YA_NPEAUIDirect3DDevice9@@M@Z) 함수)에서 확인하지 못했습니다.
+d3dUtility.obj : error LNK2019: D3DXCreateCylinder 외부 기호(참조 위치: "bool __cdecl d3d::DrawBasicScene(struct IDirect3DDevice9 *,float)" (?DrawBasicScene@d3d@@YA_NPEAUIDirect3DDevice9@@M@Z) 함수)에서 확인하지 못했습니다.
+Scene.obj : error LNK2019: D3DXCreateTeapot 외부 기호(참조 위치: "void __cdecl drawScene(struct IDirect3DDevice9 &)" (?drawScene@@YAXAEAUIDirect3DDevice9@@@Z) 함수)에서 확인하지 못했습니다.
+D:\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Debug\GameEngine_DirectX9_Prototype.exe : fatal error LNK1120: 31개의 확인할 수 없는 외부 참조입니다.

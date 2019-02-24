@@ -1,0 +1,116 @@
+** 외부 라이브러리 사용 팁
+
+	외부라이브러리 사용할때 해야할 여러가지 작업이 있다.
+
+		1. 인클루드 디렉터리 지정 or 바로 경로를 이용해서 인클루드
+		--------------------라이브러리 사용시-------------------------
+		2. 라이브러리 디렉터리 지정 and 추가 종속성에 사용할 라이브러리 추가 
+		-----------------라이브러리가 dll 사용시-----------------------
+		3. 환경변수 설정으로 dll위치 설정 or exe파일이 있는 디렉터리에 dll 복붙
+
+	라이브러리명					사용 예시(번호 지정)
+	--------------------------------------------------------------------
+	DirectX SDK					1~2 적용 // dll을 사용하지 않는 라이브러리
+	FMOD						1~3 적용 // dll을 사용하는 라이브러리
+	Bullet3						1 적용 // 해더파일과 소스파일로 이루어짐
+	--------------------------------------------------------------------
+
+	1.1. Properties->C/C++->General->Additional Include Directories를 지정하거나
+	1.2. 해더파일로만 이루어진 것을 사용 시 경로를 이용해서 바로 인클루드 하면된다.
+		// 이경우 소스파일을 복사하거나 링크해서 프로젝트에 추가해야한다. // 아니면 링커가 구현부를 알지못함
+
+	여기서 그냥 해더파일로만 이루어진 파일만 사용한다고하다고 하면 괜찮은데,
+	라이브러리파일을 사용한다고 하면 아래의 추가 작업이 필요하다.
+
+	2. 먼저 추가 라이브러리 디렉터리 목록에 추가한다.
+	Properties->Linker->General->Additional Library Directories
+
+	3. 또 추가 라이브러리 디렉터리 목록에 추가했으면 
+	사용할 라이브러리 목록을 추가종속성을 추가한다.
+	Properties->Linker->Input->Additional Dependencies
+
+	만약 라이브러리가 dll을 사용하는 라이브러리라면 여기서 또 추가작업을 해준다.
+	4.1. Properties->Debugging->Environment 에 
+		 PATH=경로;%PATH% 형식의 경로를 추가한다. 
+		  // 절대경로로 그냥설정
+		 예시 1 : PATH=C:\ProgramFiles(x86)\FMODSoundSystem\FMODStudioAPIWindows\api\lowlevel\lib;%PATH%
+
+		 // 하지만 프로젝트가 저장되는 환경에 따라서 절대경로는 다른곳에서 작동하지 않을 가능성이 너무크다.
+		 // 그렇기 때문에 .vcproj 파일의 경로나 .sln 파일의 경로가 매크로로 지정된 것을 사용하여 접근하면 좋다. 
+		 // $(ProjectDir) / $(SolutionDir) 메크로 사용
+		 예시 2 : PATH=$(SolutionDir)\FMODStudioAPIWindows\api\lowlevel\lib;%PATH%
+
+	4.2. exe파일이 있는 디렉터리에 dll을 복붙하는 방법으로도 가능하다.
+
+
+	ps. 추가 인클루드 / 라이브러리 대신 인클루드 / 라이브러리 목록에 추가할 수도 있다.
+	Properties->VC++ Directories->Include Directories / Library Directories
+
+
+	5. 추가 참고사항
+
+	정적라이브러리 기준으로 추가 설명
+
+	 - 빌드시 릴리즈 lib파일과 디버그 lib파일을 각각 릴리즈 디버그 모드에 따로 적용해야한다.
+	 - 속성->C/C++->코드생성->런다임라이브러리 버전을 맞춰주어야 한다. // 일치하지 않으면 에러 발생
+		// 정적 or 동적 라이브러리 / 디버그 or 릴리즈를 구분해둔듯 하다. // 더 알아볼예정
+
+
+** Visual Studio 경로지정 팁
+
+	비주얼 스튜디오 경로 지정할때 사용하는 기호는 \\ or / 이다
+	일반적인 경로는 \로 표현되지만 ""안에 넣으려면 \\ or / 를 사용하면 된다.
+
+	해더파일은 절대경로 또는 상대경로로 바로 인클루드 가능하다.
+	
+	// 프로젝트 속성에서 기준은 프로젝트 파일로 되어있는 듯 // $(ProjectDir)디폴트
+	// 또 해더파일에서 상대주소를 사용할 경우 디폴트 + 추가 인클루드 디렉터리 기준으로 찾게된다.
+
+	상대경로 지정
+		/	: 루트 디렉터리
+		./	: 현재 디렉터리
+		../	: 현재 디렉터리의 상위 디렉터리
+		../../ : 2단계 상위 디렉터리
+
+	메크로 사용해서 .vcproj 파일의 경로나 .sln 파일의 경로 받아오기
+		$(ProjectDir)	: 프로젝트 디렉터리
+		$(SolutionDir)	: 솔루션 디렉터리
+
+** 현재 작업중인 Bullet Physics SDK
+
+* 라이브러리 경로
+$(SolutionDir)\Physics\lib\debug
+$(SolutionDir)\Physics\lib\release
+
+
+* 해더 경로
+$(SolutionDir)\Physics\inc\src
+
+* 라이브러리 이름
+
+디버그
+
+BulletCollision_vs2010_debug.lib; BulletDynamics_vs2010_debug.lib; LinearMath_vs2010_debug.lib; BulletSoftBody_vs2010_debug.lib
+
+릴리즈
+	
+BulletCollision_vs2010.lib; BulletDynamics_vs2010.lib; LinearMath_vs2010.lib; BulletSoftBody_vs2010.lib
+
+* 버그 픽스
+
+- 여러가지 환경에서의 lib파일을 읽어서 확인 가능하도록 만들어 놨음
+- btAssert버그 고침 // C++11버전에서 존재하는 문제 점이다. 공백추가로 해결가능하다.
+// 원래는 64비트 릴리즈 모드에서만 가능했음
+https://stackoverflow.com/questions/47843645/bullet-physics-source-code-not-building-in-x86-wrong-preprocessor-directives-i
+runs into problems with the rules for user-defined literals, which reserves this format.
+This happened already in C++11.
+The simple solution is to just add a space between the string literal and the next element:
+"Assert "__FILE__ >> "Assert "  __FILE__
+
+
+- 2.88버전으로 빌드 > 실패(배치파일 사용) / 2.82버전으로 빌드 > 성공
+ // 2.88 버전으로 라이브러리 뽑아내니 이상하게 링커에 의해서 소스파일과 연결되지 않는 부분이 생겼다.
+ // build_visual_studio_vr_pybullet_double.bat 배치파일을 사용해서 프로젝트를 만들고 내부에 있는 3가지 메인 라이브러리만 뽑아오려고 했으나
+ // 링커가 일부 소스파일과 연결시키지 못해서 에러가 발생했다. // 아마 빌드를 다른 수단으로 하면 되지 않았을까 싶다.
+
+ // 버전을 2.82로 빌드하니 정상적으로 생성되었고, 라이브러리를 이용한 간단한 프로젝트도 빌드 성공
