@@ -13,6 +13,16 @@
 
 * 프로젝트 속성 > 링커 > 입력 > 추가 종속성 // DirectX9 / DirectX11
 -----------------------------------------
+>legacy_stdio_definitions.lib<
+// 비주얼 2015이전에서 어떤 함수를 사용하기 위해서 포함할 라이브러리
+// printf, scanf함수의 정의가 stdio conio crt해더로 인라인으로 이동되었는데
+// 이전 버전으로 빌드한 프로젝트에서 해더를 더 추가하지 않고 
+// 사용하기 위해서 이라이브러리 파일을 추가한다.
+
+>Effects11d.lib / Effects11.lib<
+// VS2015로 다시 빌드해서 추가하였다.
+legacy_stdio_definitions.lib;
+
 d3d9.lib;
 d3dx9.lib;
 d3dx9d.lib;
