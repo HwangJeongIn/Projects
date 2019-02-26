@@ -18,6 +18,8 @@ d3dx9.lib;
 d3dx9d.lib;
 winmm.lib;
 
+Effects11d.lib;
+Effects11.lib;
 d3d11.lib;
 d3dx11.lib;
 d3dx11d.lib;
