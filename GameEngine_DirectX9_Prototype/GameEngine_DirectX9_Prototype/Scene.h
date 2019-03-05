@@ -9,7 +9,8 @@
 #include "GameObject.h"
 #include "Trace.h"
 #include "d3dUtility.h"
-#include <chrono>
+//#include <chrono>
+#include <cstdio>
 #include <ctime>
 
 

@@ -14,12 +14,11 @@
 		// gameObjects[0]->addChild("player name1", "player1");
 
 	}
-	ID3DXMesh* Teapot = 0;
 
 	void drawScene(IDirect3DDevice9 & device_s)
 	{
-
-
+		/*
+		
 		D3DXCreateTeapot(&device_s, &Teapot, 0);
 		D3DXMATRIX W;
 		D3DXMatrixIdentity(&W);
@@ -56,6 +55,7 @@
 		device_s.SetTransform(D3DTS_WORLD, &W);
 
 		Teapot->DrawSubset(0);
+		*/
 	}
 
 	void Scene::gameLoop()
@@ -70,12 +70,15 @@
 		/*
 		기본적인 월드를 계산해서 그린다.
 		*/
-
+		previousTime;
+			currentTime;
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
-		if (previousTime == 0)
-			previousTime = clock();
+		//if (previousTime == 0)
+			previousTime = (int)clock();
 
-		currentTime = clock();
+		currentTime = (int)clock();
+
+		previousTime;
 		// 업데이트 / 렌더링
 		// 업데이트는 매 프레임당 실행되는데 MeshRenderer 컴포넌트에 의해 렌더링과 커플링 되어있다.
 
@@ -85,15 +88,6 @@
 		// 그러면 빠른 컴퓨터에서는 deltaTime의 값이 적게 나와서 적은 값을 계산하게 되고
 		// 느린 컴퓨터에서는 deltaTime의 값이 크게나와서 큰 값을 계산하게 된다.
 
-
-		//D3DXVECTOR3 position(0.0f, 0.0f, -3.0f);
-		//D3DXVECTOR3 target(0.0f, 0.0f, 0.0f);
-		//D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
-
-		//D3DXMatrixLookAtLH(&V, &position, &target, &up);
-		//D3DXMATRIX V;
-		//mainCamera->getComponent<MainCamera>()->getViewMatrix(&V);
-		//device_s.SetTransform(D3DTS_VIEW, &V);
 
 		
 		// transform 행렬 최신화
@@ -118,41 +112,38 @@
 		device_s.EndScene();
 		device_s.Present(0, 0, 0, 0);
 
-		// 업데이트 되고난후 삭제처리
-		destroyUpdate();
 
-		Sleep(20);
 
-		if(Teapot)
-			Teapot->Release();
+		//Sleep(20);
+		//return;
 
-		return;
 
 		clock_t temp = currentTime - previousTime;
 		FrameTime::setDeltaTime(temp);
 
 		previousTime = currentTime;
 
-		char t[100]{};
-		//_itoa_s(timeDelta, t, 10);
-		sprintf(t, "%f", temp);
-		Trace::Write("TAG_DEBUG", "deltaTime", t);
-
 		lagTime += temp;
 
 
-		//while (lagTime >= MS_PER_FIXEDUPDATE)
-		//{
-		//	// 일정시간 간격마다 업데이트 되는 함수이다
-		//	// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
-		//	//Trace::Write("TAG_DEBUG", "fixedUpdate");
-		//	fixedUpdate();
-		//	lagTime -= MS_PER_FIXEDUPDATE;
-		//}
+		while (lagTime >= MS_PER_FIXEDUPDATE)
+		{
+			// 일정시간 간격마다 업데이트 되는 함수이다
+			// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
+			//Trace::Write("TAG_DEBUG", "fixedUpdate");
+			fixedUpdate();
+			lagTime -= MS_PER_FIXEDUPDATE;
+		}
+
+		/*
+		프레임의 끝단계 일정시간을 딜레이 시키기 전에 여러가지 작업을 해준다.
+		*/
+		// 업데이트 되고난후 삭제처리
+		destroyUpdate();
 
 		//// 60프레임 기준으로 시간이 남았다면 딜레이
-		//if(MS_PER_FRAME - FrameTime::getDeltaTime()>0)
-		//	Sleep(MS_PER_FRAME - FrameTime::getDeltaTime());
+		if(MS_PER_FRAME - FrameTime::getDeltaTime()>0)
+			Sleep(MS_PER_FRAME - FrameTime::getDeltaTime());
 
 	}
 
