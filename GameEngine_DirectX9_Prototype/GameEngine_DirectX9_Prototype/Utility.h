@@ -206,10 +206,10 @@ public:
 class FrameTime
 {
 private :
-	static unsigned long deltaTime;
+	static long deltaTime;
 public :
-	static unsigned long getDeltaTime() { return deltaTime; }
-	static void setDeltaTime(unsigned long other)
+	static long getDeltaTime() { return deltaTime; }
+	static void setDeltaTime(long other)
 	{
 		// 간격이기 때문에 음수가 없다.
 		if (other < 0)

@@ -105,6 +105,32 @@ public :
 		return true;
 	}
 
+	static bool Write(const string & fileTagName, double value)
+	{
+		bool appMode = true;
+		// 먼저 태그로 검색해서 등록되어있는지 확인한다.
+		// 만약 등록되어있지 않다면 리턴한다.
+		if (TextFileTable.find(fileTagName) == TextFileTable.end()) return false;
+
+		// 쓰기전용으로 파일객체를 만들고 열어준다.
+		// 역시 파일 열기에 실패했으면 리턴한다.
+		unsigned int mode = ios_base::out;
+		if (appMode) mode |= ios_base::app;
+
+		ofstream file(TextFileTable[fileTagName], mode);
+
+		if (!file.is_open())
+		{
+			cout << "Unable to open file " << TextFileTable[fileTagName] << endl;
+			return false;
+		}
+
+		file << value << endl;
+
+		file.close();
+		return true;
+	}
+
 	static void Clear(const string & fileTagName)
 	{
 		if (TextFileTable.find(fileTagName) == TextFileTable.end()) return;

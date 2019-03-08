@@ -35,6 +35,7 @@ public:
 	Scene & getScene();
 	IDirect3DDevice9 & getDevice();
 	Audio & getAudio();
+	Physics & getPhysics();
 
 	const bool isDestroyed() const { return destroyed; }
  
@@ -60,6 +61,22 @@ public:
 
 	void update();
 	void fixedUpdate();
+	//void physicsUpdate()
+	//{
+	//	if (destroyed) return;
+
+
+	//	RigidBody * rb = getComponent<RigidBody>();
+	//	if (rb != nullptr)
+	//	{
+	//		// trasnfrom 위치 받아서 최신화
+	//	}
+
+	//	for (auto it : children)
+	//	{
+	//		it->physicsUpdate();
+	//	}
+	//}
 
 	void destroyUpdate();
 

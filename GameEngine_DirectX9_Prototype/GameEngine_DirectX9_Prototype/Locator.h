@@ -25,6 +25,8 @@ class Scene;
 class NullScene;
 class Audio;
 class NullAudio;
+class Physics;
+class NullPhysics;
 
 class Locator
 {
@@ -37,28 +39,32 @@ private :
 	디바이스를 가지고 호출 할 수 있는 함수가 매우 많기 때문에 
 	그 함수를 다 래핑하고 널객체 디버깅객체를 정의하기가 너무 비효율적이라고 판단했다
 	*/
-	//static DeviceWrapper * deviceWrapper;
-	//static NullDeviceWrapper nullDeviceWrapper;
-	static IDirect3DDevice9 * device;
+	// static DeviceWrapper * deviceWrapper;
+	// static NullDeviceWrapper nullDeviceWrapper;
 
+	static IDirect3DDevice9 * device;
 
 	static Audio * audio;
 	static NullAudio nullAudio;
 
+	static Physics * physics;
+	static NullPhysics nullPhysics;
+
 protected :
 	static Scene& getScene(){ return *scene; }
 	static Audio& getAudio(){ return *audio; }
+	static Physics& getPhysics() { return *physics; }
 	//static DeviceWrapper& getDeviceWrapper() {return *deviceWrapper}
 	static IDirect3DDevice9& getDevice() 
 	{
 		// 만약 널포인터인데 포인터를 얻으려고 한다면 시스템을 종료한다.
 		// 디바이스를 등록하지 않았다면 아무것도 할 수 없다.
 		assert(Locator::device);
-
 		return *device;
 	}
 
-public :	
+public :
+
 	enum SystemType
 	{
 		DEBUGTYPE,
@@ -70,6 +76,8 @@ public :
 	static void provideAudio(SystemType type = SystemType::RELEASETYPE);
 	//static void provideDeviceWrapper(IDirect3DDevice9 * device, SystemType type = SystemType::RELEASETYPE);
 	static void provideDevice(IDirect3DDevice9 * device);
+	static void providePhysics(SystemType type = SystemType::RELEASETYPE);
+	static void release();
 
 };
 

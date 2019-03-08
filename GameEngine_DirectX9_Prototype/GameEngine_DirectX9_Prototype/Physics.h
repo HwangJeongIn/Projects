@@ -2,169 +2,107 @@
 #define PHYSICS_H
 
 #include "btBulletDynamicsCommon.h"
+#include "Utility.h"
+#include <map>
+
+using namespace std;
+
+
+/*
+필요한 기능
+1. 
+
+*/
+class GameObject;
+class Transform;
 
 class Physics
 {
-public :
-	static void test()
+private:
+	map<GameObject *, btCollisionObject*> collisionObjectsTable;
+	btDefaultCollisionConfiguration* collisionConfiguration;
+	btCollisionDispatcher* dispatcher;
+	btBroadphaseInterface* overlappingPairCache;
+	btSequentialImpulseConstraintSolver* solver;
+	btDiscreteDynamicsWorld* dynamicsWorld;
+
+	void init();
+	void release();
+	bool exists(GameObject * other);
+
+
+
+protected:
+
+	Physics()
 	{
-		///-----includes_end-----
-
-		int i;
-		///-----initialization_start-----
-
-		///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
-		btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-
-		///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
-		btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-
-		///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
-		btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
-
-		///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
-		btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-
-		btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-
-		dynamicsWorld->setGravity(btVector3(0, -10, 0));
-
-		///-----initialization_end-----
-
-		//keep track of the shapes, we release memory at exit.
-		//make sure to re-use collision shapes among rigid bodies whenever possible!
-		btAlignedObjectArray<btCollisionShape*> collisionShapes;
-
-		///create a few basic rigid bodies
-
-		//the ground is a cube of side 100 at position y = -56.
-		//the sphere will hit it at y = -6, with center at -5
-		{
-			btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-
-			collisionShapes.push_back(groundShape);
-
-			btTransform groundTransform;
-			groundTransform.setIdentity();
-			groundTransform.setOrigin(btVector3(0, -56, 0));
-
-			btScalar mass(0.);
-
-			//rigidbody is dynamic if and only if mass is non zero, otherwise static
-			bool isDynamic = (mass != 0.f);
-
-			btVector3 localInertia(0, 0, 0);
-			if (isDynamic)
-				groundShape->calculateLocalInertia(mass, localInertia);
-
-			//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-			btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-			btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-			btRigidBody* body = new btRigidBody(rbInfo);
-
-			//add the body to the dynamics world
-			dynamicsWorld->addRigidBody(body);
-		}
-
-		{
-			//create a dynamic rigidbody
-
-			//btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-			btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-			collisionShapes.push_back(colShape);
-
-			/// Create Dynamic Objects
-			btTransform startTransform;
-			startTransform.setIdentity();
-
-			btScalar mass(1.f);
-
-			//rigidbody is dynamic if and only if mass is non zero, otherwise static
-			bool isDynamic = (mass != 0.f);
-
-			btVector3 localInertia(0, 0, 0);
-			if (isDynamic)
-				colShape->calculateLocalInertia(mass, localInertia);
-
-			startTransform.setOrigin(btVector3(2, 10, 0));
-
-			//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-			btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-			btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-			btRigidBody* body = new btRigidBody(rbInfo);
-
-			dynamicsWorld->addRigidBody(body);
-		}
-
-		/// Do some simulation
-
-		///-----stepsimulation_start-----
-		for (i = 0; i < 150; i++)
-		{
-			dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-
-			//print positions of all objects
-			for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-			{
-				btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-				btRigidBody* body = btRigidBody::upcast(obj);
-				btTransform trans;
-				if (body && body->getMotionState())
-				{
-					body->getMotionState()->getWorldTransform(trans);
-				}
-				else
-				{
-					trans = obj->getWorldTransform();
-				}
-				printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-			}
-		}
-
-		///-----stepsimulation_end-----
-
-		//cleanup in the reverse order of creation/initialization
-
-		///-----cleanup_start-----
-
-		//remove the rigidbodies from the dynamics world and delete them
-		for (i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-		{
-			btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			if (body && body->getMotionState())
-			{
-				delete body->getMotionState();
-			}
-			dynamicsWorld->removeCollisionObject(obj);
-			delete obj;
-		}
-
-		//delete collision shapes
-		for (int j = 0; j < collisionShapes.size(); j++)
-		{
-			btCollisionShape* shape = collisionShapes[j];
-			collisionShapes[j] = 0;
-			delete shape;
-		}
-
-		//delete dynamics world
-		delete dynamicsWorld;
-
-		//delete solver
-		delete solver;
-
-		//delete broadphase
-		delete overlappingPairCache;
-
-		//delete dispatcher
-		delete dispatcher;
-
-		delete collisionConfiguration;
-
-		//next line is optional: it will be cleared by the destructor when the array goes out of scope
-		collisionShapes.clear();
+		init();
 	}
+	virtual ~Physics()
+	{
+		release();
+	}
+
+public:
+
+	friend class Locator;
+
+	virtual void registerRigidBody(GameObject * other, Transform * transform, bool isSphereCollider = true);
+	virtual void unregisterRigidBody(GameObject * other);
+	virtual void addForce(GameObject * other, Vector3 & directionWithScalar);
+
+	// 최신화시킨 위치를 받아오거나 / 사용자가 GameObject를 인위적으로 움직였을때 시스템에 접근해서 최신화시켜줘야 한다.
+	// rigidbody를 가지고 있다면 이 함수를 통해서 계속해서 위치를 받아온다.
+	virtual void setTransformFromSystem(Transform * output, GameObject * other);
+
+	// 사용자가 GameObject를 인위적으로 움직였을때 최신화 시키기 위한 함수이다.
+	virtual void setTransformToSystem(const Transform * input, GameObject * other);
+
+	// 여기서 델타타임은 sec단위이다. // 16 milliSec = 0.016 sec
+	virtual void update(float deltaTime);
+	virtual void setGravity(GameObject * other, Vector3 & value);
+	virtual void getGravity(Vector3 & output, GameObject * other);
+};
+
+class NullPhysics : public Physics
+{
+private:
+	NullPhysics()
+		: Physics() {}
+	virtual ~NullPhysics() {}
+
+public:
+	friend class Locator;
+	virtual void registerRigidBody(GameObject * other, Transform * transform, bool isSphereCollider = true) {}
+	virtual void unregisterRigidBody(GameObject * other) {}
+	virtual void addForce(GameObject * other, Vector3 & directionWithScalar) {}
+
+	// 여기서 델타타임은 sec단위이다. // 16 milliSec = 0.016 sec
+	virtual void update(float deltaTime) {}
+	virtual void setGravity(GameObject * other, Vector3 & value) {}
+	virtual void getGravity(Vector3 & output, GameObject * other) {}
+};
+
+class DebuggingPhysics : public Physics
+{
+
+private:
+	Physics & wrapped;
+
+	DebuggingPhysics(Physics & physcis)
+		: wrapped(physcis) {}
+	virtual ~DebuggingPhysics() {}
+
+	void log(const char * message)
+	{
+		if (!message) return;
+		cout << message << endl;
+	}
+
+public:
+	friend class Locator;
+	//  나중에 로그 찍는 것으로 바꿀예정
+
 };
 
 #endif

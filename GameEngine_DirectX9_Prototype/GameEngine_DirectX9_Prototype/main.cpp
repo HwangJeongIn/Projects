@@ -193,7 +193,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
 
-	Physics::test();
 
 	/*
 	서비스 등록
@@ -201,6 +200,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	*/
 	Locator::provideScene(Locator::SystemType::RELEASETYPE);
 	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
+	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
 	
 	/*
@@ -214,12 +214,12 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// 0단계
 	GameObject * car0 = GameObject::Instantiate("car0", "Car");
 	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car0->addComponent<BoxCollider>();
+	//car0->addComponent<BoxCollider>();
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
-	car1->addComponent<BoxCollider>();
+	//car1->addComponent<BoxCollider>();
 	car1->getTransform()->setPosition(15, 0, 0);
 
 	// 1단계
@@ -252,6 +252,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// void(*ptr_display)(void)
 	Cleanup();
 
+	Locator::release();
 	device->Release();
 
 	return 0;

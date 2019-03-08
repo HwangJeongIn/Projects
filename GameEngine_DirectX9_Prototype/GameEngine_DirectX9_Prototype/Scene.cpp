@@ -1,4 +1,6 @@
 #include "Scene.h"
+#include "Audio.h"
+#include "Physics.h"
 
 	Scene::Scene()
 		: name("Scene1"), previousTime(0), currentTime(0), lagTime(0)
@@ -70,15 +72,15 @@
 		/*
 		기본적인 월드를 계산해서 그린다.
 		*/
-		previousTime;
-			currentTime;
+		clock_t previousTime1;
+		clock_t	currentTime1;
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
-		//if (previousTime == 0)
-			previousTime = (int)clock();
+		if (previousTime == 0)
+			previousTime = clock();
+		
+		currentTime = clock();
 
-		currentTime = (int)clock();
 
-		previousTime;
 		// 업데이트 / 렌더링
 		// 업데이트는 매 프레임당 실행되는데 MeshRenderer 컴포넌트에 의해 렌더링과 커플링 되어있다.
 
@@ -89,13 +91,9 @@
 		// 느린 컴퓨터에서는 deltaTime의 값이 크게나와서 큰 값을 계산하게 된다.
 
 
-		
 		// transform 행렬 최신화
+		// 내부적으로 더티플래그를 이용한 자식 위치 최신화가 이루어진다.
 		transformUpdate();
-
-		// 충돌처리
-		colliderUpdate();
-
 
 		// 화면을 지워준다.
 		device_s.Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0);
@@ -103,20 +101,13 @@
 		// 중간에 렌더링 작업도 들어가기 때문에 씬을 그리는 작업을 해준다.
 		device_s.BeginScene();
 
-
 		// 임시
 		//drawScene(device_s);
 
 		update();
 
-		device_s.EndScene();
-		device_s.Present(0, 0, 0, 0);
-
-
-
 		//Sleep(20);
 		//return;
-
 
 		clock_t temp = currentTime - previousTime;
 		FrameTime::setDeltaTime(temp);
@@ -130,8 +121,16 @@
 		{
 			// 일정시간 간격마다 업데이트 되는 함수이다
 			// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
-			//Trace::Write("TAG_DEBUG", "fixedUpdate");
+			Trace::Write("TAG_DEBUG", "fixedUpdate");
 			fixedUpdate();
+
+			// 충돌처리 + 물리처리
+			physicsUpdate((float)MS_PER_FIXEDUPDATE / 1000.0f);	//colliderUpdate();
+			// 오디오 업데이트 // 스트리밍 형식으로 되기 때문에 업데이트를 해주어야 하긴 하지만
+			// 계속해서 호출해줄 필요는 없기 때문에 fixedUpdate()에서 해준다.
+			audioUpdate();
+
+			//Trace::Write("TAG_DEBUG", (float)MS_PER_FIXEDUPDATE / 1000.0f);
 			lagTime -= MS_PER_FIXEDUPDATE;
 		}
 
@@ -141,9 +140,15 @@
 		// 업데이트 되고난후 삭제처리
 		destroyUpdate();
 
-		//// 60프레임 기준으로 시간이 남았다면 딜레이
+		// 60프레임 기준으로 시간이 남았다면 딜레이
+		
+		//Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
+		
 		if(MS_PER_FRAME - FrameTime::getDeltaTime()>0)
 			Sleep(MS_PER_FRAME - FrameTime::getDeltaTime());
+
+		device_s.EndScene();
+		device_s.Present(0, 0, 0, 0);
 
 	}
 
@@ -164,6 +169,27 @@
 		}
 	}
 
+	void Scene::audioUpdate()
+	{
+		// 시스템에 접근하기 위해서는 게임오브젝트의 함수를 통해서만 접근이 가능하다.
+		// 게임에서 항상 있어야 할 오브젝트는 카메라 오브젝트이기 때문에 카메라오브젝트를 찾아서 업데이트 시켜준다.
+		if (mainObjectsTable.find(MainObjTag::MOT_MAINCAMERA) == mainObjectsTable.end()) return;
+		GameObject * camera = mainObjectsTable[MainObjTag::MOT_MAINCAMERA];
+
+		camera->getAudio().update();
+
+	}
+
+	void Scene::physicsUpdate(float deltaTime)
+	{
+		// 시스템에 접근하기 위해서는 게임오브젝트의 함수를 통해서만 접근이 가능하다.
+		// 게임에서 항상 있어야 할 오브젝트는 카메라 오브젝트이기 때문에 카메라오브젝트를 찾아서 업데이트 시켜준다.
+		if (mainObjectsTable.find(MainObjTag::MOT_MAINCAMERA) == mainObjectsTable.end()) return;
+		GameObject * camera = mainObjectsTable[MainObjTag::MOT_MAINCAMERA];
+
+		camera->getPhysics().update(deltaTime);
+	}
+
 	void Scene::transformUpdate()
 	{
 		for (auto it : rootGameObjects)
@@ -172,8 +198,7 @@
 		}
 	}
 
-	// 일단 충돌되면 안겹치게 움직이는 걸로 하자.
-	// 나중에 물리엔진을 적용시켜서 물리 현상을 정확하게 표현하는걸로 하자
+	// 현재 물리라이브러리로 작업중
 	void Scene::colliderUpdate()
 	{
 		BoxCollider * bc_obj1 = nullptr;

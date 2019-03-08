@@ -28,5 +28,5 @@ map<KeyCode, pair<int, int>> InputManager::KeyCodeTable
 int InputManager::Major = -1;
 int InputManager::Minor = -1;
 
-unsigned long FrameTime::deltaTime = 0;
+long FrameTime::deltaTime = 0;
 

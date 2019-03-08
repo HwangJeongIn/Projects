@@ -159,41 +159,6 @@ void Transform::calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
 
 
 
-void MainCamera::update()
-{
-	// 메인카메라에서 오디오를 최신화 시킨다.
-	// 파일을 스트리밍하기 때문에 계속 업데이트가 필요하다
-	gameObject->getAudio().update();
-
-
-	setViewSpace();
-
-	if (::GetAsyncKeyState('E') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{0,.05f,0});
-	if (::GetAsyncKeyState('Q') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
-
-	if (::GetAsyncKeyState('Z') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
-	if (::GetAsyncKeyState('C') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
-
-	if (::GetAsyncKeyState('W') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (transform->getForward()) );
-	if (::GetAsyncKeyState('S') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (-1)*(transform->getForward()));
-
-	if (::GetAsyncKeyState('D') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (transform->getRight()));
-	if (::GetAsyncKeyState('A') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
-
-
-
-	//if (InputManager::GetKeyDown(KeyCode::A))
-	//	transform->setRotation(transform->getRotation().getX(), transform->getRotation().getY() + 3, transform->getRotation().getX());
-}
-
 MainCamera::MainCamera(GameObject * go, Transform * tf)
 	: Component(go, tf)
 {

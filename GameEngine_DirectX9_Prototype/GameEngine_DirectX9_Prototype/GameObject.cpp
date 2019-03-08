@@ -79,6 +79,11 @@ Audio & GameObject::getAudio()
 	return Locator::getAudio();
 }
 
+Physics & GameObject::getPhysics()
+{
+	return Locator::getPhysics();
+}
+
 
 void GameObject::setParent(GameObject * parent)
 {
@@ -89,6 +94,7 @@ void GameObject::setParent(GameObject * parent)
 		getScene().baseDestroy(this, true);
 		getScene().baseInstantiate(this, false);
 	}
+
 	if (parent == nullptr && this->parent != nullptr)
 	{
 		// 다른 자식 객체 > 루트객체
@@ -102,6 +108,7 @@ void GameObject::setParent(GameObject * parent)
 		getScene().baseDestroy(this, false);
 		getScene().baseInstantiate(this, false);
 	}
+
 	this->parent = parent;
 }
 
@@ -128,32 +135,28 @@ int GameObject::getPath(string & path)
 void GameObject::update()
 {
 	// isDestroyed 플래그가 꺼져있을때만 컴포넌트들을 업데이트 해준다.
-	if (!destroyed)
-	{
-		for (auto it : components)
-		{
-			it->update();
-		}
-	}
+	if (destroyed) return;
 
+	for (auto it : components)
+	{
+		it->update();
+	}
 
 	for (auto it : children)
 	{
 		it->update();
 	}
-
-
 }
 
 void GameObject::fixedUpdate()
 {
-	if (!destroyed)
+	if (destroyed) return;
+
+	for (auto it : components)
 	{
-		for (auto it : components)
-		{
-			it->fixedUpdate();
-		}
+		it->fixedUpdate();
 	}
+
 
 	for (auto it : children)
 	{
@@ -161,7 +164,6 @@ void GameObject::fixedUpdate()
 	}
 
 }
-
 
 // erase할때 반복자가 최신화된다.
 // 따라서 더이상 쓸수 없는 반복자.. 새롭게 바뀐 자료형에서의 end와 begin은 그전의 end와 begin과 다르다?

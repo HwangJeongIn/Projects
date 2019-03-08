@@ -10,7 +10,7 @@
 #include "Trace.h"
 #include "d3dUtility.h"
 //#include <chrono>
-#include <cstdio>
+//#include <cstdio>
 #include <ctime>
 
 
@@ -49,10 +49,10 @@ private :
 	map<MainObjTag, GameObject *> mainObjectsTable;
 
 	// 60프레임일때 1프레임당 시간
-	static const DWORD MS_PER_FRAME = 16;
+	static const long MS_PER_FRAME = 16;
 
 	// 2프레임마다 최신화하게 된다.
-	static const DWORD MS_PER_FIXEDUPDATE = MS_PER_FRAME*2;
+	static const long MS_PER_FIXEDUPDATE = MS_PER_FRAME*2;
 
 	clock_t previousTime;
 	clock_t currentTime;
@@ -69,10 +69,15 @@ public :
 	virtual void gameLoop();
 	virtual void update();
 	virtual void fixedUpdate();
+	virtual void audioUpdate();
+	virtual void physicsUpdate(float deltaTime);
 	virtual void transformUpdate();
-	virtual void colliderUpdate();
 	virtual void destroyUpdate();
 
+	// 현재 사용X
+	virtual void colliderUpdate();
+	
+	
 	virtual void changeNameIfItExists(GameObject * other);
 	virtual void registerGameObject(GameObject * other);
 	virtual void unregisterGameObject(GameObject * other);
