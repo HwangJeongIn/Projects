@@ -228,7 +228,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
-	car1->addComponent<RigidBody>()->setSphereCollider(2);
+	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
+	car1RigidBody->setSphereCollider(2);
+	//car1RigidBody->setGravity(Vector3(0, 0, 0));
 	//car1->addComponent<BoxCollider>();
 	car1->getTransform()->setPosition(15, 0, 0);
 

@@ -467,3 +467,15 @@ void RigidBody::setSphereCollider(float radius)
 	gameObject->getPhysics().setSphereCollider(gameObject, radius);
 }
 
+//virtual void setGravity(GameObject * other, Vector3 & value);
+//virtual void getGravity(Vector3 & output, GameObject * other);
+void RigidBody::setGravity(Vector3 & value)
+{
+	gameObject->getPhysics().setGravity( gameObject,value);
+}
+
+void RigidBody::getGravity(Vector3 & output)
+{
+	gameObject->getPhysics().getGravity(output, gameObject);
+}
+

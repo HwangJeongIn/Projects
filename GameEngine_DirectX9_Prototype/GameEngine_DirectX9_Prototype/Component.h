@@ -513,6 +513,9 @@ public:
 	void setBoxCollider(const Vector3 & size);
 	void setSphereCollider(float radius);
 
+	void setGravity(Vector3 & value);
+	void getGravity(Vector3 & output);
+
 };
 
 #endif
