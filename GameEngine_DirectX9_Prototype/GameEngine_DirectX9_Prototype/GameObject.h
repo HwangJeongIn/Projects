@@ -14,6 +14,7 @@ private:
 	vector<Component *> components;
 	vector<GameObject *> children;
 	Transform * transform;
+	RigidBody * rigidBody;
 	GameObject * parent;
 
 	// 각 게임 오브젝트를 업데이트 과정에서 이 플래그가 켜져있으면 업데이트를 시켜주지 않고 넘어간다.
@@ -23,7 +24,40 @@ private:
 	GameObject(const string & name = "default GO name", const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
 		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr,
-		vector<Component *> * components = nullptr);
+		vector<Component *> * components = nullptr)
+		: name(name), tag(tag), transform(new Transform(this, position, rotation, scale)), parent(parent), destroyed(false), rigidBody(nullptr) //, gameObject(this)
+	{
+		//// Transform초기화
+		//// Transform은 필수 컴포넌트 / 파라미터로 잘못들어오면 객체생성에 실패한것이기 때문에 리턴한다.
+		//if (!transform) return;
+
+		// transform은 따로 작업해주고 싶어서 넣어주지 않았다.
+		// 렌더링해야하는 객체는 Transform 컴포넌트에서 월드좌표계 포지션을 받아서 렌더링한다.
+
+		// this->components.push_back(transform);
+
+
+		// 나중에 안쓸수도 있음 아래에있는것들
+		// 아예 컴포넌트와 자식객체를 생성하기 위해서 함수로 분리할 예정
+
+		// 들어온 파라미터에 자식객체가 있으면 초기화
+		if (children != nullptr)
+		{
+			for (int i = 0; i < children->size(); ++i)
+			{
+				this->children.push_back((*children)[i]);
+			}
+		}
+
+		// 들어온 파라미터에 컴포넌트가 있으면 초기화
+		if (components != nullptr)
+		{
+			for (int i = 0; i < components->size(); ++i)
+			{
+				this->components.push_back((*components)[i]);
+			}
+		}
+	}
 
 	virtual ~GameObject();
 
@@ -45,9 +79,19 @@ public:
 
 	void setTag(const string & tag) { this->tag = tag; }
 	void setName(const string & name) { this->name = name; }
-	
-	Transform * getTransform() { return transform; }
+	void setTransform(Transform * transform)
+	{
+		if (!transform) return;
+		this->transform = transform;
+	}
+	void setRigidBody(RigidBody * rigidBody)
+	{
+		if (!rigidBody) return;
+		this->rigidBody = rigidBody;
+	}
 
+	Transform * getTransform() { return transform; }
+	RigidBody * getRigidBody() { return rigidBody; }
 	bool isRootObj(){ return parent == nullptr; }
 	GameObject * getParent() { return parent; }
 

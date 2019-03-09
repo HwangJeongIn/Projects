@@ -115,6 +115,7 @@ public:
 	const Vector3 & getUp() const { return up; }
 
 	bool getDirty() const { return dirty; }
+	void setDirty(bool dirty) { this->dirty = dirty; }
 
 	//void transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix);
 
@@ -245,32 +246,18 @@ public:
 		return num;
 	}
 
-	void setPosition(const Vector3 & other) { position = other; dirty = true; }
-	void setRotation(const Vector3 & other) 
-	{
-		rotation.setX(constrainLessThan360(other.getX())); 
-		rotation.setY(constrainLessThan360(other.getY()));
-		rotation.setZ(constrainLessThan360(other.getZ()));
-		setDirectionVectorWithRotation_DX();
-		dirty = true;
-	}
+	void setPosition_physics(const Vector3 & other);
+	void setRotation_physics(const Vector3 & other);
+	void setScale_physics(const Vector3 & other);
+
+	void setPosition(const Vector3 & other);
+	void setRotation(const Vector3 & other);
+
 	void setScale(const Vector3 & other) { scale = other; }
 
-	void setPosition(float x, float y, float z) 
-	{ 
-		position.setX(constrainLessThan360(x));
-		position.setY(constrainLessThan360(y));
-		position.setZ(constrainLessThan360(z));
-		dirty = true;
-	}
-	void setRotation(float x, float y, float z)
-	{
-		rotation.setX(constrainLessThan360(x));
-		rotation.setY(constrainLessThan360(y)); 
-		rotation.setZ(constrainLessThan360(z));
-		setDirectionVectorWithRotation_DX();
-		dirty = true;
-	}
+	void setPosition(float x, float y, float z);
+	void setRotation(float x, float y, float z);
+
 	void setScale(float x, float y, float z) { scale = { x,y,z }; }
 
 	void setTransform(const Vector3 & position, const Vector3 & rotation, const Vector3 & scale)
@@ -286,8 +273,6 @@ public:
 		setRotation(other.rotation);
 		setScale(other.scale);
 	}
-
-
 };
 
 // X파일을 통한 메쉬생성 컴포넌트
@@ -504,8 +489,9 @@ class RigidBody : public Component
 private:
 
 protected:
-	//virtual void start();
-	//virtual void update();
+	virtual void start();
+	virtual void fixedUpdate();
+	virtual void onDestroy();
 public:
 	RigidBody(GameObject * go, Transform * tf)
 		: Component(go, tf)
@@ -518,6 +504,14 @@ public:
 		onDestroy();
 	}
 
+	void turnOnStaticFlag();
+	void turnOffStaticFlag(float mass = 1.0f);
+
+	void turnOnIsTriggerFlag();
+	void turnOffIsTriggerFlag();
+
+	void setBoxCollider(const Vector3 & size);
+	void setSphereCollider(float radius);
 
 };
 

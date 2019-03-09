@@ -58,7 +58,7 @@ void Physics::release()
 	delete collisionConfiguration;
 }
 
-bool Physics::exists(GameObject * other)
+bool Physics::exists(GameObject * other) const
 {
 	if (!other) return false;
 	// 만약에 등록되어 있지 않은 게임오브젝트 일때 // 즉 리지드바디가 등록되어 있지 않다면
@@ -66,38 +66,45 @@ bool Physics::exists(GameObject * other)
 	return true;
 }
 
-
-void Physics::registerRigidBody(GameObject * other, Transform * transform, bool isSphereCollider)
+void Physics::setBaseConstructionInfo(btRigidBody::btRigidBodyConstructionInfo & info) const
 {
-	if (!exists(other)) return;
+	info.m_friction = 1.0f;
+	info.m_angularDamping = .5f;
+	info.m_linearDamping = .5f;
+}
 
-	// 일단 콜라이더는 무조건 삽입하기로 했다.
+void Physics::registerRigidBody(GameObject * other)
+{
+	if (exists(other)) return;
+
+	// 게임오브젝트만 등록하는 경우 충돌체는 반지름 1인 구
 	btCollisionShape* colShape = new btSphereShape(btScalar(1.));
 
-	/// Create Dynamic Objects
 	// 위치 초기화
 	btTransform startTransform;
 	startTransform.setIdentity();
 
+	Transform * transform = other->getTransform();
 	// 위치 초기화
 	startTransform.setOrigin(btVector3(transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ()));
 	// 로테이션 초기화
 	//startTransform.set
 
-	// 일단 매스도 무조건 1로 하기로 했다.
+	// 게임오브젝트만 등록하는 경우 mass값은 무조건 1
 	btScalar mass(1.f);
 
-	//rigidbody is dynamic if and only if mass is non zero, otherwise static
 	// 추가작업 // 관성
-	bool isDynamic = (mass != 0.f);
+	//bool isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);
-	if (isDynamic)
-		colShape->calculateLocalInertia(mass, localInertia);
+	//if (isDynamic)
+	colShape->calculateLocalInertia(mass, localInertia);
 
 
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
+	setBaseConstructionInfo(rbInfo);
+
 	btRigidBody* body = new btRigidBody(rbInfo);
 
 	// 다이나믹 월드에 추가한다.
@@ -110,6 +117,48 @@ void Physics::registerRigidBody(GameObject * other, Transform * transform, bool 
 	if (body->getCollisionShape())
 	{
 		// 맨마지막 콜리전 오브젝트를 받아오고 등록한다.
+		temp = dynamicsWorld->getCollisionObjectArray()[dynamicsWorld->getNumCollisionObjects() - 1];
+		collisionObjectsTable[other] = temp;
+	}
+
+}
+
+void Physics::registerRigidBody(GameObject * other, btCollisionShape * shape, float mass)
+{
+	if (exists(other)) return; if (!shape) return;
+
+
+	// 위치 초기화
+	btTransform startTransform;
+	startTransform.setIdentity();
+
+	Transform * transform = other->getTransform();
+	// 위치 초기화
+	startTransform.setOrigin(btVector3(transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ()));
+	// 로테이션 초기화
+	//startTransform.set
+
+	if (mass < 0)
+		mass = 1.0f;
+
+	// 추가작업 // 관성
+	btVector3 localInertia(0, 0, 0);
+	//if (isDynamic)
+	shape->calculateLocalInertia(mass, localInertia);
+
+
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, shape, localInertia);
+	setBaseConstructionInfo(rbInfo);
+
+	btRigidBody* body = new btRigidBody(rbInfo);
+
+	// 다이나믹 월드에 추가한다.
+	dynamicsWorld->addRigidBody(body);
+
+	btCollisionObject * temp = nullptr;
+	if (body->getCollisionShape())
+	{
 		temp = dynamicsWorld->getCollisionObjectArray()[dynamicsWorld->getNumCollisionObjects() - 1];
 		collisionObjectsTable[other] = temp;
 	}
@@ -157,7 +206,7 @@ void Physics::unregisterRigidBody(GameObject * other)
 	collisionObjectsTable.erase(other);
 }
 
-void Physics::addForce(GameObject * other, Vector3 & directionWithScalar)
+void Physics::addForce(GameObject * other,const Vector3 & directionWithScalar)
 {
 	if (!exists(other)) return;
 
@@ -169,21 +218,26 @@ void Physics::addForce(GameObject * other, Vector3 & directionWithScalar)
 	body->applyCentralImpulse(tempVector);
 }
 
-void Physics::setTransformFromSystem(Transform * output, GameObject * other)
+void Physics::setTransformFromSystem(GameObject * other)
 {
 	if (!exists(other)) return;
-	if (!output) return;
+
 
 	btCollisionObject * temp = collisionObjectsTable[other];
 	btRigidBody * body = btRigidBody::upcast(temp);
 	btTransform trans;
-	if (body && body->getMotionState())
-	{
-		// rigidBody가 있고 보간기능을 사용할 수 있으면
-		// transform을 rigidbody의 getMotionState > getWorldTransform함수를 통해서 받아온다.
-		body->getMotionState()->getWorldTransform(trans);
-	}
-	else
+	trans.setIdentity();
+	/*
+	대표 예제와는 다르게 body를 통해서 transform을 받아오면 오차가 생긴다.
+	collisionObject를 통해서 받아오니 해결되었다.
+	*/
+	//if (body && body->getMotionState())
+	//{
+	//	// rigidBody가 있고 보간기능을 사용할 수 있으면
+	//	// transform을 rigidbody의 getMotionState > getWorldTransform함수를 통해서 받아온다.
+	//	body->getMotionState()->getWorldTransform(trans);
+	//}
+	//else
 	{
 		// 아니면 collisionshape을 통해서 받아온다.
 		trans = temp->getWorldTransform();
@@ -192,8 +246,8 @@ void Physics::setTransformFromSystem(Transform * output, GameObject * other)
 	// 시스템으로부터 값을 받아서 위치 로테이션 최신화
 	btVector3 & position = trans.getOrigin();
 
-	
-	output->setPosition(position.getX(), position.getY(), position.getZ());
+	Transform * transform = other->getTransform();
+	transform->setPosition_physics(Vector3(position.getX(), position.getY(), position.getZ()));
 	
 	/*
 	btQuaternion & quatern = trans.getRotation();
@@ -202,24 +256,50 @@ void Physics::setTransformFromSystem(Transform * output, GameObject * other)
 	*/
 }
 
-void Physics::setTransformToSystem(const Transform * input, GameObject * other)
+void Physics::setTransformToSystem(GameObject * other)
 {
 	if (!exists(other)) return;
-	if (!input) return;
 
-	btTransform trans;
 
 	// 시스템에 들어온 자체정의 transform으로 시스템의 transform 최신화
 	btCollisionObject * temp = collisionObjectsTable[other];
 
-	trans.setOrigin(btVector3(input->getPosition().getX(), input->getPosition().getY(), input->getPosition().getZ()));
-	
+
+	Transform * transform = other->getTransform();
+
+	btTransform trans;
+	trans.setIdentity();
+
+	trans.setOrigin(btVector3(transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ()));
+	//Trace::Write("TAG_DEBUG","ToSystem X : ", transform->getPosition().getX());
+	//Trace::Write("TAG_DEBUG", "ToSystem Y : ", transform->getPosition().getY());
+	//Trace::Write("TAG_DEBUG", "ToSystem Z : ", transform->getPosition().getZ());
+
 	/*
 	btQuaternion quatern;
 	// input->여기서 로테이션값을 초기화해준다.
 	trans.setRotation(quatern);
 	*/
+
 	temp->setWorldTransform(trans);
+
+
+	// test
+	return;
+	btRigidBody * body = btRigidBody::upcast(temp);
+	btTransform ttt;
+	ttt.setIdentity();
+	body->getMotionState()->getWorldTransform(ttt);
+	Trace::Write("TAG_DEBUG", "After ToSystem_Body X : ", ttt.getOrigin().getX());
+	Trace::Write("TAG_DEBUG", "After ToSystem_Body Y : ", ttt.getOrigin().getY());
+	Trace::Write("TAG_DEBUG", "After ToSystem_Body Z : ", ttt.getOrigin().getZ());
+
+
+
+	ttt = temp->getWorldTransform();
+	Trace::Write("TAG_DEBUG", "After ToSystem_ X : ", ttt.getOrigin().getX());
+	Trace::Write("TAG_DEBUG", "After ToSystem_ Y : ", ttt.getOrigin().getY());
+	Trace::Write("TAG_DEBUG", "After ToSystem_ Z : ", ttt.getOrigin().getZ());
 }
 
 void Physics::update(float deltaTime)
@@ -247,3 +327,115 @@ void Physics::getGravity(Vector3 & output, GameObject * other)
 	output.setY(tempVector3.getY());
 	output.setY(tempVector3.getZ());
 }
+
+void Physics::setMass(GameObject * other, float mass)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+
+	if (mass < 0)
+		mass = 1.0f;
+
+	btVector3 localInertia(0, 0, 0);
+	temp->getCollisionShape()->calculateLocalInertia(mass, localInertia);
+	// mass에 따라 새롭게 계산해서 넣어준다.
+	body->setMassProps(mass, localInertia);
+}
+
+float Physics::getMass(GameObject * other)
+{
+	if (!exists(other)) return -1.0f;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+
+	return body->getInvMass();
+}
+
+
+void Physics::turnOnStaticFlag(GameObject * other)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+	// turn on
+	// 스태틱플래그를 켜고 중력을 0으로 만든다.
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
+	body->setGravity(btVector3{ 0,0,0 });
+
+	setMass(other, 0.0f);
+}
+
+void Physics::turnOffStaticFlag(GameObject * other, float mass)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+	// turn off
+	// 스태틱플래그를 끄고 중력을 되돌린다.
+	body->setCollisionFlags(body->getCollisionFlags() & ~btCollisionObject::CF_STATIC_OBJECT);
+	body->setGravity(btVector3{ 0,-10, 0 });
+
+	setMass(other, mass);
+}
+
+void Physics::turnOnIsTriggerFlag(GameObject * other)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+	// turn on
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+}
+
+void Physics::turnOffIsTriggerFlag(GameObject * other)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+	// turn off
+	body->setCollisionFlags(body->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+}
+
+void Physics::setBoxCollider(GameObject * other, const Vector3 & size)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+	// 기존의 mass값은 똑같이 유지된다.
+	float mass = body->getInvMass();
+
+	btCollisionShape* shape = new btBoxShape(btVector3(size.getX(), size.getY(), size.getZ()));
+	// 아예등록해제해주고
+	unregisterRigidBody(other);
+
+	// 다시 등록해준다
+	registerRigidBody(other, shape, mass);
+}
+
+void Physics::setSphereCollider(GameObject * other, float radius)
+{
+	if (!exists(other)) return;
+
+	btCollisionObject * temp = collisionObjectsTable[other];
+	btRigidBody * body = btRigidBody::upcast(temp);
+	// 기존의 mass값은 똑같이 유지된다.
+	float mass = body->getInvMass();
+
+	btCollisionShape* shape = new btSphereShape(radius);
+	// 아예등록해제해주고
+	unregisterRigidBody(other);
+
+	// 다시 등록해준다
+	registerRigidBody(other, shape, mass);
+}
+
+
+

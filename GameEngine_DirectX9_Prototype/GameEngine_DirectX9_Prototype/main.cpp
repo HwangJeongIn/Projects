@@ -210,15 +210,25 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -80);
 
+	// ground
+	GameObject * ground = GameObject::Instantiate("ground", "Ground");
+	ground->addComponent<MeshRenderer>()->loadXFile("car.x");
+	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
+	ground->getTransform()->setPosition(0, -15, 0);
+	groundRigidBody->setBoxCollider(Vector3{ 300,10,300 });
+	groundRigidBody->turnOnStaticFlag();
+
 
 	// 0´Ü°è
 	GameObject * car0 = GameObject::Instantiate("car0", "Car");
 	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
+	car0->addComponent<RigidBody>()->setSphereCollider(2);
 	//car0->addComponent<BoxCollider>();
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
+	car1->addComponent<RigidBody>()->setSphereCollider(2);
 	//car1->addComponent<BoxCollider>();
 	car1->getTransform()->setPosition(15, 0, 0);
 

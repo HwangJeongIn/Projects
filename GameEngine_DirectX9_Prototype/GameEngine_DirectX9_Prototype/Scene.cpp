@@ -72,14 +72,31 @@
 		/*
 		기본적인 월드를 계산해서 그린다.
 		*/
-		clock_t previousTime1;
-		clock_t	currentTime1;
+
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
 		if (previousTime == 0)
 			previousTime = clock();
 		
 		currentTime = clock();
 
+		while (lagTime >= MS_PER_FIXEDUPDATE)
+		{
+			// 일정시간 간격마다 업데이트 되는 함수이다
+			// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
+			Trace::Write("TAG_DEBUG", "fixedUpdate");
+			fixedUpdate();
+
+			// 충돌처리 + 물리처리
+			physicsUpdate((float)MS_PER_FIXEDUPDATE / 1000.0f);
+				//colliderUpdate();
+
+			// 오디오 업데이트 // 스트리밍 형식으로 되기 때문에 업데이트를 해주어야 하긴 하지만
+			// 계속해서 호출해줄 필요는 없기 때문에 fixedUpdate()에서 해준다.
+			audioUpdate();
+
+			//Trace::Write("TAG_DEBUG", (float)MS_PER_FIXEDUPDATE / 1000.0f);
+			lagTime -= MS_PER_FIXEDUPDATE;
+		}
 
 		// 업데이트 / 렌더링
 		// 업데이트는 매 프레임당 실행되는데 MeshRenderer 컴포넌트에 의해 렌더링과 커플링 되어있다.
@@ -101,42 +118,20 @@
 		// 중간에 렌더링 작업도 들어가기 때문에 씬을 그리는 작업을 해준다.
 		device_s.BeginScene();
 
-		// 임시
-		//drawScene(device_s);
 
 		update();
 
-		//Sleep(20);
-		//return;
-
 		clock_t temp = currentTime - previousTime;
 		FrameTime::setDeltaTime(temp);
-
+		Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
 		previousTime = currentTime;
 
 		lagTime += temp;
 
-
-		while (lagTime >= MS_PER_FIXEDUPDATE)
-		{
-			// 일정시간 간격마다 업데이트 되는 함수이다
-			// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
-			Trace::Write("TAG_DEBUG", "fixedUpdate");
-			fixedUpdate();
-
-			// 충돌처리 + 물리처리
-			physicsUpdate((float)MS_PER_FIXEDUPDATE / 1000.0f);	//colliderUpdate();
-			// 오디오 업데이트 // 스트리밍 형식으로 되기 때문에 업데이트를 해주어야 하긴 하지만
-			// 계속해서 호출해줄 필요는 없기 때문에 fixedUpdate()에서 해준다.
-			audioUpdate();
-
-			//Trace::Write("TAG_DEBUG", (float)MS_PER_FIXEDUPDATE / 1000.0f);
-			lagTime -= MS_PER_FIXEDUPDATE;
-		}
-
 		/*
 		프레임의 끝단계 일정시간을 딜레이 시키기 전에 여러가지 작업을 해준다.
 		*/
+
 		// 업데이트 되고난후 삭제처리
 		destroyUpdate();
 

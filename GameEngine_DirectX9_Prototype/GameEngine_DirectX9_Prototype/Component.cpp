@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Scene.h"
 #include "Audio.h"
+#include "Physics.h"
 #include "Utility.h"
 
 
@@ -30,6 +31,8 @@ void MoveScript::update()
 	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
 		transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
 
+	if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
+		gameObject->getPhysics().addForce(gameObject, (-1)*transform->getForward());
 
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
@@ -155,6 +158,69 @@ void Transform::calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
 	D3DXMatrixTranslation(&positionMatrix_DX, result.getX(), result.getY(), result.getZ());
 	// 마지막으로 부모객체의 위치만큼 이동시킨다.
 	D3DXMatrixMultiply(&positionMatrix_DX, &positionMatrix_DX, &parentPositionMatrix);
+}
+
+void Transform::setPosition_physics(const Vector3 & other)
+{
+	position = other; dirty = true;
+}
+
+void Transform::setRotation_physics(const Vector3 & other)
+{
+	rotation.setX(constrainLessThan360(other.getX()));
+	rotation.setY(constrainLessThan360(other.getY()));
+	rotation.setZ(constrainLessThan360(other.getZ()));
+	setDirectionVectorWithRotation_DX();
+	dirty = true;
+}
+
+void Transform::setScale_physics(const Vector3 & other)
+{
+	scale = other;
+}
+
+void Transform::setPosition(const Vector3 & other)
+{
+	position = other; dirty = true;
+		// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	if(gameObject->getRigidBody())
+		gameObject->getPhysics().setTransformToSystem(gameObject);
+}
+
+void Transform::setRotation(const Vector3 & other)
+{
+	rotation.setX(constrainLessThan360(other.getX()));
+	rotation.setY(constrainLessThan360(other.getY()));
+	rotation.setZ(constrainLessThan360(other.getZ()));
+	setDirectionVectorWithRotation_DX();
+	dirty = true;
+	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	if(gameObject->getRigidBody())
+		gameObject->getPhysics().setTransformToSystem(gameObject);
+}
+
+void Transform::setPosition(float x, float y, float z)
+
+{
+	position.setX(x);
+	position.setY(y);
+	position.setZ(z);
+	dirty = true;
+	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	if (gameObject->getRigidBody())
+		gameObject->getPhysics().setTransformToSystem(gameObject);
+}
+
+void Transform::setRotation(float x, float y, float z)
+{
+	rotation.setX(constrainLessThan360(x));
+	rotation.setY(constrainLessThan360(y));
+	rotation.setZ(constrainLessThan360(z));
+	setDirectionVectorWithRotation_DX();
+	dirty = true;
+	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	if (gameObject->getRigidBody())
+		gameObject->getPhysics().setTransformToSystem(gameObject);
 }
 
 
@@ -351,3 +417,53 @@ void MeshRenderer::setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long n
 
 
 const float BoxCollider::DefaultSize = 2.5f;
+
+void RigidBody::start()
+{
+	gameObject->getPhysics().registerRigidBody(gameObject);
+	gameObject->setRigidBody(this);
+}
+
+void RigidBody::fixedUpdate()
+{
+	gameObject->getPhysics().setTransformFromSystem(gameObject);
+	// 물리업데이트가 되었기 때문에 더티플래그를 켜준다.
+	transform->setDirty(true);
+}
+
+void RigidBody::onDestroy()
+{
+	gameObject->getPhysics().unregisterRigidBody(gameObject);
+	gameObject->setRigidBody(nullptr);
+}
+
+void RigidBody::turnOnStaticFlag()
+{
+	gameObject->getPhysics().turnOnStaticFlag(gameObject);
+}
+
+void RigidBody::turnOffStaticFlag(float mass)
+{
+	gameObject->getPhysics().turnOffStaticFlag(gameObject, mass);
+}
+
+void RigidBody::turnOnIsTriggerFlag()
+{
+	gameObject->getPhysics().turnOnIsTriggerFlag(gameObject);
+}
+
+void RigidBody::turnOffIsTriggerFlag()
+{
+	gameObject->getPhysics().turnOffIsTriggerFlag(gameObject);
+}
+
+void RigidBody::setBoxCollider(const Vector3 & size)
+{
+	gameObject->getPhysics().setBoxCollider(gameObject, size);
+}
+
+void RigidBody::setSphereCollider(float radius)
+{
+	gameObject->getPhysics().setSphereCollider(gameObject, radius);
+}
+
