@@ -121,6 +121,7 @@ private:
 		cout << message << endl;
 	}
 
+	Physics * getWrappedPhysics() { return &wrapped; }
 public:
 	friend class Locator;
 	//  나중에 로그 찍는 것으로 바꿀예정

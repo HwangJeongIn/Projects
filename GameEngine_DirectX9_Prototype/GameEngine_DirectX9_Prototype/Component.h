@@ -4,6 +4,7 @@
 #include "Utility.h"
 #include <vector>
 #include "d3dUtility.h"
+#include "FbxInfo.h"
 
 class Transform;
 class GameObject;
@@ -346,6 +347,7 @@ public:
 
 };
 
+// 테스트용
 class MoveScript_C : public Component
 {
 private:
@@ -377,37 +379,7 @@ class MainCamera : public Component
 {
 private :
 	/*Scene::MainObjTag*/unsigned char mainObjTag;
-	virtual void update()
-	{
-		// 메인카메라에서 오디오를 최신화 시킨다.
-		// 파일을 스트리밍하기 때문에 계속 업데이트가 필요하다
-		setViewSpace();
-
-		if (::GetAsyncKeyState('E') & 0x8000f)
-			transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
-		if (::GetAsyncKeyState('Q') & 0x8000f)
-			transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
-
-		if (::GetAsyncKeyState('Z') & 0x8000f)
-			transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
-		if (::GetAsyncKeyState('C') & 0x8000f)
-			transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
-
-		if (::GetAsyncKeyState('W') & 0x8000f)
-			transform->setPosition(transform->getPosition() + (transform->getForward()));
-		if (::GetAsyncKeyState('S') & 0x8000f)
-			transform->setPosition(transform->getPosition() + (-1)*(transform->getForward()));
-
-		if (::GetAsyncKeyState('D') & 0x8000f)
-			transform->setPosition(transform->getPosition() + (transform->getRight()));
-		if (::GetAsyncKeyState('A') & 0x8000f)
-			transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
-
-
-
-		//if (InputManager::GetKeyDown(KeyCode::A))
-		//	transform->setRotation(transform->getRotation().getX(), transform->getRotation().getY() + 3, transform->getRotation().getX());
-	}
+	virtual void update();
 protected :
 public :
 	MainCamera(GameObject * go, Transform * tf);
@@ -515,6 +487,81 @@ public:
 
 	void setGravity(Vector3 & value);
 	void getGravity(Vector3 & output);
+
+};
+
+class FbxMeshRenderer : public Component
+{
+private:
+	ID3DXMesh*  mesh;
+	FbxInfo fbxInfo;
+	vector<D3DMATERIAL9> mtrls;
+	vector<IDirect3DTexture9*> textures;
+	IDirect3DDevice9 * device;
+	string fileName;
+
+	// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
+	//static const unsigned long DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
+
+	void render();
+	//void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag);
+	//void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls);
+	struct FbxVertex
+	{
+		float position[3];
+		float normal[3];
+		float uv[2];
+
+		FbxVertex() 
+			: position{}, normal{}, uv{}
+		{
+		
+		}
+
+		FbxVertex(float x, float y, float z,
+			float nx, float ny, float nz, float u, float v)
+		{
+			position[0] = x; position[1] = y; position[2] = z;
+			normal[0] = nx; normal[1] = ny; normal[2] = nz;
+			uv[0] = u; uv[1] = v;
+		}
+
+		static const unsigned long DefaultFVF;
+		// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
+	};
+
+	static const unsigned long DefaultOptimizeFlag;
+
+protected:
+
+
+	virtual void update()
+	{
+		render();
+	}
+	virtual void onDestroy()
+	{
+		//d3d::Release<ID3DXMesh*>(mesh);
+
+		// 텍스처만 할당된 값이고 재질은 복사된 값이다.
+		//for (int i = 0; i < textures.size(); i++)
+		//	d3d::Release<IDirect3DTexture9*>(textures[i]);
+	}
+
+public:
+
+	FbxMeshRenderer(GameObject * go, Transform * tf);
+
+	virtual ~FbxMeshRenderer()
+	{
+		onDestroy();
+	}
+
+	void loadFbxFile(const string & fileName);
+	void processVertices();
+	void processIndices();
+	void processSubsets();
+	void optimizeMesh();
 
 };
 

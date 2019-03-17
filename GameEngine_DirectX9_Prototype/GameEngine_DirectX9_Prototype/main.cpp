@@ -10,6 +10,10 @@
 //         
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+// 에러코드 무시
+//#pragma warning(disable:4244) // '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+//#pragma warning(disable:4018) // '<': signed 또는 unsigned가 일치하지 않습니다.
+
 #include "d3dUtility.h"
 #include "camera.h"
 #include "Locator.h"
@@ -189,7 +193,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->LightEnable(0, true);
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
-
+	device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	// 디버깅용 txt파일을 로드
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
 
@@ -201,6 +206,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Locator::provideScene(Locator::SystemType::RELEASETYPE);
 	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
+	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
 	
 	/*
@@ -219,11 +225,18 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	groundRigidBody->turnOnStaticFlag();
 
 
+	// -1단계
+	GameObject * player = GameObject::Instantiate("player", "Player");
+	player->addComponent<FbxMeshRenderer>()->loadFbxFile("../Fbx/Models/free_male_1.FBX");
+	player->getTransform()->setRotation(Vector3{ -90,0,0 });
+
 	// 0단계
 	GameObject * car0 = GameObject::Instantiate("car0", "Car");
 	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car0->addComponent<RigidBody>()->setSphereCollider(2);
 	//car0->addComponent<BoxCollider>();
+
+
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
@@ -239,6 +252,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	car1Child1->getTransform()->setPosition(0, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
+
+
+	//car0->addComponent<RigidBody>()->setSphereCollider(2);
 
 	//GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
 	//car1Child2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");

@@ -23,10 +23,16 @@
 
 class Scene;
 class NullScene;
+
 class Audio;
 class NullAudio;
+
 class Physics;
 class NullPhysics;
+
+class FbxParser;
+class NullFbxParser;
+
 
 class Locator
 {
@@ -50,10 +56,14 @@ private :
 	static Physics * physics;
 	static NullPhysics nullPhysics;
 
+	static FbxParser * fbxParser;
+	static NullFbxParser nullFbxParser;
+
 protected :
 	static Scene& getScene(){ return *scene; }
 	static Audio& getAudio(){ return *audio; }
 	static Physics& getPhysics() { return *physics; }
+	static FbxParser& getFbxParser() { return *fbxParser; }
 	//static DeviceWrapper& getDeviceWrapper() {return *deviceWrapper}
 	static IDirect3DDevice9& getDevice() 
 	{
@@ -77,6 +87,7 @@ public :
 	//static void provideDeviceWrapper(IDirect3DDevice9 * device, SystemType type = SystemType::RELEASETYPE);
 	static void provideDevice(IDirect3DDevice9 * device);
 	static void providePhysics(SystemType type = SystemType::RELEASETYPE);
+	static void provideFbxParser(SystemType type = SystemType::RELEASETYPE);
 	static void release();
 
 };

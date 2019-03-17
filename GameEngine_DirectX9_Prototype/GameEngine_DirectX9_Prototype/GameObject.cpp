@@ -47,6 +47,11 @@ Physics & GameObject::getPhysics()
 	return Locator::getPhysics();
 }
 
+FbxParser & GameObject::getFbxParser()
+{
+	return Locator::getFbxParser();
+}
+
 
 void GameObject::setParent(GameObject * parent)
 {

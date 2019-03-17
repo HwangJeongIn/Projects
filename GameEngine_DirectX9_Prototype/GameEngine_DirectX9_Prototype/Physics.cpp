@@ -167,9 +167,12 @@ void Physics::registerRigidBody(GameObject * other, btCollisionShape * shape, fl
 
 void Physics::unregisterRigidBody(GameObject * other)
 {
+	// 존재하지 않으면 리턴
 	if (!exists(other)) return;
 
-	btCollisionObject * targetObj = nullptr;
+	// 존재하면 그 존재하는 것(collisionObject)를 받아서 다이나믹월드에서 지워준다.
+	btCollisionObject * targetObj = collisionObjectsTable.find(other)->second;
+
 	// 순회하면서 지울대상을 찾아준다.
 	for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; --i)
 	{

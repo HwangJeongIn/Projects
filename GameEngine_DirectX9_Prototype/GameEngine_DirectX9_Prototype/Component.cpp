@@ -3,6 +3,8 @@
 #include "Scene.h"
 #include "Audio.h"
 #include "Physics.h"
+#include "FbxParser.h"
+#include "FbxInfo.h"
 #include "Utility.h"
 
 
@@ -21,25 +23,25 @@ void MoveScript::update()
 
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
-		transform->setPosition(transform->getPosition() + (transform->getForward()));
+		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()* .1f *(transform->getForward()));
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
-		transform->setPosition(transform->getPosition() + (-1)*(transform->getForward()));
+		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f *(-1)*(transform->getForward()));
 
 	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
-		transform->setPosition(transform->getPosition() + (transform->getRight()));
+		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (transform->getRight()));
 
 	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
-		transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
+		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (-1)*(transform->getRight()));
 
 	if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
-		gameObject->getPhysics().addForce(gameObject, (-1)*transform->getForward());
+		gameObject->getPhysics().addForce(gameObject, FrameTime::getDeltaTime() *.1f *(-1)*transform->getForward());
 
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
-			transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+			transform->setRotation(transform->getRotation() + FrameTime::getDeltaTime() *.1f * Vector3{ 0,-.05f,0 });
 
 	if (::GetAsyncKeyState('M') & 0x8000f)
-			transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+			transform->setRotation(transform->getRotation() + FrameTime::getDeltaTime() *.1f * Vector3{ 0,.05f,0 });
 }
 
 void MoveScript::start()
@@ -224,6 +226,40 @@ void Transform::setRotation(float x, float y, float z)
 }
 
 
+
+void MainCamera::update()
+{
+	// 메인카메라에서 오디오를 최신화 시킨다.
+	setViewSpace();
+
+	if (::GetAsyncKeyState('E') & 0x8000f)
+		transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+	if (::GetAsyncKeyState('Q') & 0x8000f)
+		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+
+	if (::GetAsyncKeyState('Z') & 0x8000f)
+	{
+		//transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,.05f });
+		transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
+	}
+
+	if (::GetAsyncKeyState('C') & 0x8000f)
+	{
+		//transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,-.05f });
+		transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
+	}
+
+	if (::GetAsyncKeyState('W') & 0x8000f)
+		transform->setPosition(transform->getPosition() + (transform->getForward()));
+	if (::GetAsyncKeyState('S') & 0x8000f)
+		transform->setPosition(transform->getPosition() + (-1)*(transform->getForward()));
+
+	if (::GetAsyncKeyState('D') & 0x8000f)
+		transform->setPosition(transform->getPosition() + (transform->getRight()));
+	if (::GetAsyncKeyState('A') & 0x8000f)
+		transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
+
+}
 
 MainCamera::MainCamera(GameObject * go, Transform * tf)
 	: Component(go, tf)
@@ -479,3 +515,222 @@ void RigidBody::getGravity(Vector3 & output)
 	gameObject->getPhysics().getGravity(output, gameObject);
 }
 
+const unsigned long FbxMeshRenderer::FbxVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+const unsigned long FbxMeshRenderer::DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
+
+void FbxMeshRenderer::render()
+{
+	if (!mesh) return;
+
+	// 현재 transform행렬로 적용시킨다.
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix_DX());
+
+	//device->SetMaterial(nullptr);
+	//device->SetTexture(0, nullptr);
+
+	mesh->DrawSubset(0);
+	// 파일이 로드되어서 값이 있는 경우만 그려준다.
+	//for (int i = 0; i < mtrls.size(); ++i)
+	//{
+	//	device->SetMaterial(&mtrls[i]);
+	//	device->SetTexture(0, textures[i]);
+	//	mesh->DrawSubset(i);
+	//}
+}
+
+FbxMeshRenderer::FbxMeshRenderer(GameObject * go, Transform * tf)
+	: Component(go, tf), mesh(nullptr)
+{
+	device = &(gameObject->getDevice());
+}
+
+void FbxMeshRenderer::loadFbxFile(const string & fileName)
+{
+	gameObject->getFbxParser().loadSceneFromFbxFile(fileName, (fbxInfo.getFbxScene()));
+	// 씬이 제대로 초기화 되어있지 않다면 리턴
+	if (!(*fbxInfo.getFbxScene())) return;
+
+	// 루트 노드를 받아온다.
+	FbxNode * rootNode = (*fbxInfo.getFbxScene())->GetRootNode();
+
+	// 노드를 순회하면서 메쉬정보부터 초기화하고
+	fbxInfo.loadMeshFromNodes(rootNode);
+	// 메쉬정보로부터 컨트롤 포인트를 초기화 한다.
+	fbxInfo.processControlPoints();
+	// 마지막으로 메쉬정보, 컨트롤 포인트로 버텍스 / 인덱스를 초기화 한다.
+	fbxInfo.processVertices();
+
+	// 파일로부터 필요한 정보 추출 완료 // fbxInfo에 담겨있음
+	//---------------------------------------------------------------------------
+	// 정보를 가지고 DirectX에서 지원하는 mesh형식으로 변환
+
+	HRESULT hr = 0;
+
+	hr = D3DXCreateMeshFVF(
+		// 메쉬가 가질 면의 개수 
+		// 여기서 인덱스 버퍼의 크기도 자동으로 알수 있다.
+		// 삼각형의 개수/3 = 인덱스의 수
+		fbxInfo.getTriCount(),
+
+		// 메쉬가 가질 버텍스의 수
+		fbxInfo.getVertexCount(),
+
+		// 메쉬를 만드는데 이용될 하나 이상의 플래그
+		// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
+		D3DXMESH_MANAGED,
+
+		// 복제된 메쉬를 만드는데 이용될 포맷
+		FbxMeshRenderer::FbxVertex::DefaultFVF,
+		device,
+		// 복제된 메쉬가 담길 포인터
+		&mesh);
+
+	// 만약 실패했다면 mesh포인터를 nullptr로 만들어주고 리턴한다.
+	if (FAILED(hr))
+	{
+		mesh = nullptr;
+		return;
+	}
+
+	// mesh내부의 버텍스 정보와 인덱스 정보를 초기화 시켜준다.
+	processVertices();
+	processIndices();
+	processSubsets();
+	optimizeMesh();
+
+}
+
+void FbxMeshRenderer::processVertices()
+{
+	if (!mesh) return;
+	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
+	FbxVertex * fbxV = nullptr;
+	MyVertex * tVertex = nullptr;
+
+	int t1 = mesh->GetNumVertices();
+	int t2 = fbxInfo.getVertexCount();
+
+	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+	mesh->LockVertexBuffer(0, (void**)&fbxV);
+	for (int i = 0; i < fbxInfo.getVertexCount(); ++i)
+	{
+		tVertex = fbxInfo.getVertex(i);
+		// 값이 있을때
+		if (tVertex)
+		{
+			// 각각의 정보를 초기화 시켜준다.
+			fbxV[i] = {
+				// Position
+				(float)tVertex->getPosition().mData[0]/10,(float)tVertex->getPosition().mData[1]/10, (float)tVertex->getPosition().mData[2]/10,
+				// Normal
+				(float)tVertex->getNormal().mData[0]/10,(float)tVertex->getNormal().mData[1]/10, (float)tVertex->getNormal().mData[2]/10,
+				// UV
+				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
+			};
+			continue;
+		}
+		// 값이 없을때 // nullptr일때
+		fbxV[i] = {
+			// Position
+			0,0,0,
+			// Normal
+			0,0,0,
+			// UV
+			0,0
+		};
+	}
+
+	t1 = mesh->GetNumVertices();
+	t2 = fbxInfo.getVertexCount();
+
+	mesh->UnlockVertexBuffer();
+}
+
+void FbxMeshRenderer::processIndices()
+{
+	if (!mesh) return;
+	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
+	unsigned short * fbxI = nullptr;
+	int tIndex = -1;
+
+	int t1 = mesh->GetNumFaces();
+	int t2 = fbxInfo.getIndexCount();
+	int t3 = fbxInfo.getVertexCount();
+	int t4 = fbxInfo.getTriCount();
+
+	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+	mesh->LockIndexBuffer(0, (void**)&fbxI);
+	for (int i = 0; i < fbxInfo.getIndexCount(); ++i)
+	{
+
+		tIndex = fbxInfo.getIndex(i);
+		// 값이 있을때
+		if (tIndex != -1)
+		{
+			// 각각의 정보를 초기화 시켜준다.
+			fbxI[i] = tIndex;
+			continue;
+		}
+		// 값이 없을때
+		fbxI[i] = 0;
+	}
+	mesh->UnlockIndexBuffer();
+}
+
+void FbxMeshRenderer::processSubsets()
+{
+	if (!mesh) return;
+
+	unsigned long* attributeBuffer = nullptr;
+
+	// 다시 속성 데이터를 수정하기 위해서 버퍼를 잠궈준다.
+	mesh->LockAttributeBuffer(0, &attributeBuffer);
+
+	int ttt = mesh->GetNumFaces();
+
+	// 서브셋을 0번으로 지정해준다.
+	for (int i = 0; i < mesh->GetNumFaces(); ++i)
+		attributeBuffer[i] = 0;
+
+
+	// 설정이 완료되었으므로 다시 잠궈준다.
+	mesh->UnlockAttributeBuffer();
+}
+
+void FbxMeshRenderer::optimizeMesh()
+{
+	if (!mesh) return;
+
+	// 인접버퍼를 이용한 최적화 작업
+	vector<unsigned long> adjacencyBuffer(mesh->GetNumFaces() * 3);
+	// 메쉬의 인접정보를 받아온다.
+	mesh->GenerateAdjacency(0.0f, &adjacencyBuffer[0]);
+
+	HRESULT hr = 0;
+	// 그 인접 정보를 기반으로 최적화 작업을 시작한다.
+	hr = mesh->OptimizeInplace
+	(
+		// 속성으로(서브셋기준) 삼각형으로 정렬하고, 별도의 속성테이블을 생성
+		// GetAttributeTable함수를 이용해서 D3DXATTRIBUTERANGE구조체 배열을 받아올 수 있다.
+		// 내부 정보에는 서브셋ID / 각 면과 버텍스의 수 / 각 시작 지점이 들어있다.
+		// 속성 테이블의 각항목은 메쉬의 각 서브셋과 대응되며, 
+		// 서브셋의 기하정보들이 보관되는 버텍스/ 인덱스 버퍼내의 메모리 블록을 지정한다.
+		D3DXMESHOPT_ATTRSORT |
+		// 메쉬에서 이용하지 않는 인덱스와 버텍스를 제거한다.
+		D3DXMESHOPT_COMPACT |
+		// 버텍스 캐시의 히트율을 높인다.
+		D3DXMESHOPT_VERTEXCACHE,
+
+		// 최적화 되지않은 메쉬의 인접 배열 포인터
+		// 인접배열이 필요한이유?	// 최적화 목록에 인접정보가 필요한 부분이 있어서 필요할듯
+		&adjacencyBuffer[0],
+		// 최적화된 메쉬의 인접 배열 포인터
+		nullptr,
+		// 리맵정보 Face
+		nullptr,
+		// 리맵정보 Vertex
+		nullptr
+	);
+}

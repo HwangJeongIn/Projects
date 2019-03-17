@@ -70,6 +70,7 @@ public:
 	IDirect3DDevice9 & getDevice();
 	Audio & getAudio();
 	Physics & getPhysics();
+	FbxParser & getFbxParser();
 
 	const bool isDestroyed() const { return destroyed; }
  

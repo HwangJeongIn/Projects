@@ -126,6 +126,7 @@ private :
 		cout << message << endl;
 	}
 
+	Scene * getWrappedScene() { return &wrapped; }
 public :
 	friend class Locator;
 	/*

@@ -48,6 +48,12 @@
     <ClCompile Include="Physics.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="FbxParser.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FbxInfo.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Trace.h">
@@ -84,6 +90,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Physics.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxParser.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
