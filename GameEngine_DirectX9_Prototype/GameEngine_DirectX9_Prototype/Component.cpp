@@ -708,6 +708,10 @@ void FbxMeshRenderer::optimizeMesh()
 	// 메쉬의 인접정보를 받아온다.
 	mesh->GenerateAdjacency(0.0f, &adjacencyBuffer[0]);
 
+
+	int faceCount1 = mesh->GetNumFaces();
+	int vertexCount1 = mesh->GetNumVertices();
+
 	HRESULT hr = 0;
 	// 그 인접 정보를 기반으로 최적화 작업을 시작한다.
 	hr = mesh->OptimizeInplace
@@ -733,4 +737,7 @@ void FbxMeshRenderer::optimizeMesh()
 		// 리맵정보 Vertex
 		nullptr
 	);
+
+	int faceCount = mesh->GetNumFaces();
+	int vertexCount = mesh->GetNumVertices();
 }

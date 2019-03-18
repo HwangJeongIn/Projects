@@ -193,7 +193,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->LightEnable(0, true);
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
-	device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	// 디버깅용 txt파일을 로드
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
@@ -227,6 +227,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// -1단계
 	GameObject * player = GameObject::Instantiate("player", "Player");
+																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX
 	player->addComponent<FbxMeshRenderer>()->loadFbxFile("../Fbx/Models/free_male_1.FBX");
 	player->getTransform()->setRotation(Vector3{ -90,0,0 });
 

@@ -175,7 +175,7 @@ public:
 		Vector3::ToVector3(forward, forward_DX);
 	}
 
-	/*
+	
 		void pitch_DX(float angle)
 	{
 		D3DXMATRIX T;
@@ -235,9 +235,7 @@ public:
 		Vector3::ToVector3(up, up_DX);
 		Vector3::ToVector3(right, right_DX);
 	}
-	*/
-
-
+	
 
 	float constrainLessThan360(float num)
 	{

@@ -45,15 +45,24 @@ public:
 			&& tangent == other.getTangent() && binormal == other.getBinormal());
 	}
 
-	// 수정해야함
+
 	bool operator<(const MyVertex & other) const
 	{
-		return true; (position[0] < other.getPosition()[0]);
+		return (position[0] * position[0] + position[1] * position[1] + position[2] * position[2]
+					< other.getPosition()[0] * other.getPosition()[0] + other.getPosition()[1] * other.getPosition()[1] + other.getPosition()[2] * other.getPosition()[2]);
 	}
-	bool operator>(const MyVertex & other) const
-	{
-		return (position[0] > other.getPosition()[0]);
-	}
+
+
+	// 수정해야함
+	//bool operator<(const MyVertex & other) const
+	//{
+	//	return  (position[0] * position[0] + position[1] * position[1] + position[2] * position[2]
+	//		< other.getPosition()[0] * other.getPosition()[0] + other.getPosition()[1] * other.getPosition()[1] + other.getPosition()[2] * other.getPosition()[2]);
+	//}
+	//bool operator>(const MyVertex & other) const
+	//{
+	//	return (position[0] > other.getPosition()[0]);
+	//}
 
 };
 
@@ -68,7 +77,7 @@ private:
 	vector<FbxDouble3> controlPoints;
 	vector<MyVertex> vertices;
 	vector<unsigned int> indices;
-	map<MyVertex, unsigned int> vertexTable;
+	map<MyVertex , unsigned int> vertexTable;
 
 public:
 	FbxInfo()
@@ -230,15 +239,20 @@ public:
 
 	void insertVertex(const FbxDouble3& position, const FbxDouble3& normal, const FbxDouble2& uv, const FbxDouble3& binormal, const FbxDouble3& tangent)
 	{
-		MyVertex vertex = { position, normal, uv, binormal, tangent };
+		MyVertex vertex { position, normal, uv, binormal, tangent };
 
+		// 일단 맵에서 중복되는 버텍스를 재사용안하고 인덱스와 1:1매칭시켰다.
+		// operator == 와 operator < 가 자체 클래스객체에서 구현되어야 하는 이유는 이 두가지 기준으로 여러가지 연산을 하기 때문이다.
+		// 이는 맵이 해쉬테이블이 아닌 트리구조로 되어있다는 것을 암시하기도 한다.
+
+		// 중복된 데이터가 많지만 일단 그냥해주었다... 나중에 수정할 예정
 		unsigned int index = vertices.size();
 		//vertexTable[vertex] = index;
 		indices.push_back(index);
 		vertices.push_back(vertex);
 		return;
-
-		auto lookup = vertexTable.find(vertex);
+		// 나중에 여기서 수정
+		map<MyVertex, unsigned int>::iterator lookup = vertexTable.find(vertex);
 		if (lookup != vertexTable.end())
 		{
 			// 실제로 존재하는 값이라면(등록되어 있는 버텍스 값이라면) 그 값의 인덱스 값으로 넣어준다.
