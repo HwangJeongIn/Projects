@@ -69,15 +69,18 @@ private:
 	string fileName;
 
 	FbxMesh * mesh;
+	FbxNode * node;
 
 	vector<FbxDouble3> controlPoints;
 	vector<MyVertex> vertices;
 	vector<unsigned int> indices;
+
+	// 나중에 사용
 	map<MyVertex , unsigned int> vertexTable;
 
 public:
 	FbxMeshInfo()
-		: mesh(nullptr)/*, scene(nullptr)*/
+		: mesh(nullptr), node(nullptr)  /*, scene(nullptr)*/
 	{
 
 	}
@@ -144,9 +147,16 @@ public:
 		return mesh->GetPolygonCount(); 
 	}
 
-	void setMesh(FbxMesh * mesh)
+	void setNode(FbxNode * node)
 	{
-		this->mesh = mesh;
+		this->node = node;
+		if(node)
+			mesh = node->GetMesh();
+	}
+
+	FbxNode * getNode()
+	{
+		return node;
 	}
 
 	void loadMeshFromNodes(FbxNode * node)

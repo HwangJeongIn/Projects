@@ -494,8 +494,8 @@ private:
 	// 여러가지 메쉬정보를 담고 있음
 	vector<FbxMeshInfo *> fbxMeshInfos;
 	vector<ID3DXMesh *>  meshs;
-	map<ID3DXMesh *,vector<D3DMATERIAL9>> mtrls;
-	map<ID3DXMesh *,vector<IDirect3DTexture9*>> textures;
+	map<ID3DXMesh *,vector<D3DMATERIAL9>> mtrlsTable;
+	map<ID3DXMesh *,vector<IDirect3DTexture9*>> texturesTable;
 
 	FbxScene * scene;
 	IDirect3DDevice9 * device;
@@ -542,6 +542,22 @@ protected:
 	}
 	virtual void onDestroy()
 	{
+		// 텍스처 정보 삭제
+		// 머티리얼 경우는 그냥 복사해서 해제했기 때문에 따로 신경안써도된다.
+		for (auto it = texturesTable.begin(); it != texturesTable.end(); ++it)
+		{
+			// 맵을 돌면서 텍스처 벡터를 받아서 모두 릴리즈 시켜준다.
+			// second값이 그자체의 값을 반환하는 것이기 때문에 따로 복사가 안된다. 
+			// 만약 복사가 된다고 해도 포인터자체값을 통해서 릴리즈 하기 때문에 상관없긴하다.
+			/*vector<IDirect3DTexture9*> & temp = */
+			
+			for (auto it2 = (*it).second.begin(); it2 != (*it).second.end(); ++it2)
+			{
+				(*it2)->Release();
+			}
+
+		}
+
 		// 메쉬 정보 삭제
 		for (auto it = meshs.begin(); it != meshs.end(); ++it)
 		{
@@ -578,6 +594,7 @@ public:
 	void getAllFbxMeshInfosFromRoot(FbxNode * root);
 	void processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
 	void processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
+	void processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
 	void processSubsets(ID3DXMesh * mesh);
 	void optimizeMesh(ID3DXMesh * mesh);
 
