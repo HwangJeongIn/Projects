@@ -51,7 +51,7 @@
     <ClCompile Include="FbxParser.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="FbxInfo.cpp">
+    <ClCompile Include="FbxMeshInfo.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,7 +95,7 @@
     <ClInclude Include="FbxParser.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="FbxInfo.h">
+    <ClInclude Include="FbxMeshInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

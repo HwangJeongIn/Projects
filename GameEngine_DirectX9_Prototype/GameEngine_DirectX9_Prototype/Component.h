@@ -4,7 +4,7 @@
 #include "Utility.h"
 #include <vector>
 #include "d3dUtility.h"
-#include "FbxInfo.h"
+#include "FbxMeshInfo.h"
 
 class Transform;
 class GameObject;
@@ -491,10 +491,13 @@ public:
 class FbxMeshRenderer : public Component
 {
 private:
-	ID3DXMesh*  mesh;
-	FbxInfo fbxInfo;
-	vector<D3DMATERIAL9> mtrls;
-	vector<IDirect3DTexture9*> textures;
+	// 여러가지 메쉬정보를 담고 있음
+	vector<FbxMeshInfo *> fbxMeshInfos;
+	vector<ID3DXMesh *>  meshs;
+	map<ID3DXMesh *,vector<D3DMATERIAL9>> mtrls;
+	map<ID3DXMesh *,vector<IDirect3DTexture9*>> textures;
+
+	FbxScene * scene;
 	IDirect3DDevice9 * device;
 	string fileName;
 
@@ -539,6 +542,22 @@ protected:
 	}
 	virtual void onDestroy()
 	{
+		// 메쉬 정보 삭제
+		for (auto it = meshs.begin(); it != meshs.end(); ++it)
+		{
+			(*it)->Release();
+			(*it) = nullptr;
+		}
+		meshs.clear();
+
+		// fbx 메쉬 정보 삭제
+		for (auto it = fbxMeshInfos.begin(); it != fbxMeshInfos.end(); ++it)
+		{
+			delete (*it);
+			(*it) = nullptr;
+		}
+		fbxMeshInfos.clear();
+
 		//d3d::Release<ID3DXMesh*>(mesh);
 
 		// 텍스처만 할당된 값이고 재질은 복사된 값이다.
@@ -556,10 +575,11 @@ public:
 	}
 
 	void loadFbxFile(const string & fileName);
-	void processVertices();
-	void processIndices();
-	void processSubsets();
-	void optimizeMesh();
+	void getAllFbxMeshInfosFromRoot(FbxNode * root);
+	void processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
+	void processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
+	void processSubsets(ID3DXMesh * mesh);
+	void optimizeMesh(ID3DXMesh * mesh);
 
 };
 

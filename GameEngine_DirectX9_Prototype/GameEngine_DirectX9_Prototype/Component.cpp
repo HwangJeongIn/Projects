@@ -4,7 +4,7 @@
 #include "Audio.h"
 #include "Physics.h"
 #include "FbxParser.h"
-#include "FbxInfo.h"
+#include "FbxMeshInfo.h"
 #include "Utility.h"
 
 
@@ -520,15 +520,30 @@ const unsigned long FbxMeshRenderer::DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT 
 
 void FbxMeshRenderer::render()
 {
-	if (!mesh) return;
+	if (meshs.size() ==0) return;
 
 	// 현재 transform행렬로 적용시킨다.
 	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix_DX());
 
 	//device->SetMaterial(nullptr);
 	//device->SetTexture(0, nullptr);
+	int meshCount = meshs.size();
+	int fbxCount = fbxMeshInfos.size();
 
-	mesh->DrawSubset(0);
+	//meshs[2]->DrawSubset(0);
+	//return;
+
+	for (auto it = meshs.begin(); it != meshs.end(); ++it)
+	{
+		//// 텍스처와 머티리얼 적용
+		//device->SetMaterial(nullptr);
+		//device->SetTexture(0, nullptr);
+		// 널포인터가 아닐때 그려준다.
+		// 여기서 텍스처와 머티리얼 추가
+		if((*it) !=nullptr)
+			(*it)->DrawSubset(0);
+	}
+	//mesh->DrawSubset(0);
 	// 파일이 로드되어서 값이 있는 경우만 그려준다.
 	//for (int i = 0; i < mtrls.size(); ++i)
 	//{
@@ -539,83 +554,123 @@ void FbxMeshRenderer::render()
 }
 
 FbxMeshRenderer::FbxMeshRenderer(GameObject * go, Transform * tf)
-	: Component(go, tf), mesh(nullptr)
+	: Component(go, tf), scene(nullptr)
 {
 	device = &(gameObject->getDevice());
 }
 
 void FbxMeshRenderer::loadFbxFile(const string & fileName)
 {
-	gameObject->getFbxParser().loadSceneFromFbxFile(fileName, (fbxInfo.getFbxScene()));
+	//gameObject->getFbxParser().loadSceneFromFbxFile(fileName, (fbxInfo.getFbxScene()));
 	// 씬이 제대로 초기화 되어있지 않다면 리턴
-	if (!(*fbxInfo.getFbxScene())) return;
+	//if (!(*fbxInfo.getFbxScene())) return;
 
+	gameObject->getFbxParser().loadSceneFromFbxFile(fileName, &scene);
+
+	if (scene == nullptr) return;
+
+	FbxNode * rootNode = scene->GetRootNode();
 	// 루트 노드를 받아온다.
-	FbxNode * rootNode = (*fbxInfo.getFbxScene())->GetRootNode();
+	//FbxNode * rootNode = (*fbxInfo.getFbxScene())->GetRootNode();
+
+	// 루트노드를 시작으로 모든 메쉬 정보를 가진 노드들을 추출한다.
+	// 저장되는 곳은 fbxMeshInfos이다.
+	getAllFbxMeshInfosFromRoot(rootNode);
 
 	// 노드를 순회하면서 메쉬정보부터 초기화하고
-	fbxInfo.loadMeshFromNodes(rootNode);
-	// 메쉬정보로부터 컨트롤 포인트를 초기화 한다.
-	fbxInfo.processControlPoints();
-	// 마지막으로 메쉬정보, 컨트롤 포인트로 버텍스 / 인덱스를 초기화 한다.
-	fbxInfo.processVertices();
+	//fbxInfo.loadMeshFromNodes(rootNode);
 
-	// 파일로부터 필요한 정보 추출 완료 // fbxInfo에 담겨있음
-	//---------------------------------------------------------------------------
-	// 정보를 가지고 DirectX에서 지원하는 mesh형식으로 변환
-
-	HRESULT hr = 0;
-
-	hr = D3DXCreateMeshFVF(
-		// 메쉬가 가질 면의 개수 
-		// 여기서 인덱스 버퍼의 크기도 자동으로 알수 있다.
-		// 삼각형의 개수/3 = 인덱스의 수
-		fbxInfo.getTriCount(),
-
-		// 메쉬가 가질 버텍스의 수
-		fbxInfo.getVertexCount(),
-
-		// 메쉬를 만드는데 이용될 하나 이상의 플래그
-		// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
-		D3DXMESH_MANAGED,
-
-		// 복제된 메쉬를 만드는데 이용될 포맷
-		FbxMeshRenderer::FbxVertex::DefaultFVF,
-		device,
-		// 복제된 메쉬가 담길 포인터
-		&mesh);
-
-	// 만약 실패했다면 mesh포인터를 nullptr로 만들어주고 리턴한다.
-	if (FAILED(hr))
+	for (auto it = fbxMeshInfos.begin(); it != fbxMeshInfos.end(); ++it)
 	{
-		mesh = nullptr;
-		return;
-	}
+		// 메쉬정보로부터 컨트롤 포인트를 초기화 한다.
+		(*it)->processControlPoints();
+		// 마지막으로 메쉬정보, 컨트롤 포인트로 버텍스 / 인덱스를 초기화 한다.
+		(*it)->processVertices();
 
-	// mesh내부의 버텍스 정보와 인덱스 정보를 초기화 시켜준다.
-	processVertices();
-	processIndices();
-	processSubsets();
-	optimizeMesh();
+		// 미리 초기화된 FbxMesh를 가지는 FbxMeshInfo에서 부터 필요한 정보 추출 완료 // fbxMeshInfos에 담겨있음
+		//---------------------------------------------------------------------------
+		// 정보를 가지고 DirectX에서 지원하는 mesh형식으로 변환
+
+		ID3DXMesh * mesh;
+		HRESULT hr = 0;
+
+		hr = D3DXCreateMeshFVF(
+			// 메쉬가 가질 면의 개수 
+			// 여기서 인덱스 버퍼의 크기도 자동으로 알수 있다.
+			// 삼각형의 개수/3 = 인덱스의 수
+			(*it)->getTriCount(),
+
+			// 메쉬가 가질 버텍스의 수
+			(*it)->getVertexCount(),
+
+			// 메쉬를 만드는데 이용될 하나 이상의 플래그
+			// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
+			D3DXMESH_MANAGED,
+
+			// 복제된 메쉬를 만드는데 이용될 포맷
+			FbxMeshRenderer::FbxVertex::DefaultFVF,
+			device,
+			// 복제된 메쉬가 담길 포인터
+			&mesh);
+
+		if (FAILED(hr))
+		{
+			mesh = nullptr;
+			meshs.push_back(mesh);
+			continue;
+		}
+
+		// mesh내부의 버텍스 정보와 인덱스 정보를 초기화 시켜준다.
+		processVertices(mesh, (*it));
+		processIndices(mesh, (*it));
+		processSubsets(mesh);
+		optimizeMesh(mesh);
+
+		meshs.push_back(mesh);
+	}
 
 }
 
-void FbxMeshRenderer::processVertices()
+void FbxMeshRenderer::getAllFbxMeshInfosFromRoot(FbxNode * root)
 {
-	if (!mesh) return;
+
+	FbxNodeAttribute * nodeAtrribute = root->GetNodeAttribute();
+
+	// 모든 노드를 돌면서 Mesh 속성이 붙은것들을 추출한다.
+	if (nodeAtrribute)
+	{
+		if (nodeAtrribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+		{
+			FbxMeshInfo * temp = new FbxMeshInfo();
+			temp->setMesh(root->GetMesh());
+			fbxMeshInfos.push_back(temp);
+		}
+	}
+
+	// 자식들을 돌면서 나머지 메쉬를 찾는다.
+	const int childCount = root->GetChildCount();
+	for (unsigned int i = 0; i < childCount; ++i)
+	{
+		getAllFbxMeshInfosFromRoot(root->GetChild(i));
+	}
+}
+
+void FbxMeshRenderer::processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo)
+{
+	if (!mesh || !fbxMeshInfo) return;
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
 	FbxVertex * fbxV = nullptr;
 	MyVertex * tVertex = nullptr;
 
 	int t1 = mesh->GetNumVertices();
-	int t2 = fbxInfo.getVertexCount();
+	int t2 = fbxMeshInfo->getVertexCount();
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
 	mesh->LockVertexBuffer(0, (void**)&fbxV);
-	for (int i = 0; i < fbxInfo.getVertexCount(); ++i)
+	for (int i = 0; i < fbxMeshInfo->getVertexCount(); ++i)
 	{
-		tVertex = fbxInfo.getVertex(i);
+		tVertex = fbxMeshInfo->getVertex(i);
 		// 값이 있을때
 		if (tVertex)
 		{
@@ -642,30 +697,31 @@ void FbxMeshRenderer::processVertices()
 	}
 
 	t1 = mesh->GetNumVertices();
-	t2 = fbxInfo.getVertexCount();
+	t2 = fbxMeshInfo->getVertexCount();
 
 	mesh->UnlockVertexBuffer();
 }
 
-void FbxMeshRenderer::processIndices()
+void FbxMeshRenderer::processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo)
 {
-	if (!mesh) return;
+	if (!mesh || !fbxMeshInfo) return;
+
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
 	unsigned short * fbxI = nullptr;
 	int tIndex = -1;
 
 	int t1 = mesh->GetNumFaces();
-	int t2 = fbxInfo.getIndexCount();
-	int t3 = fbxInfo.getVertexCount();
-	int t4 = fbxInfo.getTriCount();
+	int t2 = fbxMeshInfo->getIndexCount();
+	int t3 = fbxMeshInfo->getVertexCount();
+	int t4 = fbxMeshInfo->getTriCount();
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
 	mesh->LockIndexBuffer(0, (void**)&fbxI);
-	for (int i = 0; i < fbxInfo.getIndexCount(); ++i)
+	for (int i = 0; i < fbxMeshInfo->getIndexCount(); ++i)
 	{
 
-		tIndex = fbxInfo.getIndex(i);
+		tIndex = fbxMeshInfo->getIndex(i);
 		// 값이 있을때
 		if (tIndex != -1)
 		{
@@ -679,9 +735,9 @@ void FbxMeshRenderer::processIndices()
 	mesh->UnlockIndexBuffer();
 }
 
-void FbxMeshRenderer::processSubsets()
+void FbxMeshRenderer::processSubsets(ID3DXMesh * mesh)
 {
-	if (!mesh) return;
+	if (!mesh ) return;
 
 	unsigned long* attributeBuffer = nullptr;
 
@@ -699,7 +755,7 @@ void FbxMeshRenderer::processSubsets()
 	mesh->UnlockAttributeBuffer();
 }
 
-void FbxMeshRenderer::optimizeMesh()
+void FbxMeshRenderer::optimizeMesh(ID3DXMesh * mesh)
 {
 	if (!mesh) return;
 
