@@ -83,7 +83,7 @@
 		{
 			// 일정시간 간격마다 업데이트 되는 함수이다
 			// 물리 계산도 일정시간마다 업데이트 되어야 하기 때문에 여기서 같이 처리해줄 것이다.
-			Trace::Write("TAG_DEBUG", "fixedUpdate");
+			//Trace::Write("TAG_DEBUG", "fixedUpdate");
 			fixedUpdate();
 
 			// 충돌처리 + 물리처리
@@ -123,7 +123,7 @@
 
 		clock_t temp = currentTime - previousTime;
 		FrameTime::setDeltaTime(temp);
-		Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
+		//Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
 		previousTime = currentTime;
 
 		lagTime += temp;

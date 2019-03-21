@@ -199,60 +199,61 @@ void FbxMeshInfo::readUV(FbxMesh * mesh, int controlPointIndex, int vertexCounte
 		return;
 	}
 
-	FbxGeometryElementUV * vertexUV = mesh->GetElementUV(0);
+	
+	FbxGeometryElementUV * vertexUV = mesh->GetElementUV(0); // mesh->GetLayer(0)->GetUVs();
 
 	switch (vertexUV->GetMappingMode())
 	{
 	case FbxGeometryElement::eByControlPoint:
 		switch (vertexUV->GetReferenceMode())
 		{
-		case FbxGeometryElement::eDirect:
-		{
-			outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(controlPointIndex).mData[0]);
-			outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(controlPointIndex).mData[1]);
-			//outUV[2] = static_cast<float>(vertexUV->GetDirectArray().GetAt(controlPointIndex).mData[2]);
-		}
-		break;
+			case FbxGeometryElement::eDirect:
+			{
+				outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(controlPointIndex).mData[0]);
+				outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(controlPointIndex).mData[1]);
+			}
+			break;
 
-		case FbxGeometryElement::eIndexToDirect:
-		{
-			int index = vertexUV->GetIndexArray().GetAt(controlPointIndex);
-			outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[0]);
-			outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[1]);
-			//outUV[2] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[2]);
-		}
-		break;
+			case FbxGeometryElement::eIndexToDirect:
+			{
+				int index = vertexUV->GetIndexArray().GetAt(controlPointIndex);
+				outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[0]);
+				outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[1]);
+			}
+			break;
 
-		default:
-			return;
 		}
 		break;
 
 	case FbxGeometryElement::eByPolygonVertex:
 		switch (vertexUV->GetReferenceMode())
 		{
-		case FbxGeometryElement::eDirect:
-		{
-			outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[0]);
-			outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[1]);
-			//outUV[2] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[2]);
-		}
-		break;
+			case FbxGeometryElement::eDirect:
+			{
+				outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[0]);
+				outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[1]);
+			}
+			break;
 
-		case FbxGeometryElement::eIndexToDirect:
-		{
-			int index = vertexUV->GetIndexArray().GetAt(vertexCounter);
-			outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[0]);
-			outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[1]);
-			//outUV[2] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[2]);
-		}
-		break;
+			case FbxGeometryElement::eIndexToDirect:
+			{
+				outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[0]);
+				outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(vertexCounter).mData[1]);
+				//int index = vertexUV->GetIndexArray().GetAt(vertexCounter);
+				//outUV[0] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[0]);
+				//outUV[1] = static_cast<float>(vertexUV->GetDirectArray().GetAt(index).mData[1]);
+			}
+			break;
 
-		default:
-			return;
 		}
 		break;
 	}
+	//// DirectX±‚¡ÿ¿∏∑Œ UV¡¬«• ∏¬√Á¡‹
+	////if (outUV[0] == 0.0f && outUV[1] == 0.0f) 
+	//{
+	//	outUV[0] = outUV[0];
+	//	outUV[1] = 1.0 - outUV[1];
+	//}
 }
 
 

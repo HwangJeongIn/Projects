@@ -147,7 +147,7 @@ private :
 	FMOD::System *system = NULL;
 
 	map<string, AudioSource * > audioSources;
-	string filePathToLoadSoundFiles;
+	static const string filePathToLoadSoundFiles;
 	const string fileNameToLoadSoundFiles = "Sound";
 
 	void init();

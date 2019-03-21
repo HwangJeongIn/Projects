@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "Trace.h"
 
 using namespace std;
 
@@ -144,7 +145,7 @@ public:
 	int getTriCount() const 
 	{
 		if (!mesh) return 0;
-		return mesh->GetPolygonCount(); 
+		return indices.size() / 3;
 	}
 
 	void setNode(FbxNode * node)
@@ -205,7 +206,7 @@ public:
 	{
 		if (!mesh) return;
 
-		unsigned int triCount = mesh->GetPolygonCount();
+		unsigned int polygonCount = mesh->GetPolygonCount();
 		unsigned int vertexCounter = 0;
 
 		FbxDouble3 position{ 0,0,0 };
@@ -215,32 +216,122 @@ public:
 		FbxDouble2 uv{ 0,0 };
 
 
-		for (unsigned int i = 0; i < triCount; ++i)
+		// 폴리곤
+		// 원래는 폴리곤 사이즈가 3/4였는데 converter에 의해서 3개로 모두 변경되었다.
+		// directX에서 작업하기 편하다.
+		for (unsigned int i = 0; i < polygonCount; ++i)
 		{
-			for (unsigned int j = 0; j < 3; ++j)
-			{
-				int controlPointIndex = mesh->GetPolygonVertex(i, j);
+			//for (unsigned int j = 0; j < mesh->GetPolygonSize(i); ++j)
+			//{
+				int polygonSize = mesh->GetPolygonSize(i);
 
-				// 각각의 정보를 초기화 시켜준다.
-				// 만약에 내부에 정보가 없으면 모두 0으로 들어간다.
-				position = { 0,0,0 };
-				normal = { 0,0,0 };
-				binormal = { 0,0,0 };
-				tangent = { 0,0,0 };
-				uv = { 0,0 };
+				// 현재는 모두 삼각형으로 분리시켰기 때문에 모두 삼각형기준으로 작업된다.
+				if (polygonSize == 3)
+				{
+					for (unsigned int j = 0; j < 3; ++j)
+					{
+						int controlPointIndex = mesh->GetPolygonVertex(i, j);
 
-				// 내부 레퍼런스 모드에 따라서 버텍스 카운터가 필요할 수도 있고
-				// 컨트롤 포인트 인덱스가 필요할 수도 있다.
-				position = controlPoints[controlPointIndex];
-				readNormal(mesh, controlPointIndex, vertexCounter, normal);
-				readTangent(mesh, controlPointIndex, vertexCounter, tangent);
-				readBinormal(mesh, controlPointIndex, vertexCounter, binormal);
-				readUV(mesh, controlPointIndex, mesh->GetTextureUVIndex(i, j), uv);
 
-				//vertices.push_back(vertex);
-				insertVertex(position, normal, uv, binormal, tangent);
-				++vertexCounter;
-			}
+						// 각각의 정보를 초기화 시켜준다.
+						// 만약에 내부에 정보가 없으면 모두 0으로 들어간다.
+						position = { 0,0,0 };
+						normal = { 0,0,0 };
+						binormal = { 0,0,0 };
+						tangent = { 0,0,0 };
+						uv = { 0,0 };
+
+						// 내부 레퍼런스 모드에 따라서 버텍스 카운터가 필요할 수도 있고
+						// 컨트롤 포인트 인덱스가 필요할 수도 있다.
+						position = controlPoints[controlPointIndex];
+						readNormal(mesh, controlPointIndex, vertexCounter, normal);
+						readTangent(mesh, controlPointIndex, vertexCounter, tangent);
+						readBinormal(mesh, controlPointIndex, vertexCounter, binormal);
+						readUV(mesh, controlPointIndex, mesh->GetTextureUVIndex(i, j,fbxsdk::FbxLayerElement::eTextureDiffuse)/*vertexCounter*/, uv);
+
+						// DirectX기준으로 UV좌표 맞춰줌
+					   // if (uv[0] == 0.0f && uv[1] == 0.0f) 
+						{
+							uv[0] = uv[0];
+							uv[1] = 1.0 - uv[1];
+						}
+						//if (vertexCounter == 0 || vertexCounter ==1)
+						//{
+						//	Trace::Write("TAG_DEBUG", "u", uv[0]);
+						//	Trace::Write("TAG_DEBUG", "v", uv[1]);
+
+						//}
+
+						//vertices.push_back(vertex);
+						insertVertex(position, normal, uv, binormal, tangent);
+						++vertexCounter;
+					}
+				}
+				//else if (polygonSize == 4)
+				//{
+				//	// 사각형을 그려줘야 한다.
+				//	// 먼저 삼각형하나를 그려주고
+				//	for (unsigned int j = 0; j < 3; ++j)
+				//	{
+				//		int controlPointIndex = mesh->GetPolygonVertex(i, j);
+				//
+				//		// 각각의 정보를 초기화 시켜준다.
+				//		// 만약에 내부에 정보가 없으면 모두 0으로 들어간다.
+				//		position = { 0,0,0 };
+				//		normal = { 0,0,0 };
+				//		binormal = { 0,0,0 };
+				//		tangent = { 0,0,0 };
+				//		uv = { 0,0 };
+				//
+				//		// 내부 레퍼런스 모드에 따라서 버텍스 카운터가 필요할 수도 있고
+				//		// 컨트롤 포인트 인덱스가 필요할 수도 있다.
+				//		position = controlPoints[controlPointIndex];
+				//		readNormal(mesh, controlPointIndex, vertexCounter, normal);
+				//		readTangent(mesh, controlPointIndex, vertexCounter, tangent);
+				//		readBinormal(mesh, controlPointIndex, vertexCounter, binormal);
+				//		readUV(mesh, controlPointIndex, mesh->GetTextureUVIndex(i, j), uv);
+				//
+				//		//vertices.push_back(vertex);
+				//		insertVertex(position, normal, uv, binormal, tangent);
+				//		++vertexCounter;
+				//	}
+				//
+				//	// 일단 4개기준으로 vertexCounter초기화 해준다
+				//	++vertexCounter;
+				//
+				//	// 나머지 삼각형하나를 그려준다.
+				//	for (unsigned int j = 2; j != 1; (++j)%=4)
+				//	{
+				//		int controlPointIndex = mesh->GetPolygonVertex(i, j);
+				//
+				//		// 각각의 정보를 초기화 시켜준다.
+				//		// 만약에 내부에 정보가 없으면 모두 0으로 들어간다.
+				//		position = { 0,0,0 };
+				//		normal = { 0,0,0 };
+				//		binormal = { 0,0,0 };
+				//		tangent = { 0,0,0 };
+				//		uv = { 0,0 };
+				//
+				//		vertexCounter += - 4 + (j);
+				//		// 내부 레퍼런스 모드에 따라서 버텍스 카운터가 필요할 수도 있고
+				//		// 컨트롤 포인트 인덱스가 필요할 수도 있다.
+				//		position = controlPoints[controlPointIndex];
+				//		readNormal(mesh, controlPointIndex, vertexCounter, normal);
+				//		readTangent(mesh, controlPointIndex, vertexCounter, tangent);
+				//		readBinormal(mesh, controlPointIndex, vertexCounter, binormal);
+				//		readUV(mesh, controlPointIndex, mesh->GetTextureUVIndex(i, j), uv);
+				//		vertexCounter +=  4 - (j);
+				//
+				//
+				//		//vertices.push_back(vertex);
+				//		insertVertex(position, normal, uv, binormal, tangent);
+				//
+				//	}
+				//}
+				//
+			//}
+
+
 		}
 	}
 
@@ -258,6 +349,8 @@ public:
 		indices.push_back(index);
 		vertices.push_back(vertex);
 		return;
+
+
 		// 나중에 여기서 수정
 		map<MyVertex, unsigned int>::iterator lookup = vertexTable.find(vertex);
 		if (lookup != vertexTable.end())

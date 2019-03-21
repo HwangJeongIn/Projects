@@ -10,6 +10,8 @@ void FbxParser::init()
 
 	// 만든 i/o setting객체를 이용해서 setiosetting을 해준다.
 	manager->SetIOSettings(ios);
+
+	converter = new FbxGeometryConverter(manager);
 }
 
 void FbxParser::release()
@@ -17,6 +19,9 @@ void FbxParser::release()
 	if (ios)
 		ios->Destroy();
 	ios = nullptr;
+
+	if (converter)
+		delete converter;
 
 	if (manager)
 		manager->Destroy();
@@ -49,4 +54,31 @@ void FbxParser::loadSceneFromFbxFile(const string & fileName, FbxScene ** scene)
 
 	// 파일이 임포트 되면 임포터를 지워준다.
 	importer->Destroy();
+}
+
+void FbxParser::convertGeometryInfo(FbxNodeAttribute ** nodeAttribute)
+{
+	// 더블포인터가 nullptr일때 리턴
+	if (!nodeAttribute) return;
+
+	// 포인터는 가지지만 실제 값을 가지지 않는 경우 리턴
+	// 실제 attribute값이 없는 경우
+	if ((*nodeAttribute) == nullptr) return;
+
+	// nodeAttribute가 어떤형태인지 알아보고 그 형태에 대해서만 변환해준다.
+	switch ((*nodeAttribute)->GetAttributeType())
+	{
+		case FbxNodeAttribute::eSkeleton :
+		{
+			converter->Triangulate((*nodeAttribute), true, true);
+		}
+		break;
+
+		case FbxNodeAttribute::eMesh :
+		{
+			converter->Triangulate((*nodeAttribute), true, true);
+		}
+		break;
+	}
+
 }

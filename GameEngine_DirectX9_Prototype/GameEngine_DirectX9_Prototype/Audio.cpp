@@ -1,5 +1,7 @@
 #include "Audio.h"
 
+const string Audio::filePathToLoadSoundFiles = "../Audio/Sound/";
+
 void Audio::init()
 {
 	FMOD_RESULT result;
@@ -58,7 +60,7 @@ void Audio::initFilePathToLoadSoundFiles()
 	여기서 fileNameToLoadSoundFiles(Sound)에 접근
 	최종 경로는 C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Sound
 	*/
-	filePathToLoadSoundFiles = "../Audio/Sound/"; //"../Sound/";
+	//filePathToLoadSoundFiles = "../Audio/Sound/"; //"../Sound/";
 
 }
 

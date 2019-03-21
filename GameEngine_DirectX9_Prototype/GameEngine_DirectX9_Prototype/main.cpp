@@ -181,10 +181,17 @@ int WINAPI WinMain(HINSTANCE hinstance,
 		1.0f,
 		1000.0f);
 	device->SetTransform(D3DTS_PROJECTION, &proj);
+	// wrap adress mode로 텍스처 지정
+	device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+	device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
+	// 품질
 	device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+
+	// 밉맵필터
 	device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+
 	D3DXVECTOR3 dir(1.0f, -1.0f, 1.0f);
 	D3DXCOLOR col(1.0f, 1.0f, 1.0f, 1.0f);
 	D3DLIGHT9 light = d3d::InitDirectionalLight(&dir, &col);
@@ -193,7 +200,11 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->LightEnable(0, true);
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
+
+
 	//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+
 	// 디버깅용 txt파일을 로드
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
@@ -204,7 +215,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	: Scene / Device
 	*/
 	Locator::provideScene(Locator::SystemType::RELEASETYPE);
-	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
+	//Locator::provideAudio(Locator::SystemType::RELEASETYPE);
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
@@ -214,33 +225,35 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	*/
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
-	mainCamera->getTransform()->setPosition(0, 0, -80);
+	mainCamera->getTransform()->setPosition(0, 0, -300);
 
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
-	ground->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
 	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
 	ground->getTransform()->setPosition(0, -15, 0);
 	groundRigidBody->setBoxCollider(Vector3{ 300,10,300 });
 	groundRigidBody->turnOnStaticFlag();
 
+	
 
 	// -1단계
 	GameObject * player = GameObject::Instantiate("player", "Player");
-																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX
-	player->addComponent<FbxMeshRenderer>()->loadFbxFile("../Fbx/Models/free_male_1.FBX");
-	player->getTransform()->setRotation(Vector3{ -90,0,0 });
+																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx
+	player->addComponent<FbxMeshRenderer>()->loadFbxFile("akai_e_espiritu.fbx");
+	player->getTransform()->setRotation(Vector3( 0,160,0 ));
+	player->getTransform()->setPosition(Vector3(0, 00, 0));
 
 	// 0단계
 	GameObject * car0 = GameObject::Instantiate("car0", "Car");
-	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//car0->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car0->addComponent<RigidBody>()->setSphereCollider(2);
 	//car0->addComponent<BoxCollider>();
 
 
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
-	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
 	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
 	car1RigidBody->setSphereCollider(2);
@@ -250,7 +263,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// 1단계
 	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
-	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	car1Child1->getTransform()->setPosition(0, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
 

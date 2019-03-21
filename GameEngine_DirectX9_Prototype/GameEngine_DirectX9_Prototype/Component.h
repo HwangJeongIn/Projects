@@ -125,7 +125,6 @@ public:
 	const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
 	void setTransformMatrix_DX(const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
 	{
-		
 		// 중요 :: 부모에의해 부모의 로테이션만큼 더 돌게 되어있다. (부모 + 자식 로테이션) > 부모기준(forward up right) 자식 위치 + 부모위치
 		calcRotationMatrix_DX(parentRotationMatrix); calcPositionMatrix_DX(parentPositionMatrix);
 		transformMatrix_DX = rotationMatrix_DX* positionMatrix_DX;
@@ -494,12 +493,16 @@ private:
 	// 여러가지 메쉬정보를 담고 있음
 	vector<FbxMeshInfo *> fbxMeshInfos;
 	vector<ID3DXMesh *>  meshs;
-	map<ID3DXMesh *,vector<D3DMATERIAL9>> mtrlsTable;
+	map<ID3DXMesh *,vector<D3DMATERIAL9>> materialsTable;
 	map<ID3DXMesh *,vector<IDirect3DTexture9*>> texturesTable;
 
 	FbxScene * scene;
 	IDirect3DDevice9 * device;
 	string fileName;
+
+	static const string filePathToLoadFbxMeshFiles;
+	static const string filePathToLoadFbxTextureFiles;
+	static const unsigned long DefaultOptimizeFlag;
 
 	// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
 	//static const unsigned long DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
@@ -531,7 +534,6 @@ private:
 		// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
 	};
 
-	static const unsigned long DefaultOptimizeFlag;
 
 protected:
 

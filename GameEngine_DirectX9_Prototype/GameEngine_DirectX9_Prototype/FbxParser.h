@@ -40,6 +40,7 @@ class FbxParser
 private:
 	FbxManager* manager;
 	FbxIOSettings *ios;
+	FbxGeometryConverter * converter;
 	bool isNullSystem;
 	void init();
 
@@ -48,7 +49,7 @@ private:
 protected:
 
 	FbxParser(bool isNullSystem = false)
-		: manager(nullptr), ios(nullptr)
+		: manager(nullptr), ios(nullptr), converter(nullptr)
 	{
 		// 널시스템이 아닐때만 초기화
 		if(!isNullSystem)
@@ -70,7 +71,7 @@ public:
 	// 더블 포인터를 사용해준다.
 	// 단 여기서 레퍼런스 변수를 쓰지 못하는 이유는 내부에서 Create함수가 Scene포인터를 반환하기 때문이다.
 	virtual void loadSceneFromFbxFile(const string & fileName, FbxScene ** scene);
-
+	virtual void convertGeometryInfo(FbxNodeAttribute ** nodeAttribute);
 };
 
 class NullFbxParser : public FbxParser

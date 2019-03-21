@@ -6,7 +6,7 @@
 #include "FbxParser.h"
 #include "FbxMeshInfo.h"
 #include "Utility.h"
-
+#include "Trace.h"
 
 void MoveScript::update()
 {
@@ -517,6 +517,8 @@ void RigidBody::getGravity(Vector3 & output)
 
 const unsigned long FbxMeshRenderer::FbxVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 const unsigned long FbxMeshRenderer::DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
+const string FbxMeshRenderer::filePathToLoadFbxMeshFiles = "../Fbx/Models/";
+const string FbxMeshRenderer::filePathToLoadFbxTextureFiles = "../Fbx/Textures/";
 
 void FbxMeshRenderer::render()
 {
@@ -532,16 +534,54 @@ void FbxMeshRenderer::render()
 
 	//meshs[2]->DrawSubset(0);
 	//return;
+	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator tempMaterialForMesh;
+	map<ID3DXMesh *, vector<IDirect3DTexture9*>>::iterator tempTexturesForMesh;
+	D3DMATERIAL9 * material = nullptr;
+	IDirect3DBaseTexture9 * texture = nullptr;
 
-	for (auto it = meshs.begin(); it != meshs.end(); ++it)
+	for(int i =0; i< meshs.size(); ++i)
 	{
+		// 일단 맵에 등록되어있는지 확인한다.
+		tempMaterialForMesh = materialsTable.find(meshs[i]);
+		tempTexturesForMesh = texturesTable.find(meshs[i]);
+
+		material = nullptr;
+		texture = nullptr;
+
+		// material처리
+		// 맵에 등록되어있다면 벡터에 값이 들어있는지 확인한다.
+		if (tempMaterialForMesh != materialsTable.end())
+		{
+			// 리스트(vector)에 값이 들어가 있다면 첫번째 값으로 초기화 한다.
+			if ((*tempMaterialForMesh).second.size() >= 1)
+			{
+				material = (&(*tempMaterialForMesh).second[0]);
+			}
+		}
+
+		// texture처리
+		// 맵에 등록되어있다면 벡터에 값이 들어있는지 확인한다.
+		if (tempTexturesForMesh != texturesTable.end())
+		{
+			// 리스트(vector)에 값이 들어가 있다면 첫번째 값으로 초기화 한다.
+			if ((*tempTexturesForMesh).second.size() >= 1)
+			{
+				texture = (*tempTexturesForMesh).second[0];
+			}
+		}
+
+		if(material)
+			device->SetMaterial(material);
+		if(texture)
+			device->SetTexture(0, texture);
+
 		//// 텍스처와 머티리얼 적용
 		//device->SetMaterial(nullptr);
 		//device->SetTexture(0, nullptr);
 		// 널포인터가 아닐때 그려준다.
 		// 여기서 텍스처와 머티리얼 추가
-		if((*it) !=nullptr)
-			(*it)->DrawSubset(0);
+		if(meshs[i] !=nullptr)
+			meshs[i]->DrawSubset(0);
 	}
 	//mesh->DrawSubset(0);
 	// 파일이 로드되어서 값이 있는 경우만 그려준다.
@@ -565,7 +605,7 @@ void FbxMeshRenderer::loadFbxFile(const string & fileName)
 	// 씬이 제대로 초기화 되어있지 않다면 리턴
 	//if (!(*fbxInfo.getFbxScene())) return;
 
-	gameObject->getFbxParser().loadSceneFromFbxFile(fileName, &scene);
+	gameObject->getFbxParser().loadSceneFromFbxFile(filePathToLoadFbxMeshFiles+fileName, &scene);
 
 	if (scene == nullptr) return;
 
@@ -633,27 +673,40 @@ void FbxMeshRenderer::loadFbxFile(const string & fileName)
 
 }
 
-void FbxMeshRenderer::getAllFbxMeshInfosFromRoot(FbxNode * root)
+void FbxMeshRenderer::getAllFbxMeshInfosFromRoot(FbxNode * node)
 {
 
-	FbxNodeAttribute * nodeAtrribute = root->GetNodeAttribute();
+	FbxNodeAttribute * nodeAtrribute = node->GetNodeAttribute();
 
 	// 모든 노드를 돌면서 Mesh 속성이 붙은것들을 추출한다.
 	if (nodeAtrribute)
 	{
-		if (nodeAtrribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+		switch (nodeAtrribute->GetAttributeType())
 		{
-			FbxMeshInfo * temp = new FbxMeshInfo();
-			temp->setNode(root);
-			fbxMeshInfos.push_back(temp);
+			case FbxNodeAttribute::eMesh:
+			{
+				FbxMeshInfo * temp = new FbxMeshInfo();
+				// 변환작업을 해준다. // 컨트롤포인트로 이루어진 모든 것들을 삼각형2개로 나누어준다.
+				gameObject->getFbxParser().convertGeometryInfo(&nodeAtrribute);
+				temp->setNode(node);
+				fbxMeshInfos.push_back(temp);
+			}
+			break;
+
+			case FbxNodeAttribute::eSkeleton:
+			{
+
+			}
+			break;
 		}
+
 	}
 
 	// 자식들을 돌면서 나머지 메쉬를 찾는다.
-	const int childCount = root->GetChildCount();
+	const int childCount = node->GetChildCount();
 	for (unsigned int i = 0; i < childCount; ++i)
 	{
-		getAllFbxMeshInfosFromRoot(root->GetChild(i));
+		getAllFbxMeshInfosFromRoot(node->GetChild(i));
 	}
 }
 
@@ -685,6 +738,12 @@ void FbxMeshRenderer::processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 				// UV
 				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
 			};
+			//if (i == 0 || i ==1)
+			//{
+			//	Trace::Write("TAG_DEBUG", "!u", fbxV[i].uv[0]);
+			//	Trace::Write("TAG_DEBUG", "!v", fbxV[i].uv[1]);
+			//}
+
 			continue;
 		}
 		// 값이 없을때 // nullptr일때
@@ -712,10 +771,10 @@ void FbxMeshRenderer::processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo
 	unsigned short * fbxI = nullptr;
 	int tIndex = -1;
 
-	int t1 = mesh->GetNumFaces();
-	int t2 = fbxMeshInfo->getIndexCount();
-	int t3 = fbxMeshInfo->getVertexCount();
-	int t4 = fbxMeshInfo->getTriCount();
+	//int t1 = mesh->GetNumFaces();
+	//int t2 = fbxMeshInfo->getIndexCount();
+	//int t3 = fbxMeshInfo->getVertexCount();
+	//int t4 = fbxMeshInfo->getTriCount();
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
@@ -736,8 +795,6 @@ void FbxMeshRenderer::processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo
 	}
 	mesh->UnlockIndexBuffer();
 }
-
-
 
 //if (mtrlBuffer == 0 || numMtrls == 0) return;
 //
@@ -777,13 +834,13 @@ void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 	if (!fbxMeshNode) return;
 
 
-	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator mtrls_it = mtrlsTable.find(mesh);
+	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator materials_it = materialsTable.find(mesh);
 	map<ID3DXMesh *, vector<IDirect3DTexture9*>>::iterator textures_it = texturesTable.find(mesh);
 
 	// 각각 등록이 안되어있으면 등록해준다.
-	if (mtrls_it == mtrlsTable.end())
+	if (materials_it == materialsTable.end())
 	{
-		mtrlsTable[mesh] = vector<D3DMATERIAL9>{};
+		materialsTable[mesh] = vector<D3DMATERIAL9>{};
 	}
 	if (textures_it == texturesTable.end())
 	{
@@ -793,7 +850,7 @@ void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 	// 없으면 자동으로 삽입하는 []연산자이지만
 	// 있다면 그 value값을 반환한다 앞서 없을때 모두 등록을 해준상태이므로 []로 접근해도 새롭게 할당되는 일은 없다.
 	// 레퍼런스 형으로 반환하기 때문에 레퍼런스로 받으면 참조해서 접근할 수 있다.
-	vector<D3DMATERIAL9> & mtrls = mtrlsTable[mesh];
+	vector<D3DMATERIAL9> & materials = materialsTable[mesh];
 	vector<IDirect3DTexture9*> & textures = texturesTable[mesh];
 
 	//	if (pMtrls[i].pTextureFilename != 0)
@@ -825,15 +882,31 @@ void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 			//LOG(INFO) << "\nmaterial: " << material->GetNameOnly() << std::endl;
 			string tempMatrial = material->GetNameOnly();
 			// This only gets the material of type sDiffuse, you probably need to traverse all Standard Material Property by its name to get all possible textures.
-			FbxProperty prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
-			
-			D3DXMATERIAL tempMtrl{};
-			// 여러가지 초기화
-			//tempMtrl.MatD3D.Ambient;
-			//tempMtrl.MatD3D.Diffuse;
-			//tempMtrl.MatD3D.Specular;
 
-			mtrls.push_back(tempMtrl.MatD3D);
+			// material 초기화
+			FbxProperty prop{};
+			D3DXMATERIAL tempMtrl{};
+			FbxDouble3 result(0, 0, 0);
+
+			prop = material->FindProperty(FbxSurfaceMaterial::sAmbient);
+			result = prop.Get<FbxDouble3>();
+			D3DCOLORVALUE ambient = { result.mData[0],result.mData[1],result.mData[2] };
+
+			prop = material->FindProperty(FbxSurfaceMaterial::sSpecular);
+			result = prop.Get<FbxDouble3>();
+			D3DCOLORVALUE specular = { result.mData[0],result.mData[1],result.mData[2] };
+
+			// 텍스처는 디퓨즈만 사용할것이기 때문에 마지막으로 처리해주는 부분은 디퓨즈이다.
+			// 이 prop을 이용해서 텍스처를 받아올것이다.
+			prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
+			result = prop.Get<FbxDouble3>();
+			D3DCOLORVALUE diffuse = { result.mData[0],result.mData[1],result.mData[2] };
+
+			tempMtrl.MatD3D.Ambient = ambient;
+			tempMtrl.MatD3D.Diffuse = diffuse;
+			tempMtrl.MatD3D.Specular = specular;
+
+			materials.push_back(tempMtrl.MatD3D);
 	
 			// Check if it's layeredtextures
 			int layeredTextureCount = prop.GetSrcObjectCount<FbxLayeredTexture>();
@@ -852,50 +925,7 @@ void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 						// Then, you can get all the properties of the texture, include its name
 						string textureName = texture->GetFileName();
 
-						if (textureName.size() > 0)
-						{
-							// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
-
-							// 추가적인 경로 작업
-
-
-							IDirect3DTexture9* tex = nullptr;
-							D3DXCreateTextureFromFile(
-								device,
-								textureName.c_str(),
-								&tex);
-
-							// 텍스처가 있을때 그 텍스처를 넣어주고
-							textures.push_back(tex);
-						}
-
-
-						//LOG(INFO) << textureName;
-					}
-				}
-			}
-			else
-			{
-				// Directly get textures
-				int textureCount = prop.GetSrcObjectCount<FbxFileTexture>();
-				for (int j = 0; j < textureCount; j++)
-				{
-					FbxFileTexture* texture = FbxCast<FbxFileTexture>(prop.GetSrcObject<FbxFileTexture>(j));
-					// Then, you can get all the properties of the texture, include its name
-					string textureName = texture->GetFileName();
-					//LOG(INFO) << textureName;
-
-
-					FbxProperty p = texture->RootProperty.Find(/*"Filename"*/textureName.c_str());
-					//LOG(INFO) << p.Get<FbxString>() << std::endl;
-
-
-					if (textureName.size() > 0)
-					{
-						// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
-
-						// 추가적인 경로 작업
-
+						// 처음에는 바로 파일 경로를 받아서 열어보고
 
 						IDirect3DTexture9* tex = nullptr;
 						D3DXCreateTextureFromFile(
@@ -904,18 +934,74 @@ void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 							&tex);
 
 						// 텍스처가 있을때 그 텍스처를 넣어주고
+						if (tex)
+						{
+							textures.push_back(tex);
+							continue;
+						}
+
+
+						// 파일 경로로 접근했을때 없는 경우
+						// 이미 지정해둔 경로를 뒤져서 확인해본다.
+
+						// 먼저 파일이름을 받아오고 > 그다음 지정해둔 경로를 더하는 작업을 해준다.
+						int index = textureName.find_last_of('\\');
+						textureName = textureName.substr(index + 1);
+						//textureName = texture->GetRelativeFileName();
+						textureName = filePathToLoadFbxTextureFiles + textureName;
+
+						D3DXCreateTextureFromFile(
+							device,
+							textureName.c_str(),
+							&tex);
+
 						textures.push_back(tex);
+
 					}
-					//HRESULT hr;
-					//D3DX11CreateTextureFromFile(Game::GetInstance()->GetRenderer()->GetDevice(), textureName, 0, 0, &m_texture, &hr);
-					//if (FAILED(hr))
-					//{
-					//	std::string message;
-					//	message.append("Load Texture: ");
-					//	message.append(texture->GetName());
-					//	message.append(" failed");
-					//	SHOWMESSAGEBOX(hr, message.c_str());
-					//}
+				}
+			}
+			else
+			{
+				int textureCount = prop.GetSrcObjectCount<FbxFileTexture>();
+				for (int j = 0; j < textureCount; j++)
+				{
+					FbxFileTexture* texture = FbxCast<FbxFileTexture>(prop.GetSrcObject<FbxFileTexture>(j));
+		
+					string textureName = texture->GetFileName();
+
+					//FbxProperty p = texture->RootProperty.Find(/*"Filename"*/textureName.c_str());
+					// 처음에는 바로 파일 경로를 받아서 열어보고
+
+					IDirect3DTexture9* tex = nullptr;
+					D3DXCreateTextureFromFile(
+						device,
+						textureName.c_str(),
+						&tex);
+
+					// 텍스처가 있을때 그 텍스처를 넣어주고
+					if (tex)
+					{
+						textures.push_back(tex);
+						continue;
+					}
+
+
+					// 파일 경로로 접근했을때 없는 경우
+					// 이미 지정해둔 경로를 뒤져서 확인해본다.
+
+					// 먼저 파일이름을 받아오고 > 그다음 지정해둔 경로를 더하는 작업을 해준다.
+					int index = textureName.find_last_of('\\');
+					textureName = textureName.substr(index + 1);
+					//textureName = texture->GetRelativeFileName();
+					textureName = filePathToLoadFbxTextureFiles + textureName;
+
+					D3DXCreateTextureFromFile(
+						device,
+						textureName.c_str(),
+						&tex);
+
+					textures.push_back(tex);
+
 				}
 			}
 		}
