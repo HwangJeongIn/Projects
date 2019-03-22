@@ -51,7 +51,7 @@
     <ClCompile Include="FbxParser.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="FbxMeshInfo.cpp">
+    <ClCompile Include="FbxModelMesh.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,7 +95,19 @@
     <ClInclude Include="FbxParser.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="FbxMeshInfo.h">
+    <ClInclude Include="FbxModelMesh.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelSkeletonBone.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelSkeletonBones.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelAnimation.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelAnimations.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,10 +1,12 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#include <cassert>
 #include "Utility.h"
 #include <vector>
 #include "d3dUtility.h"
-#include "FbxMeshInfo.h"
+#include "FbxModelMesh.h"
+#include "FbxModelSkeletonBones.h"
 
 class Transform;
 class GameObject;
@@ -236,12 +238,26 @@ public:
 	}
 	
 
-	float constrainLessThan360(float num)
+	float constrainLessThan180(float angle)
 	{
+		float value = abs(angle);
 		// 절댓값이 360이 넘어가면 제한한다.
-		int quotient = num / 360;
-		num += -(360 * quotient);
-		return num;
+		int quotient = value / 360;
+		value += -(360 * quotient);
+		
+		// value는 360도 내로 제한됐다.
+
+		// 만약 180도 보다 크다면
+		// 180도 내로 돌려준다.
+		if (value > 180)
+			value = value - 360;
+
+		// 만약 음수였다면 음수로 바꿔준다
+		if (angle < 0)
+			value = -value;
+
+		// -180 ~ 180 로 제한 // 쿼터니언과 호환
+		return value;
 	}
 
 	void setPosition_physics(const Vector3 & other);
@@ -487,14 +503,18 @@ public:
 
 };
 
-class FbxMeshRenderer : public Component
+class FbxModelRenderer : public Component
 {
 private:
 	// 여러가지 메쉬정보를 담고 있음
-	vector<FbxMeshInfo *> fbxMeshInfos;
+	vector<FbxModelMesh *> fbxModelMeshes;
+	FbxModelSkeletonBones * fbxModelSkeletonBones;
+
 	vector<ID3DXMesh *>  meshs;
 	map<ID3DXMesh *,vector<D3DMATERIAL9>> materialsTable;
 	map<ID3DXMesh *,vector<IDirect3DTexture9*>> texturesTable;
+
+
 
 	FbxScene * scene;
 	IDirect3DDevice9 * device;
@@ -510,24 +530,35 @@ private:
 	void render();
 	//void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag);
 	//void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls);
-	struct FbxVertex
+	struct FbxModelVertex
 	{
 		float position[3];
 		float normal[3];
 		float uv[2];
 
-		FbxVertex() 
+		FbxModelVertex()
 			: position{}, normal{}, uv{}
 		{
 		
 		}
 
-		FbxVertex(float x, float y, float z,
+		FbxModelVertex(float x, float y, float z,
 			float nx, float ny, float nz, float u, float v)
 		{
 			position[0] = x; position[1] = y; position[2] = z;
 			normal[0] = nx; normal[1] = ny; normal[2] = nz;
 			uv[0] = u; uv[1] = v;
+		}
+
+		float& operator[] (unsigned int index) 
+		{
+			// 0보다 작거나 8보다 크거나 같으면 프로그램 멈춘다.
+			// 항상 0보다 크거나 같거나 8보다는 작아야한다.
+			assert(index >= 0 && index < sizeof(FbxModelVertex) / sizeof(float));
+			
+			float * result = (float*)this;
+			result += index;
+			return *result;
 		}
 
 		static const unsigned long DefaultFVF;
@@ -541,6 +572,17 @@ protected:
 	virtual void update()
 	{
 		render();
+		if (::GetAsyncKeyState('F') & 0x8000f)
+			setScale(Vector3(1, 1, 1));
+
+		if (::GetAsyncKeyState('G') & 0x8000f)
+			setScale(Vector3(1, 3, 1));
+
+		if (::GetAsyncKeyState('H') & 0x8000f)
+			setScale(Vector3(3, 1, 3));
+
+		if (::GetAsyncKeyState('J') & 0x8000f)
+			setScale(Vector3(3, 3, 3));
 	}
 	virtual void onDestroy()
 	{
@@ -555,7 +597,8 @@ protected:
 			
 			for (auto it2 = (*it).second.begin(); it2 != (*it).second.end(); ++it2)
 			{
-				(*it2)->Release();
+				if ((*it2) != nullptr)
+					(*it2)->Release();
 			}
 
 		}
@@ -563,18 +606,24 @@ protected:
 		// 메쉬 정보 삭제
 		for (auto it = meshs.begin(); it != meshs.end(); ++it)
 		{
-			(*it)->Release();
+			if ((*it) != nullptr)
+				(*it)->Release();
 			(*it) = nullptr;
 		}
 		meshs.clear();
 
 		// fbx 메쉬 정보 삭제
-		for (auto it = fbxMeshInfos.begin(); it != fbxMeshInfos.end(); ++it)
+		for (auto it = fbxModelMeshes.begin(); it != fbxModelMeshes.end(); ++it)
 		{
-			delete (*it);
+			if ((*it) != nullptr)
+				delete (*it);
 			(*it) = nullptr;
 		}
-		fbxMeshInfos.clear();
+		fbxModelMeshes.clear();
+
+		// 스켈레톤 본 정보 삭제
+		if (fbxModelSkeletonBones)
+			delete fbxModelSkeletonBones;
 
 		//d3d::Release<ID3DXMesh*>(mesh);
 
@@ -585,18 +634,28 @@ protected:
 
 public:
 
-	FbxMeshRenderer(GameObject * go, Transform * tf);
+	FbxModelRenderer(GameObject * go, Transform * tf);
 
-	virtual ~FbxMeshRenderer()
+
+	virtual ~FbxModelRenderer()
 	{
 		onDestroy();
 	}
 
+	float constrainNegativeNumber(float value)
+	{
+		if (value < 0)
+			return 1.0f;
+		return value;
+	}
+
+	void setScale(const Vector3 & value);
+
 	void loadFbxFile(const string & fileName);
-	void getAllFbxMeshInfosFromRoot(FbxNode * root);
-	void processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
-	void processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
-	void processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo);
+	void getAllFbxModelMeshesFromRoot(FbxNode * root);
+	void processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
 	void processSubsets(ID3DXMesh * mesh);
 	void optimizeMesh(ID3DXMesh * mesh);
 

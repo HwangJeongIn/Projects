@@ -163,7 +163,7 @@
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="FbxMeshInfo.cpp" />
+    <ClCompile Include="FbxModelMesh.cpp" />
     <ClCompile Include="FbxParser.cpp" />
     <ClCompile Include="Locator.cpp" />
     <ClCompile Include="main.cpp" />
@@ -180,7 +180,11 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="d3dUtility.h" />
-    <ClInclude Include="FbxMeshInfo.h" />
+    <ClInclude Include="FbxModelAnimation.h" />
+    <ClInclude Include="FbxModelAnimations.h" />
+    <ClInclude Include="FbxModelMesh.h" />
+    <ClInclude Include="FbxModelSkeletonBone.h" />
+    <ClInclude Include="FbxModelSkeletonBones.h" />
     <ClInclude Include="FbxParser.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputManager.h" />

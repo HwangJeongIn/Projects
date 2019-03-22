@@ -4,7 +4,7 @@
 #include "Audio.h"
 #include "Physics.h"
 #include "FbxParser.h"
-#include "FbxMeshInfo.h"
+#include "FbxModelMesh.h"
 #include "Utility.h"
 #include "Trace.h"
 
@@ -169,9 +169,9 @@ void Transform::setPosition_physics(const Vector3 & other)
 
 void Transform::setRotation_physics(const Vector3 & other)
 {
-	rotation.setX(constrainLessThan360(other.getX()));
-	rotation.setY(constrainLessThan360(other.getY()));
-	rotation.setZ(constrainLessThan360(other.getZ()));
+	rotation.setX(constrainLessThan180(other.getX()));
+	rotation.setY(constrainLessThan180(other.getY()));
+	rotation.setZ(constrainLessThan180(other.getZ()));
 	setDirectionVectorWithRotation_DX();
 	dirty = true;
 }
@@ -191,9 +191,9 @@ void Transform::setPosition(const Vector3 & other)
 
 void Transform::setRotation(const Vector3 & other)
 {
-	rotation.setX(constrainLessThan360(other.getX()));
-	rotation.setY(constrainLessThan360(other.getY()));
-	rotation.setZ(constrainLessThan360(other.getZ()));
+	rotation.setX(constrainLessThan180(other.getX()));
+	rotation.setY(constrainLessThan180(other.getY()));
+	rotation.setZ(constrainLessThan180(other.getZ()));
 	setDirectionVectorWithRotation_DX();
 	dirty = true;
 	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
@@ -215,9 +215,9 @@ void Transform::setPosition(float x, float y, float z)
 
 void Transform::setRotation(float x, float y, float z)
 {
-	rotation.setX(constrainLessThan360(x));
-	rotation.setY(constrainLessThan360(y));
-	rotation.setZ(constrainLessThan360(z));
+	rotation.setX(constrainLessThan180(x));
+	rotation.setY(constrainLessThan180(y));
+	rotation.setZ(constrainLessThan180(z));
 	setDirectionVectorWithRotation_DX();
 	dirty = true;
 	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
@@ -515,12 +515,12 @@ void RigidBody::getGravity(Vector3 & output)
 	gameObject->getPhysics().getGravity(output, gameObject);
 }
 
-const unsigned long FbxMeshRenderer::FbxVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
-const unsigned long FbxMeshRenderer::DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
-const string FbxMeshRenderer::filePathToLoadFbxMeshFiles = "../Fbx/Models/";
-const string FbxMeshRenderer::filePathToLoadFbxTextureFiles = "../Fbx/Textures/";
+const unsigned long FbxModelRenderer::FbxModelVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+const unsigned long FbxModelRenderer::DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
+const string FbxModelRenderer::filePathToLoadFbxMeshFiles = "../Fbx/Models/";
+const string FbxModelRenderer::filePathToLoadFbxTextureFiles = "../Fbx/Textures/";
 
-void FbxMeshRenderer::render()
+void FbxModelRenderer::render()
 {
 	if (meshs.size() ==0) return;
 
@@ -530,7 +530,7 @@ void FbxMeshRenderer::render()
 	//device->SetMaterial(nullptr);
 	//device->SetTexture(0, nullptr);
 	int meshCount = meshs.size();
-	int fbxCount = fbxMeshInfos.size();
+	int fbxCount = fbxModelMeshes.size();
 
 	//meshs[2]->DrawSubset(0);
 	//return;
@@ -593,13 +593,57 @@ void FbxMeshRenderer::render()
 	//}
 }
 
-FbxMeshRenderer::FbxMeshRenderer(GameObject * go, Transform * tf)
+FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
 	: Component(go, tf), scene(nullptr)
 {
 	device = &(gameObject->getDevice());
 }
 
-void FbxMeshRenderer::loadFbxFile(const string & fileName)
+void FbxModelRenderer::setScale(const Vector3 & value)
+{
+
+	float xScale = constrainNegativeNumber(value.getX());
+	float yScale = constrainNegativeNumber(value.getY());
+	float zScale = constrainNegativeNumber(value.getZ());
+	
+	for (int i = 0; i < meshs.size(); ++i)
+	{
+		ID3DXMesh * mesh = nullptr;
+		mesh = meshs[i];
+		FbxModelMesh * fbxModelMesh = nullptr;
+		fbxModelMesh = fbxModelMeshes[i];
+
+		if (!mesh||!fbxModelMesh) continue;
+
+		FbxModelVertex * fbxV = nullptr;
+		MyVertex * tVertex = nullptr;
+
+		processVertices(mesh, fbxModelMesh);
+		mesh->LockVertexBuffer(0, (void**)&fbxV);
+		for (int j = 0; j < fbxModelMeshes[i]->getVertexCount(); ++j)
+		{
+			//tVertex = fbxMeshInfos[i]->getVertex(j);
+			//if (tVertex)
+			//{
+			//	fbxV[j][0] = (float)tVertex->getPosition().mData[0] / 10;
+			//	fbxV[j][1] = (float)tVertex->getPosition().mData[1] / 10;
+			//	fbxV[j][2] = (float)tVertex->getPosition().mData[2] / 10;
+			//}
+
+
+			fbxV[j][0] *= xScale;
+			fbxV[j][1] *= yScale;
+			fbxV[j][2] *= zScale;
+		}
+
+		mesh->UnlockVertexBuffer();
+	}
+	
+}
+
+
+
+void FbxModelRenderer::loadFbxFile(const string & fileName)
 {
 	//gameObject->getFbxParser().loadSceneFromFbxFile(fileName, (fbxInfo.getFbxScene()));
 	// 씬이 제대로 초기화 되어있지 않다면 리턴
@@ -615,19 +659,19 @@ void FbxMeshRenderer::loadFbxFile(const string & fileName)
 
 	// 루트노드를 시작으로 모든 메쉬 정보를 가진 노드들을 추출한다.
 	// 저장되는 곳은 fbxMeshInfos이다.
-	getAllFbxMeshInfosFromRoot(rootNode);
+	getAllFbxModelMeshesFromRoot(rootNode);
 
 	// 노드를 순회하면서 메쉬정보부터 초기화하고
 	//fbxInfo.loadMeshFromNodes(rootNode);
 
-	for (auto it = fbxMeshInfos.begin(); it != fbxMeshInfos.end(); ++it)
+	for (auto it = fbxModelMeshes.begin(); it != fbxModelMeshes.end(); ++it)
 	{
 		// 메쉬정보로부터 컨트롤 포인트를 초기화 한다.
 		(*it)->processControlPoints();
 		// 마지막으로 메쉬정보, 컨트롤 포인트로 버텍스 / 인덱스를 초기화 한다.
 		(*it)->processVertices();
 
-		// 미리 초기화된 FbxMesh를 가지는 FbxMeshInfo에서 부터 필요한 정보 추출 완료 // fbxMeshInfos에 담겨있음
+		// 미리 초기화된 FbxMesh를 가지는 fbxModelMesh에서 부터 필요한 정보 추출 완료 // fbxModelMeshes에 담겨있음
 		//---------------------------------------------------------------------------
 		// 정보를 가지고 DirectX에서 지원하는 mesh형식으로 변환
 
@@ -648,7 +692,7 @@ void FbxMeshRenderer::loadFbxFile(const string & fileName)
 			D3DXMESH_MANAGED,
 
 			// 복제된 메쉬를 만드는데 이용될 포맷
-			FbxMeshRenderer::FbxVertex::DefaultFVF,
+			FbxModelRenderer::FbxModelVertex::DefaultFVF,
 			device,
 			// 복제된 메쉬가 담길 포인터
 			&mesh);
@@ -673,7 +717,7 @@ void FbxMeshRenderer::loadFbxFile(const string & fileName)
 
 }
 
-void FbxMeshRenderer::getAllFbxMeshInfosFromRoot(FbxNode * node)
+void FbxModelRenderer::getAllFbxModelMeshesFromRoot(FbxNode * node)
 {
 
 	FbxNodeAttribute * nodeAtrribute = node->GetNodeAttribute();
@@ -685,11 +729,11 @@ void FbxMeshRenderer::getAllFbxMeshInfosFromRoot(FbxNode * node)
 		{
 			case FbxNodeAttribute::eMesh:
 			{
-				FbxMeshInfo * temp = new FbxMeshInfo();
+				FbxModelMesh * temp = new FbxModelMesh();
 				// 변환작업을 해준다. // 컨트롤포인트로 이루어진 모든 것들을 삼각형2개로 나누어준다.
 				gameObject->getFbxParser().convertGeometryInfo(&nodeAtrribute);
 				temp->setNode(node);
-				fbxMeshInfos.push_back(temp);
+				fbxModelMeshes.push_back(temp);
 			}
 			break;
 
@@ -706,26 +750,26 @@ void FbxMeshRenderer::getAllFbxMeshInfosFromRoot(FbxNode * node)
 	const int childCount = node->GetChildCount();
 	for (unsigned int i = 0; i < childCount; ++i)
 	{
-		getAllFbxMeshInfosFromRoot(node->GetChild(i));
+		getAllFbxModelMeshesFromRoot(node->GetChild(i));
 	}
 }
 
-void FbxMeshRenderer::processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo)
+void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
 {
-	if (!mesh || !fbxMeshInfo) return;
+	if (!mesh || !fbxModelMesh) return;
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
-	FbxVertex * fbxV = nullptr;
+	FbxModelVertex * fbxV = nullptr;
 	MyVertex * tVertex = nullptr;
 
 	//int t1 = mesh->GetNumVertices();
-	//int t2 = fbxMeshInfo->getVertexCount();
+	//int t2 = fbxModelMesh->getVertexCount();
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
 	mesh->LockVertexBuffer(0, (void**)&fbxV);
-	for (int i = 0; i < fbxMeshInfo->getVertexCount(); ++i)
+	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
 	{
-		tVertex = fbxMeshInfo->getVertex(i);
+		tVertex = fbxModelMesh->getVertex(i);
 		// 값이 있을때
 		if (tVertex)
 		{
@@ -758,31 +802,31 @@ void FbxMeshRenderer::processVertices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 	}
 
 	//t1 = mesh->GetNumVertices();
-	//t2 = fbxMeshInfo->getVertexCount();
+	//t2 = fbxModelMesh->getVertexCount();
 
 	mesh->UnlockVertexBuffer();
 }
 
-void FbxMeshRenderer::processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo)
+void FbxModelRenderer::processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
 {
-	if (!mesh || !fbxMeshInfo) return;
+	if (!mesh || !fbxModelMesh) return;
 
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
 	unsigned short * fbxI = nullptr;
 	int tIndex = -1;
 
 	//int t1 = mesh->GetNumFaces();
-	//int t2 = fbxMeshInfo->getIndexCount();
-	//int t3 = fbxMeshInfo->getVertexCount();
-	//int t4 = fbxMeshInfo->getTriCount();
+	//int t2 = fbxModelMesh->getIndexCount();
+	//int t3 = fbxModelMesh->getVertexCount();
+	//int t4 = fbxModelMesh->getTriCount();
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
 	mesh->LockIndexBuffer(0, (void**)&fbxI);
-	for (int i = 0; i < fbxMeshInfo->getIndexCount(); ++i)
+	for (int i = 0; i < fbxModelMesh->getIndexCount(); ++i)
 	{
 
-		tIndex = fbxMeshInfo->getIndex(i);
+		tIndex = fbxModelMesh->getIndex(i);
 		// 값이 있을때
 		if (tIndex != -1)
 		{
@@ -827,10 +871,10 @@ void FbxMeshRenderer::processIndices(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo
 //	}
 //}
 
-void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInfo)
+void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
 {
-	if (!mesh || !fbxMeshInfo) return;
-	FbxNode * fbxMeshNode = fbxMeshInfo->getNode();
+	if (!mesh || !fbxModelMesh) return;
+	FbxNode * fbxMeshNode = fbxModelMesh->getNode();
 	if (!fbxMeshNode) return;
 
 
@@ -1009,7 +1053,7 @@ void FbxMeshRenderer::processTextures(ID3DXMesh * mesh, FbxMeshInfo * fbxMeshInf
 	}
 }
 
-void FbxMeshRenderer::processSubsets(ID3DXMesh * mesh)
+void FbxModelRenderer::processSubsets(ID3DXMesh * mesh)
 {
 	if (!mesh ) return;
 
@@ -1029,7 +1073,7 @@ void FbxMeshRenderer::processSubsets(ID3DXMesh * mesh)
 	mesh->UnlockAttributeBuffer();
 }
 
-void FbxMeshRenderer::optimizeMesh(ID3DXMesh * mesh)
+void FbxModelRenderer::optimizeMesh(ID3DXMesh * mesh)
 {
 	if (!mesh) return;
 

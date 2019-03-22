@@ -225,7 +225,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	*/
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
-	mainCamera->getTransform()->setPosition(0, 0, -300);
+	mainCamera->getTransform()->setPosition(0, 0, -100);
 
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
@@ -240,9 +240,16 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// -1단계
 	GameObject * player = GameObject::Instantiate("player", "Player");
 																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx
-	player->addComponent<FbxMeshRenderer>()->loadFbxFile("akai_e_espiritu.fbx");
-	player->getTransform()->setRotation(Vector3( 0,160,0 ));
+	FbxModelRenderer * playerFbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	playerFbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	//playerFbxModelRendererplayer->setScale(Vector3(3,1,3));
+	player->getTransform()->setRotation(Vector3( 0,180,0 ));
 	player->getTransform()->setPosition(Vector3(0, 00, 0));
+	player->addComponent<MoveScript>();
+	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	playerRigidBody->setSphereCollider(2);
+
+
 
 	// 0단계
 	GameObject * car0 = GameObject::Instantiate("car0", "Car");
