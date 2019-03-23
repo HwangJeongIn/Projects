@@ -1,10 +1,15 @@
 #include "Component.h"
 #include "GameObject.h"
+
 #include "Scene.h"
 #include "Audio.h"
 #include "Physics.h"
 #include "FbxParser.h"
+
 #include "FbxModelMesh.h"
+#include "FbxModelSkeletonBones.h"
+#include "FbxModelAnimations.h"
+
 #include "Utility.h"
 #include "Trace.h"
 
@@ -527,13 +532,11 @@ void FbxModelRenderer::render()
 	// 현재 transform행렬로 적용시킨다.
 	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix_DX());
 
-	//device->SetMaterial(nullptr);
-	//device->SetTexture(0, nullptr);
+
 	int meshCount = meshs.size();
 	int fbxCount = fbxModelMeshes.size();
 
-	//meshs[2]->DrawSubset(0);
-	//return;
+
 	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator tempMaterialForMesh;
 	map<ID3DXMesh *, vector<IDirect3DTexture9*>>::iterator tempTexturesForMesh;
 	D3DMATERIAL9 * material = nullptr;
@@ -541,6 +544,26 @@ void FbxModelRenderer::render()
 
 	for(int i =0; i< meshs.size(); ++i)
 	{
+		if (!meshs[i]) continue;
+		//animation-------------------------------------------------------------
+		// 본들이 있을때
+			// 애니메이션 매니저가있을때
+				// 애니메이션이 출력되어야 할때
+					// 애니메이션을위한 본들의 계산(최종매트릭스 계산)
+					// FbxModelMesh(mesh와 인덱스 1:1 매칭)에 접근해서(vectorMyVertex)
+
+					// 렌더링할 mesh의 버텍스 버퍼를 열어서 최종적인 위치 값들을 다시 넣어준다.
+
+					// FbxModelMesh의 각 버텍스에서 MyFbxVertex->getPositionWithAnimation해서 초기화 
+					//  position * animationmatrix // 	
+					// 내부적으로 가중치 벡터를 가진 점에 대해서 내부 애니메이션 매트릭스 계산
+
+
+					// 만약에 애니메이션이 멈춘다면 모든 메쉬들을 processVertice함수로 // 초기값으로 지정해준다.
+
+
+		
+		//material, texture-----------------------------------------------------
 		// 일단 맵에 등록되어있는지 확인한다.
 		tempMaterialForMesh = materialsTable.find(meshs[i]);
 		tempTexturesForMesh = texturesTable.find(meshs[i]);
@@ -570,31 +593,78 @@ void FbxModelRenderer::render()
 			}
 		}
 
+		// rendering-----------------------------------------------------
 		if(material)
 			device->SetMaterial(material);
 		if(texture)
 			device->SetTexture(0, texture);
-
-		//// 텍스처와 머티리얼 적용
-		//device->SetMaterial(nullptr);
-		//device->SetTexture(0, nullptr);
-		// 널포인터가 아닐때 그려준다.
-		// 여기서 텍스처와 머티리얼 추가
-		if(meshs[i] !=nullptr)
-			meshs[i]->DrawSubset(0);
+		
+		meshs[i]->DrawSubset(0);
 	}
-	//mesh->DrawSubset(0);
-	// 파일이 로드되어서 값이 있는 경우만 그려준다.
-	//for (int i = 0; i < mtrls.size(); ++i)
-	//{
-	//	device->SetMaterial(&mtrls[i]);
-	//	device->SetTexture(0, textures[i]);
-	//	mesh->DrawSubset(i);
-	//}
+
+}
+
+void FbxModelRenderer::onDestroy()
+{
+	{
+		// 텍스처 정보 삭제
+		// 머티리얼 경우는 그냥 복사해서 해제했기 때문에 따로 신경안써도된다.
+		for (auto it = texturesTable.begin(); it != texturesTable.end(); ++it)
+		{
+			// 맵을 돌면서 텍스처 벡터를 받아서 모두 릴리즈 시켜준다.
+			// second값이 그자체의 값을 반환하는 것이기 때문에 따로 복사가 안된다. 
+			// 만약 복사가 된다고 해도 포인터자체값을 통해서 릴리즈 하기 때문에 상관없긴하다.
+			/*vector<IDirect3DTexture9*> & temp = */
+
+			for (auto it2 = (*it).second.begin(); it2 != (*it).second.end(); ++it2)
+			{
+				if ((*it2) != nullptr)
+					(*it2)->Release();
+			}
+
+		}
+
+		// 메쉬 정보 삭제
+		for (auto it = meshs.begin(); it != meshs.end(); ++it)
+		{
+			if ((*it) != nullptr)
+				(*it)->Release();
+			(*it) = nullptr;
+		}
+		meshs.clear();
+
+		// fbx 메쉬 정보 삭제
+		for (auto it = fbxModelMeshes.begin(); it != fbxModelMeshes.end(); ++it)
+		{
+			if ((*it) != nullptr)
+				delete (*it);
+			(*it) = nullptr;
+		}
+		fbxModelMeshes.clear();
+
+		// 스켈레톤 본 정보 삭제
+		if (skeletonBones)
+			delete skeletonBones;
+
+		if (animations)
+			delete animations;
+
+		if (importer)
+			importer->Destroy();
+
+		if (scene)
+			scene->Destroy();
+
+		//d3d::Release<ID3DXMesh*>(mesh);
+
+		// 텍스처만 할당된 값이고 재질은 복사된 값이다.
+		//for (int i = 0; i < textures.size(); i++)
+		//	d3d::Release<IDirect3DTexture9*>(textures[i]);
+	}
 }
 
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
-	: Component(go, tf), scene(nullptr)
+	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr)
 {
 	device = &(gameObject->getDevice());
 }
@@ -616,7 +686,7 @@ void FbxModelRenderer::setScale(const Vector3 & value)
 		if (!mesh||!fbxModelMesh) continue;
 
 		FbxModelVertex * fbxV = nullptr;
-		MyVertex * tVertex = nullptr;
+		MyFbxVertex * tVertex = nullptr;
 
 		processVertices(mesh, fbxModelMesh);
 		mesh->LockVertexBuffer(0, (void**)&fbxV);
@@ -645,10 +715,6 @@ void FbxModelRenderer::setScale(const Vector3 & value)
 
 void FbxModelRenderer::loadFbxFile(const string & fileName)
 {
-	//gameObject->getFbxParser().loadSceneFromFbxFile(fileName, (fbxInfo.getFbxScene()));
-	// 씬이 제대로 초기화 되어있지 않다면 리턴
-	//if (!(*fbxInfo.getFbxScene())) return;
-
 	gameObject->getFbxParser().loadSceneFromFbxFile(filePathToLoadFbxMeshFiles+fileName, &scene);
 
 	if (scene == nullptr) return;
@@ -657,25 +723,37 @@ void FbxModelRenderer::loadFbxFile(const string & fileName)
 	// 루트 노드를 받아온다.
 	//FbxNode * rootNode = (*fbxInfo.getFbxScene())->GetRootNode();
 
-	// 루트노드를 시작으로 모든 메쉬 정보를 가진 노드들을 추출한다.
-	// 저장되는 곳은 fbxMeshInfos이다.
-	getAllFbxModelMeshesFromRoot(rootNode);
+
+	/*
+	1. 스켈레톤본들 초기화
+	2. 메쉬 초기화 // 초기화 과정에서 스켈레톤 본이 존재한다면 버텍스들의 본 가중치도 넣어준다.
+	*/
+	processAllNodesWithSameAtrributeTypeFromRoot(rootNode, FbxNodeAttribute::eSkeleton);
+	processAllNodesWithSameAtrributeTypeFromRoot(rootNode, FbxNodeAttribute::eMesh);
+
+	skeletonBones->printAllInfo();
+
+
+
+	//getAllFbxModelMeshesFromRoot(rootNode);
 
 	// 노드를 순회하면서 메쉬정보부터 초기화하고
 	//fbxInfo.loadMeshFromNodes(rootNode);
 
+	// 여기서 processControlPoints와 processVertices빼고 처리
+	// mesh객체에 FbxModelMesh의 정보를 넣어서 처리
 	for (auto it = fbxModelMeshes.begin(); it != fbxModelMeshes.end(); ++it)
 	{
-		// 메쉬정보로부터 컨트롤 포인트를 초기화 한다.
-		(*it)->processControlPoints();
-		// 마지막으로 메쉬정보, 컨트롤 포인트로 버텍스 / 인덱스를 초기화 한다.
-		(*it)->processVertices();
+		/// 메쉬정보로부터 컨트롤 포인트를 초기화 한다.
+		///*삭제예정*/(*it)->processControlPoints();
+		/// 마지막으로 메쉬정보, 컨트롤 포인트로 버텍스 / 인덱스를 초기화 한다.
+		///*삭제예정*/(*it)->processVertices();
 
 		// 미리 초기화된 FbxMesh를 가지는 fbxModelMesh에서 부터 필요한 정보 추출 완료 // fbxModelMeshes에 담겨있음
 		//---------------------------------------------------------------------------
 		// 정보를 가지고 DirectX에서 지원하는 mesh형식으로 변환
 
-		ID3DXMesh * mesh;
+		ID3DXMesh * mesh = nullptr;
 		HRESULT hr = 0;
 
 		hr = D3DXCreateMeshFVF(
@@ -717,29 +795,62 @@ void FbxModelRenderer::loadFbxFile(const string & fileName)
 
 }
 
-void FbxModelRenderer::getAllFbxModelMeshesFromRoot(FbxNode * node)
+void FbxModelRenderer::processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * node , FbxNodeAttribute::EType attributeType)
 {
 
 	FbxNodeAttribute * nodeAtrribute = node->GetNodeAttribute();
 
 	// 모든 노드를 돌면서 Mesh 속성이 붙은것들을 추출한다.
-	if (nodeAtrribute)
+	// 조건문은 앞에서부터 검사하다가 없으면 바로 false반환하기 때문에 이런식으로 코딩이 가능하다
+	if (nodeAtrribute && nodeAtrribute->GetAttributeType() == attributeType)
 	{
-		switch (nodeAtrribute->GetAttributeType())
+		switch (attributeType)
 		{
 			case FbxNodeAttribute::eMesh:
 			{
 				FbxModelMesh * temp = new FbxModelMesh();
 				// 변환작업을 해준다. // 컨트롤포인트로 이루어진 모든 것들을 삼각형2개로 나누어준다.
 				gameObject->getFbxParser().convertGeometryInfo(&nodeAtrribute);
+				// 노드를 초기화시켜주고
 				temp->setNode(node);
+
+				// 내부적으로 프로세스해준다 
+				// 컨트롤포인트 정보받기 
+				temp->processControlPoints();
+
+				// 앞서 스켈레톤 초기화이후(본들의 정보가 버텍스 초기화시 필요) 버텍스값 초기화
+				temp->processVertices();
 				fbxModelMeshes.push_back(temp);
 			}
 			break;
 
 			case FbxNodeAttribute::eSkeleton:
 			{
+				FbxSkeleton * fbxSkeleton = node->GetSkeleton();
+				if (!fbxSkeleton) break;
 
+				// 최초로 스켈레톤객체를 받아왔을때 스켈레톤본 매니저가 생성된다.
+				if (skeletonBones == nullptr) skeletonBones = new FbxModelSkeletonBones();
+
+				// 루트본의 부모본은 인덱스가 -1이고 이름이 NONE이다
+				int parentBoneIndex = -1;
+				string parentBoneName = "NONE";
+				FbxNode * parentNode = node->GetParent();
+				if (parentNode)
+				{
+					// 부모노드의 스켈레톤이 존재할때만 처리해준다. 
+					// 아닌경우는 부모노드의 스켈레톤 존재X = 부모본이 없음
+					// 즉 초기 설정해뒀던 index : -1 / name : NONE 으로 결정된다.
+					if (parentNode->GetSkeleton())
+					{
+						parentBoneName = parentNode->GetName();
+						parentBoneIndex = skeletonBones->findBoneIndexWithBoneName(parentNode->GetName());
+					}
+				}
+				int boneIndex = skeletonBones->getIndexOfBoneToInsert();
+				string boneName = node->GetName();
+
+				skeletonBones->AddBone(parentBoneIndex, parentBoneName, boneIndex, boneName);
 			}
 			break;
 		}
@@ -750,7 +861,7 @@ void FbxModelRenderer::getAllFbxModelMeshesFromRoot(FbxNode * node)
 	const int childCount = node->GetChildCount();
 	for (unsigned int i = 0; i < childCount; ++i)
 	{
-		getAllFbxModelMeshesFromRoot(node->GetChild(i));
+		processAllNodesWithSameAtrributeTypeFromRoot(node->GetChild(i), attributeType);
 	}
 }
 
@@ -759,7 +870,7 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 	if (!mesh || !fbxModelMesh) return;
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
 	FbxModelVertex * fbxV = nullptr;
-	MyVertex * tVertex = nullptr;
+	MyFbxVertex * tVertex = nullptr;
 
 	//int t1 = mesh->GetNumVertices();
 	//int t2 = fbxModelMesh->getVertexCount();
@@ -774,7 +885,8 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 		if (tVertex)
 		{
 			// 각각의 정보를 초기화 시켜준다.
-			fbxV[i] = {
+			fbxV[i] = 
+			{
 				// Position
 				(float)tVertex->getPosition().mData[0]/10,(float)tVertex->getPosition().mData[1]/10, (float)tVertex->getPosition().mData[2]/10,
 				// Normal
@@ -782,16 +894,11 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 				// UV
 				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
 			};
-			//if (i == 0 || i ==1)
-			//{
-			//	Trace::Write("TAG_DEBUG", "!u", fbxV[i].uv[0]);
-			//	Trace::Write("TAG_DEBUG", "!v", fbxV[i].uv[1]);
-			//}
-
 			continue;
 		}
 		// 값이 없을때 // nullptr일때
-		fbxV[i] = {
+		fbxV[i] = 
+		{
 			// Position
 			0,0,0,
 			// Normal
@@ -803,6 +910,36 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 
 	//t1 = mesh->GetNumVertices();
 	//t2 = fbxModelMesh->getVertexCount();
+
+	mesh->UnlockVertexBuffer();
+}
+
+void FbxModelRenderer::processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+{
+	if (!mesh || !fbxModelMesh) return;
+
+	FbxModelVertex * fbxV = nullptr;
+	MyFbxVertex * tVertex = nullptr;
+
+	mesh->LockVertexBuffer(0, (void**)&fbxV);
+	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
+	{
+		tVertex = fbxModelMesh->getVertex(i);
+		// 값이 있을때
+		if (tVertex)
+		{
+			// 내부적으로 애니메이션 행렬을 곱한 것들을 처리해준다.
+			// 애니메이션 행렬을 곱하기 전에 본들의 가중치에 따른 애니메이션 행렬을 내부적으로 계산해준다.
+			fbxV[i][0] = (float)tVertex->getPositionWithAnimation().mData[0] / 10;
+			fbxV[i][1] = (float)tVertex->getPositionWithAnimation().mData[1] / 10;
+			fbxV[i][2] = (float)tVertex->getPositionWithAnimation().mData[2] / 10;
+
+			// 노말값이나 UV값은 안바꿔도 될까..
+			// UV값은 어차피 같은 텍스처 좌표이기때문에 상관없을것같은데 노말값은 달라져야하는거아닐까?
+		}
+		// 값이 없을때 // 아무것도 해주지않는다.
+	}
+
 
 	mesh->UnlockVertexBuffer();
 }

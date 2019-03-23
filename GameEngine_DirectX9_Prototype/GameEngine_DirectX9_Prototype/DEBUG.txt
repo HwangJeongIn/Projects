@@ -1,0 +1,390 @@
+Index :: 0
+boneIndex :: 0
+boneName :: Hips
+parentBoneIndex :: -1
+parentBoneName :: NONE
+ :: 
+Index :: 1
+boneIndex :: 1
+boneName :: Spine
+parentBoneIndex :: 0
+parentBoneName :: Hips
+ :: 
+Index :: 2
+boneIndex :: 2
+boneName :: Spine1
+parentBoneIndex :: 1
+parentBoneName :: Spine
+ :: 
+Index :: 3
+boneIndex :: 3
+boneName :: Spine2
+parentBoneIndex :: 2
+parentBoneName :: Spine1
+ :: 
+Index :: 4
+boneIndex :: 4
+boneName :: Neck
+parentBoneIndex :: 3
+parentBoneName :: Spine2
+ :: 
+Index :: 5
+boneIndex :: 5
+boneName :: Head
+parentBoneIndex :: 4
+parentBoneName :: Neck
+ :: 
+Index :: 6
+boneIndex :: 6
+boneName :: HeadTop_End
+parentBoneIndex :: 5
+parentBoneName :: Head
+ :: 
+Index :: 7
+boneIndex :: 7
+boneName :: LeftShoulder
+parentBoneIndex :: 3
+parentBoneName :: Spine2
+ :: 
+Index :: 8
+boneIndex :: 8
+boneName :: LeftArm
+parentBoneIndex :: 7
+parentBoneName :: LeftShoulder
+ :: 
+Index :: 9
+boneIndex :: 9
+boneName :: LeftForeArm
+parentBoneIndex :: 8
+parentBoneName :: LeftArm
+ :: 
+Index :: 10
+boneIndex :: 10
+boneName :: LeftHand
+parentBoneIndex :: 9
+parentBoneName :: LeftForeArm
+ :: 
+Index :: 11
+boneIndex :: 11
+boneName :: LeftHandThumb1
+parentBoneIndex :: 10
+parentBoneName :: LeftHand
+ :: 
+Index :: 12
+boneIndex :: 12
+boneName :: LeftHandThumb2
+parentBoneIndex :: 11
+parentBoneName :: LeftHandThumb1
+ :: 
+Index :: 13
+boneIndex :: 13
+boneName :: LeftHandThumb3
+parentBoneIndex :: 12
+parentBoneName :: LeftHandThumb2
+ :: 
+Index :: 14
+boneIndex :: 14
+boneName :: LeftHandThumb4
+parentBoneIndex :: 13
+parentBoneName :: LeftHandThumb3
+ :: 
+Index :: 15
+boneIndex :: 15
+boneName :: LeftHandIndex1
+parentBoneIndex :: 10
+parentBoneName :: LeftHand
+ :: 
+Index :: 16
+boneIndex :: 16
+boneName :: LeftHandIndex2
+parentBoneIndex :: 15
+parentBoneName :: LeftHandIndex1
+ :: 
+Index :: 17
+boneIndex :: 17
+boneName :: LeftHandIndex3
+parentBoneIndex :: 16
+parentBoneName :: LeftHandIndex2
+ :: 
+Index :: 18
+boneIndex :: 18
+boneName :: LeftHandIndex4
+parentBoneIndex :: 17
+parentBoneName :: LeftHandIndex3
+ :: 
+Index :: 19
+boneIndex :: 19
+boneName :: LeftHandMiddle1
+parentBoneIndex :: 10
+parentBoneName :: LeftHand
+ :: 
+Index :: 20
+boneIndex :: 20
+boneName :: LeftHandMiddle2
+parentBoneIndex :: 19
+parentBoneName :: LeftHandMiddle1
+ :: 
+Index :: 21
+boneIndex :: 21
+boneName :: LeftHandMiddle3
+parentBoneIndex :: 20
+parentBoneName :: LeftHandMiddle2
+ :: 
+Index :: 22
+boneIndex :: 22
+boneName :: LeftHandMiddle4
+parentBoneIndex :: 21
+parentBoneName :: LeftHandMiddle3
+ :: 
+Index :: 23
+boneIndex :: 23
+boneName :: LeftHandRing1
+parentBoneIndex :: 10
+parentBoneName :: LeftHand
+ :: 
+Index :: 24
+boneIndex :: 24
+boneName :: LeftHandRing2
+parentBoneIndex :: 23
+parentBoneName :: LeftHandRing1
+ :: 
+Index :: 25
+boneIndex :: 25
+boneName :: LeftHandRing3
+parentBoneIndex :: 24
+parentBoneName :: LeftHandRing2
+ :: 
+Index :: 26
+boneIndex :: 26
+boneName :: LeftHandRing4
+parentBoneIndex :: 25
+parentBoneName :: LeftHandRing3
+ :: 
+Index :: 27
+boneIndex :: 27
+boneName :: LeftHandPinky1
+parentBoneIndex :: 10
+parentBoneName :: LeftHand
+ :: 
+Index :: 28
+boneIndex :: 28
+boneName :: LeftHandPinky2
+parentBoneIndex :: 27
+parentBoneName :: LeftHandPinky1
+ :: 
+Index :: 29
+boneIndex :: 29
+boneName :: LeftHandPinky3
+parentBoneIndex :: 28
+parentBoneName :: LeftHandPinky2
+ :: 
+Index :: 30
+boneIndex :: 30
+boneName :: LeftHandPinky4
+parentBoneIndex :: 29
+parentBoneName :: LeftHandPinky3
+ :: 
+Index :: 31
+boneIndex :: 31
+boneName :: RightShoulder
+parentBoneIndex :: 3
+parentBoneName :: Spine2
+ :: 
+Index :: 32
+boneIndex :: 32
+boneName :: RightArm
+parentBoneIndex :: 31
+parentBoneName :: RightShoulder
+ :: 
+Index :: 33
+boneIndex :: 33
+boneName :: RightForeArm
+parentBoneIndex :: 32
+parentBoneName :: RightArm
+ :: 
+Index :: 34
+boneIndex :: 34
+boneName :: RightHand
+parentBoneIndex :: 33
+parentBoneName :: RightForeArm
+ :: 
+Index :: 35
+boneIndex :: 35
+boneName :: RightHandThumb1
+parentBoneIndex :: 34
+parentBoneName :: RightHand
+ :: 
+Index :: 36
+boneIndex :: 36
+boneName :: RightHandThumb2
+parentBoneIndex :: 35
+parentBoneName :: RightHandThumb1
+ :: 
+Index :: 37
+boneIndex :: 37
+boneName :: RightHandThumb3
+parentBoneIndex :: 36
+parentBoneName :: RightHandThumb2
+ :: 
+Index :: 38
+boneIndex :: 38
+boneName :: RightHandThumb4
+parentBoneIndex :: 37
+parentBoneName :: RightHandThumb3
+ :: 
+Index :: 39
+boneIndex :: 39
+boneName :: RightHandIndex1
+parentBoneIndex :: 34
+parentBoneName :: RightHand
+ :: 
+Index :: 40
+boneIndex :: 40
+boneName :: RightHandIndex2
+parentBoneIndex :: 39
+parentBoneName :: RightHandIndex1
+ :: 
+Index :: 41
+boneIndex :: 41
+boneName :: RightHandIndex3
+parentBoneIndex :: 40
+parentBoneName :: RightHandIndex2
+ :: 
+Index :: 42
+boneIndex :: 42
+boneName :: RightHandIndex4
+parentBoneIndex :: 41
+parentBoneName :: RightHandIndex3
+ :: 
+Index :: 43
+boneIndex :: 43
+boneName :: RightHandMiddle1
+parentBoneIndex :: 34
+parentBoneName :: RightHand
+ :: 
+Index :: 44
+boneIndex :: 44
+boneName :: RightHandMiddle2
+parentBoneIndex :: 43
+parentBoneName :: RightHandMiddle1
+ :: 
+Index :: 45
+boneIndex :: 45
+boneName :: RightHandMiddle3
+parentBoneIndex :: 44
+parentBoneName :: RightHandMiddle2
+ :: 
+Index :: 46
+boneIndex :: 46
+boneName :: RightHandMiddle4
+parentBoneIndex :: 45
+parentBoneName :: RightHandMiddle3
+ :: 
+Index :: 47
+boneIndex :: 47
+boneName :: RightHandRing1
+parentBoneIndex :: 34
+parentBoneName :: RightHand
+ :: 
+Index :: 48
+boneIndex :: 48
+boneName :: RightHandRing2
+parentBoneIndex :: 47
+parentBoneName :: RightHandRing1
+ :: 
+Index :: 49
+boneIndex :: 49
+boneName :: RightHandRing3
+parentBoneIndex :: 48
+parentBoneName :: RightHandRing2
+ :: 
+Index :: 50
+boneIndex :: 50
+boneName :: RightHandRing4
+parentBoneIndex :: 49
+parentBoneName :: RightHandRing3
+ :: 
+Index :: 51
+boneIndex :: 51
+boneName :: RightHandPinky1
+parentBoneIndex :: 34
+parentBoneName :: RightHand
+ :: 
+Index :: 52
+boneIndex :: 52
+boneName :: RightHandPinky2
+parentBoneIndex :: 51
+parentBoneName :: RightHandPinky1
+ :: 
+Index :: 53
+boneIndex :: 53
+boneName :: RightHandPinky3
+parentBoneIndex :: 52
+parentBoneName :: RightHandPinky2
+ :: 
+Index :: 54
+boneIndex :: 54
+boneName :: RightHandPinky4
+parentBoneIndex :: 53
+parentBoneName :: RightHandPinky3
+ :: 
+Index :: 55
+boneIndex :: 55
+boneName :: LeftUpLeg
+parentBoneIndex :: 0
+parentBoneName :: Hips
+ :: 
+Index :: 56
+boneIndex :: 56
+boneName :: LeftLeg
+parentBoneIndex :: 55
+parentBoneName :: LeftUpLeg
+ :: 
+Index :: 57
+boneIndex :: 57
+boneName :: LeftFoot
+parentBoneIndex :: 56
+parentBoneName :: LeftLeg
+ :: 
+Index :: 58
+boneIndex :: 58
+boneName :: LeftToeBase
+parentBoneIndex :: 57
+parentBoneName :: LeftFoot
+ :: 
+Index :: 59
+boneIndex :: 59
+boneName :: LeftToe_End
+parentBoneIndex :: 58
+parentBoneName :: LeftToeBase
+ :: 
+Index :: 60
+boneIndex :: 60
+boneName :: RightUpLeg
+parentBoneIndex :: 0
+parentBoneName :: Hips
+ :: 
+Index :: 61
+boneIndex :: 61
+boneName :: RightLeg
+parentBoneIndex :: 60
+parentBoneName :: RightUpLeg
+ :: 
+Index :: 62
+boneIndex :: 62
+boneName :: RightFoot
+parentBoneIndex :: 61
+parentBoneName :: RightLeg
+ :: 
+Index :: 63
+boneIndex :: 63
+boneName :: RightToeBase
+parentBoneIndex :: 62
+parentBoneName :: RightFoot
+ :: 
+Index :: 64
+boneIndex :: 64
+boneName :: RightToe_End
+parentBoneIndex :: 63
+parentBoneName :: RightToeBase
+ :: 

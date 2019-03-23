@@ -1,7 +1,7 @@
 #ifndef FBXMODELANIMATION_H 
 #define FBXMODELANIMATION_H
 
-class FbxModelanimation
+class FbxModelAnimation
 {
 private :
 

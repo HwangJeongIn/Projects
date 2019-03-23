@@ -7,6 +7,7 @@
 #include <map>
 #include <cmath>
 #include <d3dx9.h>
+#include <fbxsdk.h>
 
 using namespace std;
 
@@ -145,6 +146,85 @@ Vector3 Vector3::Up{ 0,1,0 };
 Vector3 Vector3::Right{ 0,0,1 };
 Vector3 Vector3::Forward{ 1,0,0 };
 */
+class FbxDXConverter
+{
+public :
+	
+	static void ToD3DXVECTOR2(D3DXVECTOR2 & output, const FbxVector2 & input)
+	{
+		output.x = (float)input.mData[0];
+		output.y = (float)input.mData[1];
+	}
+
+	static void ToD3DXVECTOR2_UV(D3DXVECTOR2 & output, const FbxVector2 & input)
+	{
+		output.x = (float)input.mData[0];
+		output.y = 1- (float)input.mData[1];
+	}
+
+	static void ToD3DXVECTOR3(D3DXVECTOR3 & output, const FbxVector4 & input)
+	{
+		output.x = (float)input.mData[0];
+		output.y = (float)input.mData[1];
+		output.z = (float)input.mData[2];
+	}
+
+	static void ToD3DXVECTOR3(D3DXVECTOR3 & output, const FbxDouble3 & input)
+	{
+		output.x = (float)input.mData[0];
+		output.y = (float)input.mData[1];
+		output.z = (float)input.mData[2];
+	}
+
+	static void ToD3DXMATRIX(D3DXMATRIX & output, const FbxMatrix & input)
+	{
+		FbxVector4 r1 = input.GetRow(0);
+		FbxVector4 r2 = input.GetRow(1);
+		FbxVector4 r3 = input.GetRow(2);
+		FbxVector4 r4 = input.GetRow(3);
+
+		output =
+		{
+			(float)r1.mData[0], (float)r1.mData[1], (float)r1.mData[2], (float)r1.mData[3],
+			(float)r2.mData[0], (float)r2.mData[1], (float)r2.mData[2], (float)r2.mData[3],
+			(float)r3.mData[0], (float)r3.mData[1], (float)r3.mData[2], (float)r3.mData[3],
+			(float)r4.mData[0], (float)r4.mData[1], (float)r4.mData[2], (float)r4.mData[3]
+		};
+	}
+	
+	static void ToFbxVector2( FbxVector2 & output, const D3DXVECTOR2 & input)
+	{
+		output.mData[0] = (double)input.x;
+		output.mData[1] = (double)input.y;
+	}
+
+	static void ToFbxVector2_UV(FbxVector2 & output, const  D3DXVECTOR2 & input)
+	{
+		output.mData[0] = (double)input.x;
+		output.mData[1] = 1- (double)input.y;
+	}
+
+
+	static void ToFbxDouble3(FbxDouble3  & output, const D3DXVECTOR3 & input)
+	{
+		output.mData[0] = (double)input.x;
+		output.mData[1] = (double)input.y;
+		output.mData[2] = (double)input.z;
+	}
+
+	static void ToFbxMatrix( FbxMatrix & output, const D3DXMATRIX & input)
+	{
+		output =
+		{
+			(double)input._11, (double)input._12, (double)input._13, (double)input._14,
+			(double)input._21, (double)input._22, (double)input._23, (double)input._24,
+			(double)input._31, (double)input._32, (double)input._33, (double)input._34,
+			(double)input._41, (double)input._42, (double)input._43, (double)input._44
+		};
+	}
+
+};
+
 enum class KeyCode
 {
 	None,

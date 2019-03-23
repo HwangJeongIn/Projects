@@ -76,6 +76,7 @@
 		$(ProjectDir)	: 프로젝트 디렉터리
 		$(SolutionDir)	: 솔루션 디렉터리
 
+
 ** 현재 작업중인 Bullet Physics SDK
 
 * 라이브러리 경로
