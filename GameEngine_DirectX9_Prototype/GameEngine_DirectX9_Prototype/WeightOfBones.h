@@ -82,6 +82,10 @@ public :
 
 		return result;
 	}
+
+	// µð¹ö±ë¿ë
+	vector<pair<int, float>> & getAllInfo(){ return weightOfBones; }
+
 };
 
 #endif

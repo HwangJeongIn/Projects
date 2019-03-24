@@ -2,3 +2,4 @@
 
 
 const unsigned int WeightOfBones::maxNumberOfBones = 4;
+

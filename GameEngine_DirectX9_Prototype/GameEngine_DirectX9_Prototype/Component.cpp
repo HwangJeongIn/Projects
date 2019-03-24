@@ -731,7 +731,7 @@ void FbxModelRenderer::loadFbxFile(const string & fileName)
 	processAllNodesWithSameAtrributeTypeFromRoot(rootNode, FbxNodeAttribute::eSkeleton);
 	processAllNodesWithSameAtrributeTypeFromRoot(rootNode, FbxNodeAttribute::eMesh);
 
-	skeletonBones->printAllInfo();
+	//skeletonBones->printAllInfo();
 
 
 
@@ -811,15 +811,20 @@ void FbxModelRenderer::processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * no
 				FbxModelMesh * temp = new FbxModelMesh();
 				// 변환작업을 해준다. // 컨트롤포인트로 이루어진 모든 것들을 삼각형2개로 나누어준다.
 				gameObject->getFbxParser().convertGeometryInfo(&nodeAtrribute);
+
+
 				// 노드를 초기화시켜주고
+				// 나중에 노드를 받아서 사용해야한다 // processVertices에서
 				temp->setNode(node);
+
 
 				// 내부적으로 프로세스해준다 
 				// 컨트롤포인트 정보받기 
 				temp->processControlPoints();
 
 				// 앞서 스켈레톤 초기화이후(본들의 정보가 버텍스 초기화시 필요) 버텍스값 초기화
-				temp->processVertices();
+				// 스켈레톤본들의 정보도 필요하기 때문에 넘겨준다 // 가중치 계산해야한다. 본의인덱스필요
+				temp->processVertices(skeletonBones);
 				fbxModelMeshes.push_back(temp);
 			}
 			break;
