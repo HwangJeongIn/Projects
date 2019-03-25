@@ -3,7 +3,9 @@
 
 #include <d3dx9.h>
 #include <string>
+#include <map>
 #include <iostream>
+#include "FbxModelAnimationKeyFrames.h"
 
 /*
 VertexAtTimeT = TransformationOfPoseAtTimeT * InverseOfGlobalBindPoseMatrix * VertexAtBindingTime 
@@ -32,6 +34,15 @@ private :
 	int boneIndex;
 	string boneName;
 
+	// 최종 애니메이션에 사용할 행렬
+	D3DXMATRIX finalAnimationMatrix;
+
+
+	// 재귀적으로 최종 애니메이션 매트릭스를 구하기 위해 필요한 매트릭스
+	D3DXMATRIX animationMatrix;
+
+
+
 	// The transformation of the mesh at binding time
 	// 바인딩 타임에 전체 메쉬의 변환행렬이다. // 모든 클러스터에서 모두 같다
 	FbxMatrix clusterTransformMatrix;
@@ -46,17 +57,63 @@ private :
 	FbxMatrix clusterTransformInverseMatrix;
 	FbxMatrix clusterTransformInverseLinkMatrix;
 
-	//map<string, KeyFrames> animation;
 	// 애니메이션 이름 + 키프레임들
+	map<string, FbxModelAnimationKeyFrames *> animationKeyFramesTable;
+
 public :
 	FbxModelSkeletonBone(int parentBoneIndex, const string & parentBoneName, int boneIndex, const string & boneName)
 		: parentBoneIndex(parentBoneIndex), parentBoneName(parentBoneName), boneIndex(boneIndex), boneName(boneName)
 	{
+		D3DXMatrixIdentity(&animationMatrix);
+		D3DXMatrixIdentity(&finalAnimationMatrix);
+
 		clusterTransformMatrix.SetIdentity();
 		clusterTransformLinkMatrix.SetIdentity();
 
 		clusterTransformInverseMatrix.SetIdentity();
 		clusterTransformInverseLinkMatrix.SetIdentity();
+	}
+
+	~FbxModelSkeletonBone()
+	{
+		for (auto it = animationKeyFramesTable.begin(); it != animationKeyFramesTable.end(); ++it)
+		{
+			if ((*it).second)
+			{
+				delete (*it).second;
+				(*it).second = nullptr;
+			}
+		}
+		animationKeyFramesTable.clear();
+	}
+
+	const D3DXMATRIX & getFinalAnimationMatrix() const { return finalAnimationMatrix; }
+	const D3DXMATRIX & getAnimationMatrix() const { return animationMatrix; }
+	void setFinalAnimationMatrix(const D3DXMATRIX & matrix) { finalAnimationMatrix = matrix; }
+	void setAnimationMatrix(const D3DXMATRIX & matrix) { animationMatrix = matrix; }
+
+
+	void addAnimationKeyFrames(FbxModelAnimationKeyFrames * animationKeyFrames)
+	{
+		if (!animationKeyFrames) return;
+		const string & animationName = animationKeyFrames->getAnimationName();
+
+		map<string, FbxModelAnimationKeyFrames *>::iterator it = animationKeyFramesTable.find(animationName);
+		// 만약 등록되어 있다면 리턴한다.
+		if (it != animationKeyFramesTable.end()) return;
+
+		// 등록이 안되어 있다면 등록해준다
+		animationKeyFramesTable[animationName] = animationKeyFrames;
+	}
+
+	FbxModelAnimationKeyFrames * getAnimationKeyFrames(const string & animationName)
+	{
+		map<string, FbxModelAnimationKeyFrames *>::iterator it = animationKeyFramesTable.find(animationName);
+		// 만약 등록되어 있지 않다면 널포인터 리턴
+		if (it == animationKeyFramesTable.end()) return nullptr;
+
+		// 등록되어 있다면 리턴
+		return (*it).second;
 	}
 
 	void setClusterTransformMatrix(const FbxMatrix & matrix)
@@ -72,7 +129,7 @@ public :
 		// 설정해줄때 역행렬까지 같이 설정해준다.
 		// 클러스터 정보에서 받아올 수 있는 행렬이다.
 		clusterTransformLinkMatrix = matrix;
-		clusterTransformInverseLinkMatrix = clusterTransformMatrix.Inverse();
+		clusterTransformInverseLinkMatrix = clusterTransformLinkMatrix.Inverse();
 	}
 
 	const FbxMatrix & getClusterTransformMatrix() const { return clusterTransformMatrix; }

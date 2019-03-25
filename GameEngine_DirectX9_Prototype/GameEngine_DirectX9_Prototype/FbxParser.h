@@ -70,7 +70,7 @@ public:
 	// FbxInfo에 있는 scene포인터가 가리키는 값을 변경시켜주고싶기 때문에
 	// 더블 포인터를 사용해준다.
 	// 단 여기서 레퍼런스 변수를 쓰지 못하는 이유는 내부에서 Create함수가 Scene포인터를 반환하기 때문이다.
-	virtual void loadSceneFromFbxFile(const string & fileName, FbxScene ** scene);
+	void loadSceneFromFbxFile(const string & fileName, FbxScene ** scene, FbxImporter ** importer);
 	virtual void convertGeometryInfo(FbxNodeAttribute ** nodeAttribute);
 };
 

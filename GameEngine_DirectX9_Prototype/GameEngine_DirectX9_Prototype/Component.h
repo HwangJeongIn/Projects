@@ -509,9 +509,9 @@ class FbxModelRenderer : public Component
 {
 private:
 	// 여러가지 메쉬정보를 담고 있음
-	vector<FbxModelMesh *> fbxModelMeshes;
+	vector<FbxModelMesh *> fbxMeshes;
 
-	vector<ID3DXMesh *>  meshs;
+	vector<ID3DXMesh *>  meshes;
 	map<ID3DXMesh *,vector<D3DMATERIAL9>> materialsTable;
 	map<ID3DXMesh *,vector<IDirect3DTexture9*>> texturesTable;
 
@@ -526,6 +526,7 @@ private:
 
 	static const string filePathToLoadFbxMeshFiles;
 	static const string filePathToLoadFbxTextureFiles;
+	static const string filePathToLoadFbxAnimationFiles;
 	static const unsigned long DefaultOptimizeFlag;
 
 	// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
@@ -608,11 +609,27 @@ public:
 		return value;
 	}
 
+	void play(const string & animationName);
+	void stop();
+
 	void setScale(const Vector3 & value);
 
+	// FbxFile -> FbxModelRednerer(FbxModelMesh, FbxAnimations)
 	void loadFbxFile(const string & fileName);
+	// 외부 애니메이션 파일 불러올때 사용
+	void loadFbxFileForAnimation(const string & fileName);
+	// 스켈레톤 > 메쉬 노드 처리할때 사용
 	void processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * node, FbxNodeAttribute::EType attributeType);
+	// 애니메이션 처리할때 사용
+	void processAnimation(FbxScene * _scene, FbxImporter * _importer);
+	// 애니메이션 처리시 본의 모든 키프레임 초기화할때 사용
+	void processKeyFramesOfAllNodes(FbxNode * node, const string & animationName, float frameRate, float start, float stop);
+	// 애니메이션이 렌더링되고 있을때 본들의 애니메이션 행렬을 최신화 하기 위해 사용
+	void processSkeletonBonesAnimation(FbxModelAnimations * animations);
 
+
+
+	// FbxModelMesh -> DXMesh
 	void processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
 	void processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
 	void processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);

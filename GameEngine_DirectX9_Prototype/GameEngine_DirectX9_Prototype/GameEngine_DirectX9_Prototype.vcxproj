@@ -182,6 +182,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="d3dUtility.h" />
     <ClInclude Include="FbxModelAnimation.h" />
+    <ClInclude Include="FbxModelAnimationKeyFrames.h" />
     <ClInclude Include="FbxModelAnimations.h" />
     <ClInclude Include="FbxModelMesh.h" />
     <ClInclude Include="FbxModelSkeletonBone.h" />

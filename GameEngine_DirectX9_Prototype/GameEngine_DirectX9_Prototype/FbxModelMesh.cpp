@@ -2,6 +2,22 @@
 #include "FbxModelSkeletonBones.h"
 
 
+FbxMatrix FbxModelMesh::getGeometryTransformation(FbxNode * node)
+{
+	FbxMatrix result;
+	result.SetIdentity();
+	if (node)
+	{
+		result.SetTRS
+		(
+			node->GetGeometricTranslation(FbxNode::eSourcePivot),
+			node->GetGeometricRotation(FbxNode::eSourcePivot),
+			node->GetGeometricScaling(FbxNode::eSourcePivot)
+		);
+	}
+	return result;
+}
+
 void FbxModelMesh::processVertices(FbxModelSkeletonBones * skeletonBones)
 {
 	if (!mesh) return;
@@ -128,8 +144,6 @@ void FbxModelMesh::processVertices(FbxModelSkeletonBones * skeletonBones)
 
 				//디버깅
 
-
-
 				//Trace::Write("TAG_DEBUG", "controlPoint Index", controlPointIndex);
 				//vector<pair<int, float>> & tempArray = weightOfBonesArray[controlPointIndex].getAllInfo();
 
@@ -154,17 +168,12 @@ void FbxModelMesh::processVertices(FbxModelSkeletonBones * skeletonBones)
 				//Trace::Write("TAG_DEBUG", "", "");
 
 
-
-
-
-
 				++vertexCounter;
 			}
 		}
-
-		// 사용한 배열을 모두 지워준다.
-		// 값을 넣을때 복사해서 MyFbxVertex가 초기화 되기 때문에 원본이 지워진다고해도 상관없다.
-
+		
+		globalTransformMatrix = node->EvaluateGlobalTransform(FbxTime(0));
+		geometryTransformMatrix = getGeometryTransformation(node);
 
 		//else if (polygonSize == 4)
 		//{

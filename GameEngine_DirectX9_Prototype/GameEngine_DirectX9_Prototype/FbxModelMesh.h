@@ -8,6 +8,8 @@
 #include <map>
 #include "Trace.h"
 #include "WeightOfBones.h"
+#include <d3d9.h>
+#include "Utility.h"
 
 using namespace std;
 
@@ -25,46 +27,54 @@ private:
 
 	// for animation
 	WeightOfBones weightOfBones;
-	FbxMatrix animationMatrix;
+	D3DXMATRIX animationMatrix;
 public:
 	MyFbxVertex(const FbxDouble3 & position, const FbxDouble3 & normal,
 		const FbxDouble2 & uv, const FbxDouble3 & binormal, const FbxDouble3 & tangent, const WeightOfBones & weightOfBones)
 		: position(position), normal(normal), uv(uv), binormal(binormal), tangent(tangent), weightOfBones(weightOfBones)
 	{
-		animationMatrix.SetIdentity();
+		//animationMatrix.SetIdentity();
+		D3DXMatrixIdentity(&animationMatrix);
 	}
 	friend class FbxModelMesh;
 	const FbxDouble3 & getPosition() const { return position; }
-	FbxDouble3 getPositionWithAnimation()
+	D3DXVECTOR3 getPositionWithAnimation()
 	{
-		calcAnimationMatrix();
+		D3DXVECTOR3 result;
+		FbxDXConverter::ToD3DXVECTOR3(result, position);
 
-		FbxVector4 temp { position.mData[0], position.mData[0], position.mData[0], 1 };
-		// 나중에 테스트 해볼예정 // FbxVector4가 아닌 FbxDouble이 들어가도되는지
-		temp = animationMatrix.MultNormalize(temp);
-		return{ temp.mData[0], temp.mData[1], temp.mData[2] };
+		//D3DXVec3TransformNormal(&result, &result, &animationMatrix);
+		D3DXVec3TransformCoord(&result, &result, &animationMatrix);
+		return  result;
+
+		//calcAnimationMatrix(skeletonBones);
+
+		//FbxVector4 temp { position.mData[0], position.mData[0], position.mData[0], 1 };
+		//// 나중에 테스트 해볼예정 // FbxVector4가 아닌 FbxDouble이 들어가도되는지
+		////temp = animationMatrix.MultNormalize(temp);
+		//return{ temp.mData[0], temp.mData[1], temp.mData[2] };
 	}
 
-	void calcAnimationMatrix()
+	void calcAnimationMatrix(FbxModelSkeletonBones * skeletonBones)
 	{
 		// 애니메이션이 진행될때마다 여기서 새롭게 계산되어 animationMatrix에 저장된다.
 		// 이 animationMatrix는 getPositionWithAnimation함수를 통해 사용되며 
 		// 이 함수의 반환값을 통해서 실제 렌더링할 메쉬 위치를 이동한다.
-		animationMatrix = weightOfBones.getCombinedBonesMatrixWithWeight();
+		animationMatrix = weightOfBones.getCombinedBonesMatrixWithWeight(skeletonBones);
 	}
 
 	const FbxDouble3 & getNormal()const { return normal; }
 	const FbxDouble2 & getUV()const { return uv; }
 	const FbxDouble3 & getBinormal()const { return binormal; }
 	const FbxDouble3 & getTangent() const { return tangent; }
-	const FbxMatrix & getAnimationMatrix() const { return animationMatrix; }
+	const D3DXMATRIX & getAnimationMatrix() const { return animationMatrix; }
 
 	void setPosition(const FbxDouble3 & other) { position = other; }
 	void setNormal(const FbxDouble3 & other) { normal = other; }
 	void setUv(const FbxDouble2 & other) { uv = other; }
 	void setBinormal(const FbxDouble3 & other) { binormal = other; }
 	void setTangent(const FbxDouble3 & other) { tangent = other; }
-	void setAnimationMatrix(const FbxMatrix & other) { animationMatrix = other; }
+	void setAnimationMatrix(const D3DXMATRIX & other) { animationMatrix = other; }
 
 
 	bool operator==(const MyFbxVertex & other) const
@@ -103,6 +113,17 @@ private:
 	vector<MyFbxVertex> vertices;
 	vector<unsigned int> indices;
 
+	// 이노드의 글로벌 좌표기준 초기위치
+	FbxMatrix globalTransformMatrix;
+
+	// Geometry 행렬 // 아직 학습안했지만 쓰일까 싶어서 생성
+	FbxMatrix geometryTransformMatrix;
+
+	//// 이노드의 로컬 좌표기준 초기위치
+	//FbxMatrix localTransform;
+
+
+
 	// 나중에 사용
 	map<MyFbxVertex, unsigned int> vertexTable;
 
@@ -110,7 +131,9 @@ public:
 	FbxModelMesh()
 		: mesh(nullptr), node(nullptr)  /*, scene(nullptr)*/
 	{
-
+		globalTransformMatrix.SetIdentity();
+		geometryTransformMatrix.SetIdentity();
+		//localTransform.SetIdentity();
 	}
 
 	~FbxModelMesh()
@@ -121,6 +144,19 @@ public:
 	// Scene을 로드 하는 것은 외부에서 해준다. 
 	// 씬포인터를 더블포인터로 받아서 여기포인터가 가리키는 값을 변경
 	//FbxScene ** getFbxScene() { return &scene; }
+
+	const FbxMatrix & getGlobalTransformMatrix() const { return globalTransformMatrix; }
+	void setGlobalTrasformMatrix(const FbxMatrix & matrix) { globalTransformMatrix = matrix; }
+
+	const FbxMatrix & getGeometryTransformMatrix() const { return geometryTransformMatrix; }
+	void setGeometryTransformMatrix(const FbxMatrix & matrix) { geometryTransformMatrix = matrix; }
+
+	//const FbxMatrix & getLocalTransform() const { return localTransform; }
+	//void seLocalTrasform(const FbxMatrix & matrix) { localTransform = matrix; }
+	FbxMatrix getGeometryTransformation(FbxNode * node);
+
+
+
 
 	int getIndex(int index)
 	{
@@ -140,37 +176,7 @@ public:
 		return &vertices[index];
 	}
 
-	//FbxDouble3 getVertexPositionWithAnimation(int index)
-	//{
-	//	// 만약에 사이즈보다 인덱스가 크거나 0보다 작으면 000 리턴
-	//	if (vertices.size() <= index || index <0)
-	//		return{0,0,0};
-	//
-	//	FbxVector4 temp { vertices[index].position.mData[0], vertices[index].position.mData[0], vertices[index].position.mData[0], 1 };
 
-	//	temp = vertices[index].animationMatrix.MultNormalize(temp);
-	//	return{ temp.mData[0], temp.mData[1], temp.mData[2] };
-	//}
-
-	//bool getIndex(int index, unsigned int * output)
-	//{
-	//	// 만약에 사이즈보다 인덱스가 크거나 0보다 작거나 넣어줘야하는 포인터가 nullptr라면 리턴
-	//	if (indices.size() <= index || index < 0 || !output)
-	//		return false;
-
-	//	output = &indices[index];
-	//	return true;
-	//}
-
-	//bool getVertex(int index, MyVertex * output)
-	//{
-	//	// 만약에 사이즈보다 인덱스가 크거나 0보다 작거나 넣어줘야하는 포인터가 nullptr라면 리턴
-	//	if (vertices.size() <= index || index <0 || !output)
-	//		return false;
-
-	//	output = &vertices[index];
-	//	return true;
-	//}
 	int getVertexCount() const
 	{ 
 		if (!mesh) return 0;
@@ -243,6 +249,13 @@ public:
 
 	void processVertices(FbxModelSkeletonBones * skeletonBones);
 	
+	void processVertexAnimationMatrix(FbxModelSkeletonBones * skeletonBones)
+	{
+		for (int i = 0; i < vertices.size(); ++i)
+		{
+			vertices[i].calcAnimationMatrix(skeletonBones);
+		}
+	}
 
 	void insertVertex(const FbxDouble3& position, const FbxDouble3& normal, const FbxDouble2& uv, const FbxDouble3& binormal, const FbxDouble3& tangent, const WeightOfBones & weightOfBones)
 	{

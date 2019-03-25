@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <fbxsdk.h>
+#include <d3dx9.h>
+#include "Trace.h"
 
 using namespace std;
 
@@ -37,6 +39,8 @@ using namespace std;
 * 나중에 블렌드 본을 넣고 블렌드 작업을 할때
 
 */
+class FbxModelSkeletonBones;
+
 class WeightOfBones
 {
 private :
@@ -71,17 +75,8 @@ public :
 		weightOfBones.push_back({ boneIndex, weight });
 	}
 
-	FbxMatrix getCombinedBonesMatrixWithWeight() const
-	{
-		// 본들에 대한 가중치가 없는 경우 단위행렬이 반환된다.
-		FbxMatrix result;
-		result.SetIdentity();
+	D3DXMATRIX getCombinedBonesMatrixWithWeight(FbxModelSkeletonBones * skeletonBones) const;
 
-		// 1. 각본들을 인덱스로 받아오고 그 본들에대한 애니메이션 매트릭스를 받아온다
-		// 2. 그 애니메이션매트릭스와 가중치를 곱해서 매트릭스를 최종 조합해서 result에 저장한다.
-
-		return result;
-	}
 
 	// 디버깅용
 	vector<pair<int, float>> & getAllInfo(){ return weightOfBones; }

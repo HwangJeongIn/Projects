@@ -239,9 +239,11 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// -1´Ü°è
 	GameObject * player = GameObject::Instantiate("player", "Player");
-																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx
+																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx / Crouch Walk Left.fbx / Standing Aim Recoil.fbx
+	// standing run forward.fbx
 	FbxModelRenderer * playerFbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	playerFbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	playerFbxModelRendererplayer->loadFbxFile("standing run forward.fbx");
+	playerFbxModelRendererplayer->play("mixamo.com");
 	//playerFbxModelRendererplayer->setScale(Vector3(3,1,3));
 	player->getTransform()->setRotation(Vector3( 0,180,0 ));
 	player->getTransform()->setPosition(Vector3(0, 00, 0));

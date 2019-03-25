@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include "Trace.h"
+#include "Utility.h"
 
 using namespace std;
 
@@ -64,6 +65,83 @@ public :
 		}
 		bones.clear();
 	}
+
+	void setAllBonesAnimationMatrix(const string & animationName, unsigned int currentKeyFrame, unsigned int nextKeyFrame, float keyFrameFactor)
+	{
+		D3DXMATRIX parentAnimationMatrix;
+		D3DXMATRIX animationMatrix;
+		D3DXMATRIX inverseMatrix;
+
+		// 차례대로 본을 받아서(최상위부터 순회하게됨) 매트릭스를 세팅해준다.
+		for (int i = 0; i < bones.size(); ++i)
+		{
+			D3DXMatrixIdentity(&parentAnimationMatrix);
+			D3DXMatrixIdentity(&animationMatrix);
+			D3DXMatrixIdentity(&inverseMatrix);
+
+
+			const FbxMatrix & tempInverse = bones[i]->getClusterTransformInverseLinkMatrix();
+			FbxDXConverter::ToD3DXMATRIX(inverseMatrix, tempInverse);
+
+
+			FbxModelAnimationKeyFrames * animationKeyFrames = bones[i]->getAnimationKeyFrames(animationName);
+			if (animationKeyFrames == nullptr)
+			{
+				// 널포인터일때
+				// 애니메이션 행렬은 단위행렬이다.
+				bones[i]->setAnimationMatrix(animationMatrix * parentAnimationMatrix);
+				
+				// 널포인터일때
+				// 최종 애니메이션 행렬은 T포즈의 역행렬 * 단위행렬이다.
+				bones[i]->setFinalAnimationMatrix(inverseMatrix * bones[i]->getAnimationMatrix());
+				continue;
+			}
+
+			int parentIndex = bones[i]->getParentBoneIndex();
+
+			// 부모본의 인덱스가 -1이 아닐때만 단위행렬에서 벗어나게 된다.
+			if (parentIndex != -1)
+			{
+				parentAnimationMatrix = bones[parentIndex]->getAnimationMatrix();
+			}
+			
+		
+			pair<D3DXMATRIX, CombinationOfQuaternionAndTranslation> * currentP = animationKeyFrames->getKeyFrameTransform(currentKeyFrame);
+			pair<D3DXMATRIX, CombinationOfQuaternionAndTranslation> * nextP = animationKeyFrames->getKeyFrameTransform(nextKeyFrame);
+
+			// 둘다 널이 아닐때 보간작업을 해준다.
+			if (currentP && nextP /*&& false*/)
+			{
+				const D3DXQUATERNION & currentQ = currentP->second.getQuaternion();
+				const D3DXQUATERNION & nextQ = nextP->second.getQuaternion();
+				D3DXQUATERNION q;
+				D3DXQuaternionSlerp(&q, &currentQ, &nextQ, keyFrameFactor);
+				D3DXMatrixRotationQuaternion(&animationMatrix,&q);
+
+
+				const D3DXVECTOR3 & currentT = currentP->second.getTranslation();
+				const D3DXVECTOR3 & nextT = nextP->second.getTranslation();
+				D3DXVECTOR3 t;
+				D3DXVec3Lerp(&t, &currentT, &nextT, keyFrameFactor);
+
+				animationMatrix._41 = t.x;
+				animationMatrix._42 = t.y;
+				animationMatrix._43 = t.z;
+
+			}
+			//else
+			//{
+			//	animationMatrix = animationKeyFrames->getKeyFrameTransform(currentKeyFrame)->first;
+			//}
+
+
+
+
+			bones[i]->setAnimationMatrix( animationMatrix * parentAnimationMatrix);
+			bones[i]->setFinalAnimationMatrix(inverseMatrix * bones[i]->getAnimationMatrix());
+		}
+	}
+
 
 	// 순차적으로 인덱스가 정해지기 때문에 현재 본을 넣을때 인덱스는 bones.size()값이다
 	int getIndexOfBoneToInsert() const { return bones.size(); }

@@ -30,30 +30,33 @@ void FbxParser::release()
 }
 
 
-void FbxParser::loadSceneFromFbxFile(const string & fileName, FbxScene ** scene)
+void FbxParser::loadSceneFromFbxFile(const string & fileName, FbxScene ** scene, FbxImporter ** importer)
 {
 	// 실제 Scene포인터(FbxInfo)를 가리키지 않을떄 리턴
-	if (!scene) return;
+	// 마찬가지로 실제 Importer포인터를 가리키지 않을때 리턴
+	if (!scene || !importer) return;
 
 	// 씬이 이미 있는 경우 리턴해준다.
 	if ((*scene)) return;
 
 	const char * cStrFileName = fileName.c_str();
 	// 임포터를 만들어준다.
-	FbxImporter* importer = FbxImporter::Create(manager, "");
+	 (*importer) = FbxImporter::Create(manager, "");
 
 	// Use the first argument as the filename for the importer.
-	if (!importer->Initialize(cStrFileName, -1, manager->GetIOSettings()))
+	if (!(*importer)->Initialize(cStrFileName, -1, manager->GetIOSettings()))
 		return;
 
 	// scene의 이름은 파일의 이름과 같게 해준다.
 	(*scene) = FbxScene::Create(manager, cStrFileName);
 
 	// 임포터를 이용해서 씬을 임포트 시킨다.
-	importer->Import((*scene));
+	(*importer)->Import((*scene));
 
+
+	// 임포터도 필요하기 때문에 컴포넌트에서 가지고 있게 만든다.
 	// 파일이 임포트 되면 임포터를 지워준다.
-	importer->Destroy();
+	//importer->Destroy();
 }
 
 void FbxParser::convertGeometryInfo(FbxNodeAttribute ** nodeAttribute)
