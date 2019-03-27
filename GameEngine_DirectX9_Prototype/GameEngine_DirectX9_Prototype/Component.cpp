@@ -684,9 +684,10 @@ FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
 	device = &(gameObject->getDevice());
 }
 
-void FbxModelRenderer::play(const string & animationName)
+void FbxModelRenderer::playWithFileName(const string & animationFileName)
 {
-	animations->play(animationName);
+	if (animations)
+		animations->playWithFileName(animationFileName);
 }
 
 void FbxModelRenderer::stop()
@@ -757,7 +758,7 @@ void FbxModelRenderer::loadFbxFile(const string & fileName)
 	processAllNodesWithSameAtrributeTypeFromRoot(rootNode, FbxNodeAttribute::eMesh);
 
 	// 애니메이션이 들어있을 수도 있으니 애니메이션 생성
-	processAnimation(scene, importer);
+	processAnimation(fileName,scene, importer);
 
 	//skeletonBones->printAllInfo();
 
@@ -831,7 +832,7 @@ void FbxModelRenderer::loadFbxFileForAnimation(const string & fileName)
 
 	if (!_scene || !_importer) return;
 
-	processAnimation(_scene, _importer);
+	processAnimation(fileName,_scene, _importer);
 
 	importer->Destroy();
 	scene->Destroy();
@@ -913,7 +914,7 @@ void FbxModelRenderer::processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * no
 	}
 }
 
-void FbxModelRenderer::processAnimation(FbxScene * _scene, FbxImporter * _importer)
+void FbxModelRenderer::processAnimation(const string & animationFileName, FbxScene * _scene, FbxImporter * _importer)
 {
 	// 외부에서 파일을 받아오는 경우 먼저 씬과 임포터를 생성해서 넘겨주면 여기서 알아서 처리되도록 한다.
 
@@ -952,11 +953,11 @@ void FbxModelRenderer::processAnimation(FbxScene * _scene, FbxImporter * _import
 		{
 			// 초 * 1초당 프레임수 = 전체 키프레임 수가 나온다.
 			int keyFrames = (stopTime - startTime) * frameRate;
-			FbxModelAnimation * animation = new FbxModelAnimation(animationName, keyFrames, frameRate);
+			FbxModelAnimation * animation = new FbxModelAnimation(animationFileName, animationName, keyFrames, frameRate);
 			animations->addAnimation(animation);
 
 			// 애니메이션을 추가했으면 각 본을 돌면서 추가한 애니메이션에 대한 키프레임 매트릭스를 모두 구해서 추가해준다.
-			processKeyFramesOfAllNodes(rootNode, animationName, frameRate, startTime, stopTime);
+			processKeyFramesOfAllNodes(rootNode, animationFileName, animationName, frameRate, startTime, stopTime);
 
 		}
 	}
@@ -965,7 +966,7 @@ void FbxModelRenderer::processAnimation(FbxScene * _scene, FbxImporter * _import
 
 }
 
-void FbxModelRenderer::processKeyFramesOfAllNodes(FbxNode * node, const string & animationName, float frameRate, float start, float stop)
+void FbxModelRenderer::processKeyFramesOfAllNodes(FbxNode * node, const string & animationFileName, const string & animationName, float frameRate, float start, float stop)
 {
 	if (!node) return;
 
@@ -984,7 +985,7 @@ void FbxModelRenderer::processKeyFramesOfAllNodes(FbxNode * node, const string &
 		// 외부 애니메이션 파일을 가져올때는 똑같은 프로세스를 거친다. 단 본의 이름이 같아야 한다.
 		if (bone)
 		{
-			FbxModelAnimationKeyFrames * animationKeyFrames = new FbxModelAnimationKeyFrames(animationName);
+			FbxModelAnimationKeyFrames * animationKeyFrames = new FbxModelAnimationKeyFrames(animationFileName, animationName);
 
 			double time = 0;
 
@@ -1012,7 +1013,7 @@ void FbxModelRenderer::processKeyFramesOfAllNodes(FbxNode * node, const string &
 	// 자식본들도 재귀적으로 처리해준다.
 	for (int i = 0; i < node->GetChildCount(); ++i)
 	{
-		processKeyFramesOfAllNodes(node->GetChild(i), animationName, frameRate, start, stop);
+		processKeyFramesOfAllNodes(node->GetChild(i), animationFileName, animationName, frameRate, start, stop);
 	}
 }
 
@@ -1026,13 +1027,11 @@ void FbxModelRenderer::processSkeletonBonesAnimation(FbxModelAnimations * animat
 	float keyFrameFactor = animations->getKeyFrameFactor();
 
 	FbxModelAnimation * animation = animations->getCurrentAnimation();
+	const string & animationFileName = animation->getAnimationFileName();
 	const string & animationName = animation->getAnimationName();
 
 
-	skeletonBones->setAllBonesAnimationMatrix(animationName, currentKeyFrame, nextKeyFrame, keyFrameFactor);
-	
-
-
+	skeletonBones->setAllBonesAnimationMatrix(animationFileName, animationName, currentKeyFrame, nextKeyFrame, keyFrameFactor);
 }
 
 void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)

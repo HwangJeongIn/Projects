@@ -57,8 +57,8 @@ private :
 	FbxMatrix clusterTransformInverseMatrix;
 	FbxMatrix clusterTransformInverseLinkMatrix;
 
-	// 애니메이션 이름 + 키프레임들
-	map<string, FbxModelAnimationKeyFrames *> animationKeyFramesTable;
+	// 애니메이션 파일이름 + 키프레임들
+	map<pair<string,string> , FbxModelAnimationKeyFrames *> animationKeyFramesTable;
 
 public :
 	FbxModelSkeletonBone(int parentBoneIndex, const string & parentBoneName, int boneIndex, const string & boneName)
@@ -97,18 +97,19 @@ public :
 	{
 		if (!animationKeyFrames) return;
 		const string & animationName = animationKeyFrames->getAnimationName();
+		const string & animationFileName = animationKeyFrames->getAnimationFileName();
 
-		map<string, FbxModelAnimationKeyFrames *>::iterator it = animationKeyFramesTable.find(animationName);
+		map<pair<string,string>, FbxModelAnimationKeyFrames *>::iterator it = animationKeyFramesTable.find(pair<string, string>(animationFileName, animationName));
 		// 만약 등록되어 있다면 리턴한다.
 		if (it != animationKeyFramesTable.end()) return;
 
 		// 등록이 안되어 있다면 등록해준다
-		animationKeyFramesTable[animationName] = animationKeyFrames;
+		animationKeyFramesTable[pair<string,string>(animationFileName, animationName)] = animationKeyFrames;
 	}
 
-	FbxModelAnimationKeyFrames * getAnimationKeyFrames(const string & animationName)
+	FbxModelAnimationKeyFrames * getAnimationKeyFrames(const string & animationFileName, const string & animationName)
 	{
-		map<string, FbxModelAnimationKeyFrames *>::iterator it = animationKeyFramesTable.find(animationName);
+		map<pair<string, string>, FbxModelAnimationKeyFrames *>::iterator it = animationKeyFramesTable.find({ animationFileName,animationName });
 		// 만약 등록되어 있지 않다면 널포인터 리턴
 		if (it == animationKeyFramesTable.end()) return nullptr;
 

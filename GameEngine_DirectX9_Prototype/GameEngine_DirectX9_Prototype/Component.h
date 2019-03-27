@@ -609,21 +609,35 @@ public:
 		return value;
 	}
 
-	void play(const string & animationName);
+	//void play(const string & animationName)
+	//{
+	//	if (animations)
+	//		animations->play(animationName);
+	//}
+	void playWithFileName(const string & animationFileName);
 	void stop();
 
 	void setScale(const Vector3 & value);
 
 	// FbxFile -> FbxModelRednerer(FbxModelMesh, FbxAnimations)
+
 	void loadFbxFile(const string & fileName);
+
 	// 외부 애니메이션 파일 불러올때 사용
 	void loadFbxFileForAnimation(const string & fileName);
+
 	// 스켈레톤 > 메쉬 노드 처리할때 사용
 	void processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * node, FbxNodeAttribute::EType attributeType);
+
 	// 애니메이션 처리할때 사용
-	void processAnimation(FbxScene * _scene, FbxImporter * _importer);
+	void processAnimation(const string & animationFileName, FbxScene * _scene, FbxImporter * _importer);
+
+
+
 	// 애니메이션 처리시 본의 모든 키프레임 초기화할때 사용
-	void processKeyFramesOfAllNodes(FbxNode * node, const string & animationName, float frameRate, float start, float stop);
+	void processKeyFramesOfAllNodes(FbxNode * node, const string & animationFileName, const string & animationName, float frameRate, float start, float stop);
+	//void processKeyFramesOfAllNodes(FbxNode * node, const string & animationName, float frameRate, float start, float stop);
+
 	// 애니메이션이 렌더링되고 있을때 본들의 애니메이션 행렬을 최신화 하기 위해 사용
 	void processSkeletonBonesAnimation(FbxModelAnimations * animations);
 

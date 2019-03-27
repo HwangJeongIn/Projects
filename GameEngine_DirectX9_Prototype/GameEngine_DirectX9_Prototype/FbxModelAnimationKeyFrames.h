@@ -30,11 +30,12 @@ class FbxModelAnimationKeyFrames
 {
 private :
 	string animationName;
+	string animationFileName;
 	vector<pair <D3DXMATRIX, CombinationOfQuaternionAndTranslation>> keyFrames;
 
 public :
-	FbxModelAnimationKeyFrames(const string & animationName)
-		: animationName(animationName) 
+	FbxModelAnimationKeyFrames(const string & animationFileName, const string & animationName)
+		: animationFileName(animationFileName), animationName(animationName) 
 	{}
 
 	void addKeyFrame(const D3DXMATRIX & matrix)
@@ -50,6 +51,7 @@ public :
 	}
 
 	unsigned int getKeyFrameCount() const{ return keyFrames.size(); }
+	const string & getAnimationFileName() const { return animationFileName; }
 	const string & getAnimationName() const { return animationName; }
 
 	

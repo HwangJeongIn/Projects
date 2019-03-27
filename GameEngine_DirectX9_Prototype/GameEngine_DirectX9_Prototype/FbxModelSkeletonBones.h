@@ -66,7 +66,7 @@ public :
 		bones.clear();
 	}
 
-	void setAllBonesAnimationMatrix(const string & animationName, unsigned int currentKeyFrame, unsigned int nextKeyFrame, float keyFrameFactor)
+	void setAllBonesAnimationMatrix(const string & animationFileName, const string & animationName, unsigned int currentKeyFrame, unsigned int nextKeyFrame, float keyFrameFactor)
 	{
 		D3DXMATRIX parentAnimationMatrix;
 		D3DXMATRIX animationMatrix;
@@ -84,7 +84,7 @@ public :
 			FbxDXConverter::ToD3DXMATRIX(inverseMatrix, tempInverse);
 
 
-			FbxModelAnimationKeyFrames * animationKeyFrames = bones[i]->getAnimationKeyFrames(animationName);
+			FbxModelAnimationKeyFrames * animationKeyFrames = bones[i]->getAnimationKeyFrames(animationFileName, animationName);
 			if (animationKeyFrames == nullptr)
 			{
 				// 널포인터일때
