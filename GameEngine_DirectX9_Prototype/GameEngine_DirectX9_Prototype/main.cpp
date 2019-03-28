@@ -241,10 +241,18 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * player = GameObject::Instantiate("player", "Player");
 																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx / Crouch Walk Left.fbx / Standing Aim Recoil.fbx
 	// standing run forward.fbx
-	FbxModelRenderer * playerFbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	playerFbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	//playerFbxModelRendererplayer->play("mixamo.com");
-	//playerFbxModelRendererplayer->setScale(Vector3(3,1,3));
+	FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	//fbxModelRendererplayer->play("mixamo.com");
+	//fbxModelRendererplayer->setScale(Vector3(3,1,3));
+
+	fbxModelRendererplayer->loadFbxFileForAnimation("standing run forward.fbx");
+	fbxModelRendererplayer->loadFbxFileForAnimation("standing run back.fbx");
+
+	fbxModelRendererplayer->loadFbxFileForAnimation("standing run right.fbx");
+	fbxModelRendererplayer->loadFbxFileForAnimation("standing run left.fbx");
+
+	fbxModelRendererplayer->playWithFileName("standing run right.fbx");
 	player->getTransform()->setRotation(Vector3( 0,180,0 ));
 	player->getTransform()->setPosition(Vector3(0, 00, 0));
 	player->addComponent<MoveScript>();

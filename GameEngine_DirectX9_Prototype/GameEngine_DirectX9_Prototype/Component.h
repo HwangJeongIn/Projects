@@ -617,6 +617,12 @@ public:
 	void playWithFileName(const string & animationFileName);
 	void stop();
 
+
+	FbxModelAnimations * getAnimations()
+	{
+		return animations;
+	}
+
 	void setScale(const Vector3 & value);
 
 	// FbxFile -> FbxModelRednerer(FbxModelMesh, FbxAnimations)
@@ -641,8 +647,6 @@ public:
 	// 애니메이션이 렌더링되고 있을때 본들의 애니메이션 행렬을 최신화 하기 위해 사용
 	void processSkeletonBonesAnimation(FbxModelAnimations * animations);
 
-
-
 	// FbxModelMesh -> DXMesh
 	void processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
 	void processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
@@ -650,6 +654,75 @@ public:
 	void processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
 	void processSubsets(ID3DXMesh * mesh);
 	void optimizeMesh(ID3DXMesh * mesh);
+
+};
+
+class AnimationFSM : public Component
+{
+private:
+	FbxModelRenderer * fbxModelRenderer;
+	FbxModelAnimations * fbxModelAnimations;
+
+	// 등록한 이름과 상태를 저장하는 state 테이블
+	map<string, unsigned int> stateTable;
+
+	// 사용할 float의 이름을 설정해둔 float 테이블
+	map<string, float> floatTable;
+
+	// 사용할 bool의 이름을 설정해둔 bool 테이블
+	map<string, bool> boolTable;
+
+	// 현재 상태
+	string currentState;
+	// 기본 상태
+	string defaultState;
+
+protected:
+
+	virtual void start();
+	virtual void update();
+	virtual void onDestroy();
+
+public:
+
+	AnimationFSM(GameObject * go, Transform * tf)
+		: Component(go, tf), fbxModelRenderer(nullptr), fbxModelAnimations(nullptr), currentState(""), defaultState("")
+	{
+		start();
+	}
+
+	// 애니메이션 목록
+	/*
+	Standing Aim Recoil.fbx
+	standing idle 01.fbx
+	standing run forward.fbx
+	standing run forward stop.fbx
+	standing run back.fbx
+	standing run left.fbx
+	standing run right.fbx
+
+	standing walk back.fbx
+	standing walk forward.fbx
+	standing walk left.fbx
+	standing walk right.fbx
+	*/
+	void registerAnimation(const string & animationFileName);
+	void setDefaultState(const string & animationFileName);
+
+	void registerFloat(const string & floatName);
+	void registerBool(const string & boolName);
+
+	void setFloat(const string & floatName, float input);
+	bool getFloat(float & output, const string & floatName);
+
+	void setBool(const string & boolName, bool input);
+	bool getBool(bool & output, const string & boolName);
+	/*
+	애니메이션 전이 조건
+	 - 처리방법
+	 - 전이조건 만들어주기
+	 - 
+	*/
 
 };
 

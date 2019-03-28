@@ -834,8 +834,8 @@ void FbxModelRenderer::loadFbxFileForAnimation(const string & fileName)
 
 	processAnimation(fileName,_scene, _importer);
 
-	importer->Destroy();
-	scene->Destroy();
+	_importer->Destroy();
+	_scene->Destroy();
 
 }
 
@@ -1431,4 +1431,130 @@ void FbxModelRenderer::optimizeMesh(ID3DXMesh * mesh)
 
 	int faceCount = mesh->GetNumFaces();
 	int vertexCount = mesh->GetNumVertices();
+}
+
+void AnimationFSM::start()
+{
+	// 현재 컴포넌트가 있을때 초기화 된다.
+	fbxModelRenderer = gameObject->getComponent<FbxModelRenderer>();
+
+	// FbxModelRenderer의 컴포넌트가 있는 경우 애니메이션 매너저를 받아온다.
+	if (fbxModelRenderer)
+	{
+		fbxModelAnimations = fbxModelRenderer->getAnimations();
+	}
+
+}
+
+void AnimationFSM::update()
+{
+	//string state;
+	//switch(state)
+	//{
+	//	case "":
+	//}
+
+
+}
+
+void AnimationFSM::onDestroy()
+{
+
+}
+
+void AnimationFSM::registerAnimation(const string & animationFileName)
+{
+	if (!fbxModelRenderer || !fbxModelAnimations) return;
+
+	fbxModelRenderer->loadFbxFileForAnimation(animationFileName);
+
+	// 만약에 등록이 안되어있다면 stateTable에 등록한다.
+	map<string, unsigned int>::iterator stateIt = stateTable.find(animationFileName);
+
+	if (stateIt == stateTable.end()) return;
+	// 인덱스는 등록한 순서대로 차례대로 해준다.
+	stateTable[animationFileName] = stateTable.size();
+}
+
+void AnimationFSM::setDefaultState(const string & animationFileName)
+{
+	if (!fbxModelRenderer || !fbxModelAnimations) return;
+
+	map<string, unsigned int>::iterator stateIt = stateTable.find(animationFileName);
+
+	// 만약에 등록이 안되어 있다면 리턴한다.
+	if (stateIt == stateTable.end())
+	{
+		defaultState = "";
+		return;
+	}
+	
+	// 만약에 등록된 상황이라면 디폴트 상태를 정의해준다.
+	defaultState = animationFileName;
+}
+
+void AnimationFSM::registerFloat(const string & floatName)
+{
+	map<string, float>::iterator floatIt = floatTable.find(floatName);
+	// 이미등록되어 있다면 리턴
+	if (floatIt != floatTable.end())
+		return;
+
+	floatTable[floatName] = 0.0f;
+}
+
+void AnimationFSM::registerBool(const string & boolName)
+{
+	map<string, bool>::iterator boolIt = boolTable.find(boolName);
+	// 이미등록되어 있다면 리턴
+	if (boolIt != boolTable.end())
+		return;
+
+	boolTable[boolName] = false;
+}
+
+void AnimationFSM::setFloat(const string & floatName, float input)
+{
+	map<string, float>::iterator floatIt = floatTable.find(floatName);
+	// 이미등록되어 있지 않다면 새롭게 등록해주고 input값으로 초기화 시켜준다.
+	if (floatIt == floatTable.end())
+	{
+		floatTable[floatName] = input;
+		return;
+	}
+
+	floatIt->second = input;
+}
+
+bool AnimationFSM::getFloat(float & output, const string & floatName)
+{
+	map<string, float>::iterator floatIt = floatTable.find(floatName);
+	if (floatIt == floatTable.end())
+		return false;
+
+	output = floatIt->second;
+	return true;
+}
+
+void AnimationFSM::setBool(const string & boolName, bool input)
+{
+	map<string, bool>::iterator boolIt = boolTable.find(boolName);
+	// 이미등록되어 있지 않다면 새롭게 등록해주고 input값으로 초기화 시켜준다.
+	if (boolIt == boolTable.end())
+	{
+		boolTable[boolName] = input;
+		return;
+	}
+	
+	boolIt->second = input;
+}
+
+bool AnimationFSM::getBool(bool & output, const string & boolName)
+{
+	map<string, bool>::iterator boolIt = boolTable.find(boolName);
+	if (boolIt == boolTable.end())
+		return false;
+
+	output = boolIt->second;
+	return true;
 }
