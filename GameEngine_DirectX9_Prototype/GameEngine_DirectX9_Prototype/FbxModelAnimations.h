@@ -60,6 +60,9 @@ private:
 			setCurrentAnimation(nullptr);
 		}
 
+		// 만약에 현재 아니메이션이랑 같을 경우 아무것도 안하고 리턴한다.
+		if (it->second == currentAnimation) return;
+
 		// 등록되어있는 상황
 		setCurrentAnimation((*it).second);
 

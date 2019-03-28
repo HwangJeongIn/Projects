@@ -657,6 +657,8 @@ public:
 
 };
 
+class AnimationFSM::Transition;
+
 class AnimationFSM : public Component
 {
 private:
@@ -671,6 +673,10 @@ private:
 
 	// 사용할 bool의 이름을 설정해둔 bool 테이블
 	map<string, bool> boolTable;
+
+	// 전이를 위한 테이블 // A from to B로 지원 a에서 b까지 가는데 어떤 전이 조건이 있는지
+	map<pair<string, string>, Transition *> transitionTable;
+
 
 	// 현재 상태
 	string currentState;
@@ -691,6 +697,106 @@ public:
 		start();
 	}
 
+	~AnimationFSM()
+	{
+		for (auto it = transitionTable.begin(); it != transitionTable.end(); ++it)
+		{
+			if ((it->second) == nullptr) continue;
+
+			delete (it->second);
+			it->second = nullptr;
+		}
+		transitionTable.clear();
+	}
+
+	friend class Transition;
+
+	enum ValueType
+	{
+		FLOATTYPE,
+		BOOLTYPE
+	};
+
+	class Transition
+	{
+	private :
+		AnimationFSM * animationFSM;
+
+		string from;
+		string to;
+
+		int factor;
+		ValueType type;
+		string valueName;
+
+		float fValueToCompare;
+		bool bValueToCompare;
+
+	public :
+		Transition(AnimationFSM * animationFSM, const string & from, const string & to, const string & valueName,
+			int factor, ValueType type, float valueToCompare)
+			: animationFSM(animationFSM), from(from), to(to), factor(factor), type(type), valueName(valueName), fValueToCompare(valueToCompare), bValueToCompare(valueToCompare)
+		{
+
+		}
+
+		const string & getFrom() const { return from; }
+		const string & getTo() const { return to; }
+
+		bool evaluate()
+		{
+			if (!animationFSM) return false;
+
+			// 각각의 애니메이션이 존재하는지 테이블을 통해서 확인
+			if (animationFSM->stateTable.find(from) == animationFSM->stateTable.end()
+				|| animationFSM->stateTable.find(to) == animationFSM->stateTable.end())
+				return false;
+
+
+			float value = 0.0f;
+
+			float valueToCompare = 0.0f;
+			bool result = false;
+
+			// 타입에 따라 값을 받아온다.
+			if (type == ValueType::BOOLTYPE)
+			{
+				// 비교할 주체가 되는 대상이 테이블에 등록되어있는지 확인해보고 값을 받아온다.
+				auto it = animationFSM->boolTable.find(valueName);
+				if (it == animationFSM->boolTable.end()) return false;
+
+				value = it->second;
+				valueToCompare = bValueToCompare;
+			}
+			else if (type == ValueType::FLOATTYPE)
+			{
+				// 비교할 주체가 되는 대상이 테이블에 등록되어있는지 확인해보고 값을 받아온다.
+				auto it = animationFSM->floatTable.find(valueName);
+				if (it == animationFSM->floatTable.end()) return false;
+
+				value = it->second;
+				valueToCompare = fValueToCompare;
+			}
+
+			// factor에 의해 비교연산자 결정
+			if (factor == 0)
+			{
+				return value == valueToCompare;
+			}
+			else if(factor <0)
+			{
+				return value < valueToCompare;
+			}
+			else //if (factor > 0)
+			{
+				return value > valueToCompare;
+			}
+
+		}
+	};
+
+
+
 	// 애니메이션 목록
 	/*
 	Standing Aim Recoil.fbx
@@ -703,7 +809,7 @@ public:
 
 	standing walk back.fbx
 	standing walk forward.fbx
-	standing walk left.fbx
+	standing walk left.fbxComparison value
 	standing walk right.fbx
 	*/
 	void registerAnimation(const string & animationFileName);
@@ -718,11 +824,38 @@ public:
 	void setBool(const string & boolName, bool input);
 	bool getBool(bool & output, const string & boolName);
 	/*
-	애니메이션 전이 조건
-	 - 처리방법
 	 - 전이조건 만들어주기
-	 - 
+	 - 현재상태의 전이조건 체크
+	 
+		from : 현재 애니메이션
+		To : 전이체크할 애니메이션'
+		valueName : 비교하는 주체가 되는 값의 이름
+		factor : -1 = less / 0 = equal / 1 = more
+		type : float테이블에서 찾을지 bool 테이블에서 찾을지
+		valueToCompare : 비교할 값
 	*/
+	// 함수포인터로 받아서 실행해준다.
+
+
+	//(AnimationFSM * animationFSM, const string & from, const string & to, const string & valueName,
+	//	int factor, ValueType type, float valueToCompare)
+	
+	void makeTransition(const string & from, const string & to, int factor, const string & valueName, ValueType type, float valueToCompare)
+	{
+		// 테이블에 등록되어 있는지 확인하고 등록되어 있으면 리턴
+		if (transitionTable.find(pair<string, string>(from, to)) != transitionTable.end()) return;
+
+		// 애니메이션이 등록되어 있지 않다면 리턴
+		if (stateTable.find(from) == stateTable.end() || stateTable.find(to) == stateTable.end()) return;
+
+		transitionTable[pair<string, string>(from, to)] = new Transition(this, from, to, valueName, factor, type, valueToCompare);
+
+	}
+
+	void updateAllTrasitions(const string & animationFileName)
+	{
+
+	}
 
 };
 

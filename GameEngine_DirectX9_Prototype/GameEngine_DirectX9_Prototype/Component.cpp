@@ -1448,13 +1448,17 @@ void AnimationFSM::start()
 
 void AnimationFSM::update()
 {
-	//string state;
-	//switch(state)
-	//{
-	//	case "":
-	//}
+	if (!fbxModelAnimations || currentState == "") return;
 
+	auto it = stateTable.find(currentState);
+	// 만약에 현제 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
+	if (it == stateTable.end())
+		currentState = defaultState;
+	
+	// 애니메이션을 플레이해주고 // 현재플레이중이면 계속플레이
+	fbxModelAnimations->playWithFileName(currentState);
 
+	updateAllTrasitions(currentState);
 }
 
 void AnimationFSM::onDestroy()
