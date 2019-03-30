@@ -335,10 +335,11 @@ public:
 	void loadXFile(const string & fileName);
 };
 
+class AnimationFSM;
 class MoveScript : public Component
 {
 private:
-
+	AnimationFSM * animationFSM;
 protected:
 	virtual void update();
 	virtual void start();
@@ -657,11 +658,54 @@ public:
 
 };
 
-class AnimationFSM::Transition;
 
 class AnimationFSM : public Component
 {
+
+public:
+	enum ValueType
+	{
+		FLOATTYPE,
+		BOOLTYPE
+	};
+
+	class Transition
+	{
+	private:
+		AnimationFSM * animationFSM;
+
+		string from;
+		string to;
+
+		int factor;
+		ValueType type;
+		string valueName;
+
+		float fValueToCompare;
+		bool bValueToCompare;
+
+	public:
+		Transition(AnimationFSM * animationFSM, const string & from, const string & to, const string & valueName,
+			int factor, ValueType type, float valueToCompare)
+			: animationFSM(animationFSM), from(from), to(to), factor(factor), type(type), valueName(valueName), fValueToCompare(valueToCompare), bValueToCompare((bool)valueToCompare)
+		{
+
+		}
+
+		const string & getFrom() const { return from; }
+		const string & getTo() const { return to; }
+
+		bool operator==(const Transition & transition)
+		{
+			return (transition.factor == this->factor && transition.to == this->to && transition.from == this->from
+				&& transition.type == this->type);
+		}
+
+		bool evaluate();
+
+	};
 private:
+	//class Transition;
 	FbxModelRenderer * fbxModelRenderer;
 	FbxModelAnimations * fbxModelAnimations;
 
@@ -675,7 +719,11 @@ private:
 	map<string, bool> boolTable;
 
 	// 전이를 위한 테이블 // A from to B로 지원 a에서 b까지 가는데 어떤 전이 조건이 있는지
-	map<pair<string, string>, Transition *> transitionTable;
+	// 한파일 이름을 기준으로한 모든 전이 조건들을 업데이트에서 
+	// 검사하고 전이될 상황이면 animations클래스를 이용해서 현재애니메이션을 변경시켜준다.
+	// 키값 : from node
+	// 밸류값 : to node / Transition * 
+	multimap<string, pair<string, Transition *>> transitionTable;
 
 
 	// 현재 상태
@@ -697,103 +745,9 @@ public:
 		start();
 	}
 
-	~AnimationFSM()
-	{
-		for (auto it = transitionTable.begin(); it != transitionTable.end(); ++it)
-		{
-			if ((it->second) == nullptr) continue;
-
-			delete (it->second);
-			it->second = nullptr;
-		}
-		transitionTable.clear();
-	}
+	~AnimationFSM();
 
 	friend class Transition;
-
-	enum ValueType
-	{
-		FLOATTYPE,
-		BOOLTYPE
-	};
-
-	class Transition
-	{
-	private :
-		AnimationFSM * animationFSM;
-
-		string from;
-		string to;
-
-		int factor;
-		ValueType type;
-		string valueName;
-
-		float fValueToCompare;
-		bool bValueToCompare;
-
-	public :
-		Transition(AnimationFSM * animationFSM, const string & from, const string & to, const string & valueName,
-			int factor, ValueType type, float valueToCompare)
-			: animationFSM(animationFSM), from(from), to(to), factor(factor), type(type), valueName(valueName), fValueToCompare(valueToCompare), bValueToCompare(valueToCompare)
-		{
-
-		}
-
-		const string & getFrom() const { return from; }
-		const string & getTo() const { return to; }
-
-		bool evaluate()
-		{
-			if (!animationFSM) return false;
-
-			// 각각의 애니메이션이 존재하는지 테이블을 통해서 확인
-			if (animationFSM->stateTable.find(from) == animationFSM->stateTable.end()
-				|| animationFSM->stateTable.find(to) == animationFSM->stateTable.end())
-				return false;
-
-
-			float value = 0.0f;
-
-			float valueToCompare = 0.0f;
-			bool result = false;
-
-			// 타입에 따라 값을 받아온다.
-			if (type == ValueType::BOOLTYPE)
-			{
-				// 비교할 주체가 되는 대상이 테이블에 등록되어있는지 확인해보고 값을 받아온다.
-				auto it = animationFSM->boolTable.find(valueName);
-				if (it == animationFSM->boolTable.end()) return false;
-
-				value = it->second;
-				valueToCompare = bValueToCompare;
-			}
-			else if (type == ValueType::FLOATTYPE)
-			{
-				// 비교할 주체가 되는 대상이 테이블에 등록되어있는지 확인해보고 값을 받아온다.
-				auto it = animationFSM->floatTable.find(valueName);
-				if (it == animationFSM->floatTable.end()) return false;
-
-				value = it->second;
-				valueToCompare = fValueToCompare;
-			}
-
-			// factor에 의해 비교연산자 결정
-			if (factor == 0)
-			{
-				return value == valueToCompare;
-			}
-			else if(factor <0)
-			{
-				return value < valueToCompare;
-			}
-			else //if (factor > 0)
-			{
-				return value > valueToCompare;
-			}
-
-		}
-	};
 
 
 
@@ -840,22 +794,11 @@ public:
 	//(AnimationFSM * animationFSM, const string & from, const string & to, const string & valueName,
 	//	int factor, ValueType type, float valueToCompare)
 	
-	void makeTransition(const string & from, const string & to, int factor, const string & valueName, ValueType type, float valueToCompare)
-	{
-		// 테이블에 등록되어 있는지 확인하고 등록되어 있으면 리턴
-		if (transitionTable.find(pair<string, string>(from, to)) != transitionTable.end()) return;
+	void makeTransition(const string & from, const string & to, const string & valueName, int factor, ValueType type, float valueToCompare);
 
-		// 애니메이션이 등록되어 있지 않다면 리턴
-		if (stateTable.find(from) == stateTable.end() || stateTable.find(to) == stateTable.end()) return;
 
-		transitionTable[pair<string, string>(from, to)] = new Transition(this, from, to, valueName, factor, type, valueToCompare);
+	void updateAllTrasitions(const string & animationFileName);
 
-	}
-
-	void updateAllTrasitions(const string & animationFileName)
-	{
-
-	}
 
 };
 

@@ -201,7 +201,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
 
-
 	//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 
@@ -245,14 +244,61 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
 	//fbxModelRendererplayer->play("mixamo.com");
 	//fbxModelRendererplayer->setScale(Vector3(3,1,3));
+	AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+	playerAnimationFSM->registerAnimation("standing run forward.fbx");
+	playerAnimationFSM->registerAnimation("standing run back.fbx");
+	playerAnimationFSM->registerAnimation("standing run right.fbx");
+	playerAnimationFSM->registerAnimation("standing run left.fbx");
+	playerAnimationFSM->setDefaultState("standing run forward.fbx");
+	/*
+	전이될 상황 등록
+	*/
+	string floatSpeed = "speed";
+	string floatSideSpeed = "sideSpeed";
+	// 변수 등록
+	playerAnimationFSM->registerFloat("speed");
+	playerAnimationFSM->setFloat("speed", 1.0f);
+	playerAnimationFSM->registerFloat("sideSpeed");
+	playerAnimationFSM->setFloat("sideSpeed", 1.0f);
+	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
+	playerAnimationFSM->makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 클때 back > forward
+	playerAnimationFSM->makeTransition( "standing run back.fbx","standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
-	fbxModelRendererplayer->loadFbxFileForAnimation("standing run forward.fbx");
-	fbxModelRendererplayer->loadFbxFileForAnimation("standing run back.fbx");
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
+	playerAnimationFSM->makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
+	playerAnimationFSM->makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
-	fbxModelRendererplayer->loadFbxFileForAnimation("standing run right.fbx");
-	fbxModelRendererplayer->loadFbxFileForAnimation("standing run left.fbx");
+	//// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
+	//playerAnimationFSM->makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	//// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
+	//playerAnimationFSM->makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
-	fbxModelRendererplayer->playWithFileName("standing run right.fbx");
+	//// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
+	//playerAnimationFSM->makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	//// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
+	//playerAnimationFSM->makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
+	//// float형으로 등록된 "speed"가 0보다 작을때 left > forward
+	//playerAnimationFSM->makeTransition("standing run left.fbx", "standing run left.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	//// float형으로 등록된 "speed"가 0보다 클때 left > back
+	//playerAnimationFSM->makeTransition("standing run left.fbx", "standing run right.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
+	//// float형으로 등록된 "speed"가 0보다 작을때 back > left
+	//playerAnimationFSM->makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	//// float형으로 등록된 "speed"가 0보다 클때 forward > right
+	//playerAnimationFSM->makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
+
+
+
+	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run forward.fbx");
+	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run back.fbx");
+	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run right.fbx");
+	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run left.fbx");
+	//fbxModelRendererplayer->playWithFileName("standing run right.fbx");
+
 	player->getTransform()->setRotation(Vector3( 0,180,0 ));
 	player->getTransform()->setPosition(Vector3(0, 00, 0));
 	player->addComponent<MoveScript>();

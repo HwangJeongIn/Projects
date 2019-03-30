@@ -28,15 +28,39 @@ void MoveScript::update()
 
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
+	{
+		if (animationFSM)
+		{
+			animationFSM->setFloat("speed", 1);
+		}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()* .1f *(transform->getForward()));
+	}
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
+	{
+		if (animationFSM)
+		{
+			animationFSM->setFloat("speed", -1);
+		}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f *(-1)*(transform->getForward()));
+	}
 
 	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	{
+		if (animationFSM)
+		{
+			animationFSM->setFloat("sideSpeed", 1);
+		}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (transform->getRight()));
+	}
 
 	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
+	{
+		if (animationFSM)
+		{
+			animationFSM->setFloat("sideSpeed", -1);
+		}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (-1)*(transform->getRight()));
+	}
 
 	if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
 		gameObject->getPhysics().addForce(gameObject, FrameTime::getDeltaTime() *.1f *(-1)*transform->getForward());
@@ -51,6 +75,7 @@ void MoveScript::update()
 
 void MoveScript::start()
 {
+	animationFSM = gameObject->getComponent<AnimationFSM>();
 	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
 	if (temp)
 	{
@@ -1448,10 +1473,10 @@ void AnimationFSM::start()
 
 void AnimationFSM::update()
 {
-	if (!fbxModelAnimations || currentState == "") return;
+	if (!fbxModelAnimations) return;
 
 	auto it = stateTable.find(currentState);
-	// 만약에 현제 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
+	// 만약에 현재 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
 	if (it == stateTable.end())
 		currentState = defaultState;
 	
@@ -1461,9 +1486,72 @@ void AnimationFSM::update()
 	updateAllTrasitions(currentState);
 }
 
+bool AnimationFSM::Transition::evaluate()
+{
+	if (!animationFSM) return false;
+
+	// 각각의 애니메이션이 존재하는지 테이블을 통해서 확인
+	if (animationFSM->stateTable.find(from) == animationFSM->stateTable.end()
+		|| animationFSM->stateTable.find(to) == animationFSM->stateTable.end())
+		return false;
+
+
+	float value = 0.0f;
+	float valueToCompare = 0.0f;
+	bool result = false;
+
+	// 타입에 따라 값을 받아온다.
+	if (type == ValueType::BOOLTYPE)
+	{
+		// 비교할 주체가 되는 대상이 테이블에 등록되어있는지 확인해보고 값을 받아온다.
+		auto it = animationFSM->boolTable.find(valueName);
+		if (it == animationFSM->boolTable.end()) return false;
+
+		value = it->second;
+		valueToCompare = (float)bValueToCompare;
+	}
+	else //if (type == ValueType::FLOATTYPE)
+	{
+		// 비교할 주체가 되는 대상이 테이블에 등록되어있는지 확인해보고 값을 받아온다.
+		auto it = animationFSM->floatTable.find(valueName);
+		if (it == animationFSM->floatTable.end()) return false;
+
+		value = it->second;
+		valueToCompare = fValueToCompare;
+	}
+
+	// factor에 의해 비교연산자 결정
+	if (factor == 0)
+	{
+		return value == valueToCompare;
+	}
+	else if (factor <0)
+	{
+		return value < valueToCompare;
+	}
+	else //if (factor > 0)
+	{
+		return value > valueToCompare;
+	}
+
+}
+
 void AnimationFSM::onDestroy()
 {
 
+}
+
+AnimationFSM::~AnimationFSM()
+{
+	for (auto it = transitionTable.begin(); it != transitionTable.end(); ++it)
+	{
+
+		if ((it->second.second) == nullptr) continue;
+
+		delete (it->second.second);
+		it->second.second = nullptr;
+	}
+	transitionTable.clear();
 }
 
 void AnimationFSM::registerAnimation(const string & animationFileName)
@@ -1475,9 +1563,11 @@ void AnimationFSM::registerAnimation(const string & animationFileName)
 	// 만약에 등록이 안되어있다면 stateTable에 등록한다.
 	map<string, unsigned int>::iterator stateIt = stateTable.find(animationFileName);
 
-	if (stateIt == stateTable.end()) return;
-	// 인덱스는 등록한 순서대로 차례대로 해준다.
-	stateTable[animationFileName] = stateTable.size();
+	if (stateIt == stateTable.end())
+	{
+		// 인덱스는 등록한 순서대로 차례대로 해준다.
+		stateTable[animationFileName] = stateTable.size();
+	}
 }
 
 void AnimationFSM::setDefaultState(const string & animationFileName)
@@ -1495,6 +1585,7 @@ void AnimationFSM::setDefaultState(const string & animationFileName)
 	
 	// 만약에 등록된 상황이라면 디폴트 상태를 정의해준다.
 	defaultState = animationFileName;
+	currentState = defaultState;
 }
 
 void AnimationFSM::registerFloat(const string & floatName)
@@ -1561,4 +1652,53 @@ bool AnimationFSM::getBool(bool & output, const string & boolName)
 
 	output = boolIt->second;
 	return true;
+}
+
+void AnimationFSM::makeTransition(const string & from, const string & to, const string & valueName, int factor, ValueType type, float valueToCompare)
+{
+	// 중복된 키값을 가질 수 있기 때문에 그냥 등록한다. 찾아보고 나온것들에 대해서 
+	// 밸류값이 같은지 검사하고
+	// 같다면 리턴하고 아니면 등록한다.
+	// 원래는 밸류값이 같은지 확인하려고 했는데 밸류의 second값이 포인터라서 내부 파라미터들을 다 비교해야한다.
+	pair <multimap<string, pair<string, Transition *>>::iterator, multimap<string, pair<string, Transition *>>::iterator> result;
+	result = transitionTable.equal_range(from);
+
+	Transition * transition = new Transition(this, from, to, valueName, factor, type, valueToCompare);
+
+	for (multimap<string, pair<string, Transition *>>::iterator it = result.first; it != result.second; ++it)
+	{
+		if ((*transition) == (*(it->second.second)))
+		{
+			// 이미 동일한 transition이 등록되어 있으면 리턴해준다.
+			delete transition;
+			return;
+		}
+	}
+
+	// 전이에 들어가는 애니메이션들이 등록되어 있지 않다면 리턴
+	if (stateTable.find(from) == stateTable.end() || stateTable.find(to) == stateTable.end())
+	{
+		delete transition;
+		return;
+	}
+
+	// 전이 객체가 등록되어야 할상황
+	transitionTable.insert(pair<string, pair<string, Transition *>>({ from }, { to, transition }));
+}
+
+void AnimationFSM::updateAllTrasitions(const string & animationFileName)
+{
+	pair <multimap<string, pair<string, Transition *>>::iterator, multimap<string, pair<string, Transition *>>::iterator> result;
+	result = transitionTable.equal_range(animationFileName);
+
+	// 모든 전이상황들을 돌면서 확인해보고 
+	// 만약 평가했을떄 true가 나오면 그 애니메이션을 현재애니메이션으로 설정한다.
+	for (multimap<string, pair<string, Transition *>>::iterator it = result.first; it != result.second; ++it)
+	{
+		if (it->second.second->evaluate())
+		{
+			currentState = it->second.first;
+			return;
+		}
+	}
 }
