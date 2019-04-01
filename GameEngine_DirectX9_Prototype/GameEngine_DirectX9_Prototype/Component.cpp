@@ -29,36 +29,36 @@ void MoveScript::update()
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
 	{
-		if (animationFSM)
-		{
-			animationFSM->setFloat("speed", 1);
-		}
+		//if (animationFSM)
+		//{
+		//	animationFSM->setFloat("speed", 1);
+		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()* .1f *(transform->getForward()));
 	}
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
 	{
-		if (animationFSM)
-		{
-			animationFSM->setFloat("speed", -1);
-		}
+		//if (animationFSM)
+		//{
+		//	animationFSM->setFloat("speed", -1);
+		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
 
 	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
 	{
-		if (animationFSM)
-		{
-			animationFSM->setFloat("sideSpeed", 1);
-		}
+		//if (animationFSM)
+		//{
+		//	animationFSM->setFloat("sideSpeed", 1);
+		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (transform->getRight()));
 	}
 
 	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
 	{
-		if (animationFSM)
-		{
-			animationFSM->setFloat("sideSpeed", -1);
-		}
+		//if (animationFSM)
+		//{
+		//	animationFSM->setFloat("sideSpeed", -1);
+		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (-1)*(transform->getRight()));
 	}
 
@@ -1469,6 +1469,61 @@ void AnimationFSM::start()
 		fbxModelAnimations = fbxModelRenderer->getAnimations();
 	}
 
+	registerAnimation("standing run forward.fbx");
+	registerAnimation("standing run back.fbx");
+	registerAnimation("standing run right.fbx");
+	registerAnimation("standing run left.fbx");
+	setDefaultState("standing run forward.fbx");
+
+	// 플레이어 기준
+
+	/*
+	전이될 상황 등록
+	*/
+	string floatSpeed = "speed";
+	string floatSideSpeed = "sideSpeed";
+	// 변수 등록
+	registerFloat("speed");
+	setFloat("speed", 1.0f);
+	registerFloat("sideSpeed");
+	setFloat("sideSpeed", 1.0f);
+
+	// forward > back / left / right
+
+	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
+	makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
+	makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
+	makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
+	// back > forward / left / right
+
+	// float형으로 등록된 "speed"가 0보다 클때 back > forward
+	makeTransition("standing run back.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
+	makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 클때 back > right
+	makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
+	// left > forward / back / right
+
+	// float형으로 등록된 "speed"가 0보다 작을때 left > forward
+	makeTransition("standing run left.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 클때 left > back
+	makeTransition("standing run left.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
+	makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
+	// right > forward / back / left
+
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
+	makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 right > forward
+	makeTransition("standing run right.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 작을때 right > back
+	makeTransition("standing run right.fbx", "standing run back.fbx", "sidepeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+
 }
 
 void AnimationFSM::update()
@@ -1479,7 +1534,37 @@ void AnimationFSM::update()
 	// 만약에 현재 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
 	if (it == stateTable.end())
 		currentState = defaultState;
-	
+
+
+
+	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
+	{
+		setFloat("speed", 1);
+		setFloat("sideSpeed", 0);
+	}
+	else if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
+	{
+		setFloat("speed", -1);
+		setFloat("sideSpeed", 0);
+	}
+	else if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	{
+		setFloat("sideSpeed", 1);
+		setFloat("speed", 0);
+	}
+	else if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
+	{
+		setFloat("sideSpeed", -1);
+		setFloat("speed", 0);
+	}
+	else
+	{
+		setFloat("sideSpeed", 0);
+		setFloat("speed", 0);
+	}
+
+
+
 	// 애니메이션을 플레이해주고 // 현재플레이중이면 계속플레이
 	fbxModelAnimations->playWithFileName(currentState);
 
