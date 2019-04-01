@@ -212,6 +212,19 @@ void GameObject::destroyUpdate()
 
 }
 
+void GameObject::collisionUpdate(GameObjectWithCollision & other)
+{
+	// 모든 컴포넌트에 대해서 onCollisionXX함수를 실행시킨다.
+
+
+	// 나중에 enter / exit도 추가할 예정
+	for (auto it = components.begin(); it != components.end(); ++it)
+	{
+		(*it)->onCollisionStay(other);
+	}
+}
+
+
 /*
 Scene의 base작업은 
 루트객체 :: 루트객체 리스트 추가 / 삭제 + 맵에 등록 / 해제

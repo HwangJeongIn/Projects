@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "Locator.h"
 
+struct GameObjectWithCollision;
 
 class GameObject : public Locator
 {
@@ -106,17 +107,15 @@ public:
 
 	void update();
 	void fixedUpdate();
+
 	//void physicsUpdate()
 	//{
 	//	if (destroyed) return;
-
-
 	//	RigidBody * rb = getComponent<RigidBody>();
 	//	if (rb != nullptr)
 	//	{
 	//		// trasnfrom 위치 받아서 최신화
 	//	}
-
 	//	for (auto it : children)
 	//	{
 	//		it->physicsUpdate();
@@ -124,6 +123,10 @@ public:
 	//}
 
 	void destroyUpdate();
+
+	// 충돌처리 함수 업데이트
+	void collisionUpdate(GameObjectWithCollision & other);
+	//void triggerUpdate();
 
 
 	//vector<Component *> components;
@@ -196,5 +199,16 @@ public:
 
 
 };
+
+
+typedef struct GameObjectWithCollision
+{
+	GameObject * gameObject;
+	Vector3 contactPoint;
+
+	GameObjectWithCollision(GameObject * gameObject, const Vector3 & contactPoint)
+		: gameObject(gameObject), contactPoint(contactPoint) {}
+
+}GameObjectWithCollision;
 
 #endif

@@ -9,6 +9,7 @@
 
 class Transform;
 class GameObject;
+struct GameObjectWithCollision;
 
 class Component
 {
@@ -23,7 +24,7 @@ protected:
 	virtual void fixedUpdate() {}
 	virtual void start() { cout << "Component start" << endl; }
 	virtual void onDestroy(){}
-
+	virtual void onCollisionStay(GameObjectWithCollision & other){}
 	GameObject * gameObject;
 	Transform * transform;
 
@@ -344,7 +345,7 @@ private:
 protected:
 	virtual void update();
 	virtual void start();
-
+	virtual void onCollisionStay(GameObjectWithCollision & other);
 public:
 	MoveScript(GameObject * go, Transform * tf)
 		: Component(go, tf)

@@ -84,6 +84,11 @@ void MoveScript::start()
 	}
 }
 
+void MoveScript::onCollisionStay(GameObjectWithCollision & other)
+{
+	int a;
+}
+
 void MoveScript_C::start()
 {
 

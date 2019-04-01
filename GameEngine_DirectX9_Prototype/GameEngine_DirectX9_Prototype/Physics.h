@@ -20,7 +20,16 @@ class Transform;
 class Physics
 {
 private:
+	// 두개의 테이블을 선택한 이유
+	/*
+	1. 등록하거나 해제할때 GameObject * 기준으로 작업
+	2. 콜백함수 호출시 btCollisionObject * 기준으로 작업
+	*/
+	static Physics * currentPhysics;
+
 	map<GameObject *, btCollisionObject*> collisionObjectsTable;
+	map<btCollisionObject *, GameObject *> gameObjectsTable;
+
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* dispatcher;
 	btBroadphaseInterface* overlappingPairCache;
@@ -31,7 +40,7 @@ private:
 	void release();
 	bool exists(GameObject * other) const;
 	void setBaseConstructionInfo(btRigidBody::btRigidBodyConstructionInfo & info) const;
-
+	static void collisionCallBack(btDynamicsWorld *world, btScalar timeStep);
 
 
 protected:
