@@ -237,14 +237,16 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	
 
 	// -1단계
-	GameObject * player = GameObject::Instantiate("player", "Player");
-																// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx / Crouch Walk Left.fbx / Standing Aim Recoil.fbx
-	// standing run forward.fbx
-	FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	//fbxModelRendererplayer->play("mixamo.com");
-	//fbxModelRendererplayer->setScale(Vector3(3,1,3));
-	AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+	//GameObject * player = GameObject::Instantiate("player", "Player");
+	//															// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx / Crouch Walk Left.fbx / Standing Aim Recoil.fbx
+	//// standing run forward.fbx
+	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	////fbxModelRendererplayer->play("mixamo.com");
+	////fbxModelRendererplayer->setScale(Vector3(3,1,3));
+	////AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+
+
 	/*
 	playerAnimationFSM->registerAnimation("standing run forward.fbx");
 	playerAnimationFSM->registerAnimation("standing run back.fbx");
@@ -297,32 +299,24 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	playerAnimationFSM->makeTransition("standing run right.fbx", "standing run back.fbx", "sidepeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	*/
 
-
-
-	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run forward.fbx");
-	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run back.fbx");
-	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run right.fbx");
-	//fbxModelRendererplayer->loadFbxFileForAnimation("standing run left.fbx");
-	//fbxModelRendererplayer->playWithFileName("standing run right.fbx");
-
-	player->getTransform()->setRotation(Vector3( 0,180,0 ));
-	player->getTransform()->setPosition(Vector3(0, 00, 0));
-	player->addComponent<MoveScript>();
-	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	playerRigidBody->setSphereCollider(2);
+	//player->getTransform()->setRotation(Vector3( 0,180,0 ));
+	//player->getTransform()->setPosition(Vector3(0, 00, 0));
+	//player->addComponent<MoveScript>();
+	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	//playerRigidBody->setSphereCollider(2);
 
 
 
 	// 0단계
 	GameObject * car0 = GameObject::Instantiate("car0", "Car");
-	//car0->addComponent<MeshRenderer>()->loadXFile("car.x");
+	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car0->addComponent<RigidBody>()->setSphereCollider(2);
-	//car0->addComponent<BoxCollider>();
+	///car0->addComponent<BoxCollider>();
 
 
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
-	//car1->addComponent<MeshRenderer>()->loadXFile("car.x");
+	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<MoveScript>();
 	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
 	car1RigidBody->setSphereCollider(2);
@@ -332,27 +326,26 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// 1단계
 	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
-	//car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	car1Child1->getTransform()->setPosition(0, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
 
 
-	//car0->addComponent<RigidBody>()->setSphereCollider(2);
 
 	//GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
 	//car1Child2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	//car1Child2->getTransform()->setPosition(10, 0, 0);
 
 	// 2단계
-	/*
-	GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
+	
+	/*GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
 	car1Child1Child1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child1->getTransform()->setPosition(0, 5, 0);
 
 	GameObject * car1Child1Child2 = car1Child1->addChild("car4", "Car");
 	car1Child1Child2->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car1Child1Child2->getTransform()->setPosition(7, 0, 0);
-	*/
+	car1Child1Child2->getTransform()->setPosition(7, 0, 0);*/
+	
 
 	Scene & scene = mainCamera->getScene();
 

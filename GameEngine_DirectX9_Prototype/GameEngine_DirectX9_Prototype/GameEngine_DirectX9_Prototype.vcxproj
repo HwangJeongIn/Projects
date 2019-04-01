@@ -95,7 +95,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)Audio\inc;$(SolutionDir)Physics\inc</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4244;4018;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4244;4018;4800;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

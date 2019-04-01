@@ -241,7 +241,7 @@ public:
 	{
 		float value = abs(angle);
 		// 절댓값이 360이 넘어가면 제한한다.
-		int quotient = value / 360;
+		int quotient = (int)((int)value / 360);
 		value += -(360 * quotient);
 		
 		// value는 360도 내로 제한됐다.
@@ -335,11 +335,12 @@ public:
 	void loadXFile(const string & fileName);
 };
 
-class AnimationFSM;
+//class AnimationFSM;
+
 class MoveScript : public Component
 {
 private:
-	AnimationFSM * animationFSM;
+	//AnimationFSM * animationFSM;
 protected:
 	virtual void update();
 	virtual void start();

@@ -4,27 +4,45 @@
 
 GameObject::~GameObject()
 {
-	// 완전히 지우기 전에 Scene에서 등록했던것들을 지워준다.
-	// 이때 이 객체가 제일 상위 객체인지 확인한다.
-	bool isRootObj = parent == nullptr;
-	getScene().baseDestroy(this, isRootObj);
 	// 외부에서 동적할당 했던것을 한꺼번에 GameObject 소멸자에서 처리한다.
-
 	// 내부에 있는 자식객체들과 컴포넌트 동적할당해뒀던 것을 삭제한다
-	if (components.size() != 0)
+
+
+	Component * tComponent = nullptr;
+ 	auto it = components.begin();
+	while (it != components.end())
 	{
-		for (int i = 0; i < components.size(); ++i)
-		{
-			delete components[i];
-		}
+		tComponent = *it;
+		++it;
+		delete tComponent;
+	}
+	
+	GameObject * tGameObject = nullptr;
+	auto it2 = children.begin();
+	while (it2 != children.end())
+	{
+		tGameObject = *it2;
+		++it2;
+		FinalDestroy(tGameObject);
 	}
 
-	GameObject * temp = nullptr;
-	while (children.size() !=0)
-	{
-		temp = children.back();
-		FinalDestroy(temp);
-	}
+
+
+
+	//for (auto it2 = children.begin(); it2 != children.end(); ++it2)
+	//{
+	//	tGameObject = *it2;
+	//	++it2;
+	//	FinalDestroy (tGameObject);
+	//}
+
+	// 최종적으로 삭제한다.
+	// 내부적으로 delete호출하기 때문에 무한루프 돈다
+	// 다른 작업을 해주자
+	//FinalDestroy(this);
+	getScene().baseDestroy(this, isRootObj());
+
+
 }
 
 Scene & GameObject::getScene()
@@ -143,44 +161,52 @@ void GameObject::fixedUpdate()
 // 다른곳에서 호출을 해줘야 할 경우 잊어버리고 부모객체의 차일드리스트에서 삭제 안하는 경우가 생길 수 있기 때문이다.
 void GameObject::destroyUpdate()
 {
-	auto it = children.begin();
+	// 먼저 삭제되어야 한다면 삭제해주고 리턴한다.
+	// 소멸자에서 하위 객체들 모두 삭제 // 컴포넌트 / 자식오브젝트
+	if (destroyed)
+	{
+		FinalDestroy(this);
+		return;
+	}
 
-	while (it != children.end())
+	auto it = children.begin();
+	while ( it != children.end())
 	{
 		// 미리 다음걸 받아서 현재를 업데이트 시키고 나중에 최신화 시킨다
 		// 중간에 삭제된 반복자를 가리키고 있을 가능성이 있기 때문이다.
+		// 최종적으로 삭제
+		GameObject * temp = *it;
 
 		if ((*it)->destroyed)
 		{
 			// 루트오브젝트라면 부모객체의 리스트에서 삭제할 필요가 없다.
 			if ((*it)->isRootObj() == true)
 			{
-				FinalDestroy(*it); continue;
+				FinalDestroy(temp); continue;
 			}
 
-			vector<GameObject *>& childrenOfParent = (*it)->parent->children;
-			// 만약 자식객체라면 부모객체의 리스트에서도 삭제해줘야 한다.
-			// 시간복잡도 고려해서 바꿀수있으면 바꿀예정
+			it = children.erase(it);
+			FinalDestroy(temp);
 
-			for (auto it2 = childrenOfParent.begin(); it2 != childrenOfParent.end(); ++it2)
-			{
-				// 순회하다가 만약 발견하면 지운다.
-				if (*it2 == *it)
-				{
-					childrenOfParent.erase(it);
-					break;
-				}
-			}
+			//// 만약 자식객체라면 부모객체의 리스트에서도 삭제해줘야 한다.
+			//// 시간복잡도 고려해서 바꿀수있으면 바꿀예정
+			//for (auto it2 = children.begin(); it2 != children.end(); ++it2)
+			//{
+			//	// 순회하다가 만약 발견하면 지운다.
+			//	if (*it2 == *it)
+			//	{
+			//		children.erase(it2);
+			//		break;
+			//	}
+			//}
 
-			// 최종적으로 삭제
-			FinalDestroy(*it);
-			
+
 		}
 		else
 		{
-			// 삭제되어야 하지 않는다면 자식객체를 확인해준다.
-			(*it)->destroyUpdate();
+			// 삭제되어야 하지 않는다면 자식객체의 자식객체를 확인해준다.
 			++it;
+			temp->destroyUpdate();
 		}
 	}
 

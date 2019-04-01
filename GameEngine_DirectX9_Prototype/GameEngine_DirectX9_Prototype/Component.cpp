@@ -75,7 +75,7 @@ void MoveScript::update()
 
 void MoveScript::start()
 {
-	animationFSM = gameObject->getComponent<AnimationFSM>();
+	//animationFSM = gameObject->getComponent<AnimationFSM>();
 	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
 	if (temp)
 	{
