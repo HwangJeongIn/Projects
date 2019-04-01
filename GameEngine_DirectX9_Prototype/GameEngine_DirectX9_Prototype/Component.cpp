@@ -13,7 +13,7 @@
 #include "Utility.h"
 #include "Trace.h"
 
-void MoveScript::update()
+void PlayerScript::update()
 {
 	//if (::GetAsyncKeyState('Q') & 0x8000f)
 	//	transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
@@ -29,41 +29,39 @@ void MoveScript::update()
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
 	{
-		//if (animationFSM)
-		//{
-		//	animationFSM->setFloat("speed", 1);
-		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()* .1f *(transform->getForward()));
 	}
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
 	{
-		//if (animationFSM)
-		//{
-		//	animationFSM->setFloat("speed", -1);
-		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
 
 	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
 	{
-		//if (animationFSM)
-		//{
-		//	animationFSM->setFloat("sideSpeed", 1);
-		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (transform->getRight()));
 	}
 
 	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
 	{
-		//if (animationFSM)
-		//{
-		//	animationFSM->setFloat("sideSpeed", -1);
-		//}
 		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (-1)*(transform->getRight()));
 	}
 
 	if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
-		gameObject->getPhysics().addForce(gameObject, FrameTime::getDeltaTime() *.1f *(-1)*transform->getForward());
+	{
+		Vector3 direction = transform->getForward() + transform->getUp();
+		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
+		bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
+		bullet->getTransform()->setPosition(transform->getPosition()+direction);
+
+		RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
+		bulletRigidBody->setSphereCollider(1);
+		bulletRigidBody->addForce(direction * 20.0f);
+		bullet->addComponent<BulletScript>();
+
+		//car1RigidBody->setGravity(Vector3(0, 0, 0));
+		//car1->addComponent<BoxCollider>();
+
+	}
 
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
@@ -73,7 +71,7 @@ void MoveScript::update()
 			transform->setRotation(transform->getRotation() + FrameTime::getDeltaTime() *.1f * Vector3{ 0,.05f,0 });
 }
 
-void MoveScript::start()
+void PlayerScript::start()
 {
 	//animationFSM = gameObject->getComponent<AnimationFSM>();
 	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
@@ -84,9 +82,9 @@ void MoveScript::start()
 	}
 }
 
-void MoveScript::onCollisionStay(GameObjectWithCollision & other)
+void PlayerScript::onCollisionStay(GameObjectWithCollision & other)
 {
-	int a;
+	
 }
 
 void MoveScript_C::start()
@@ -548,6 +546,11 @@ void RigidBody::setGravity(Vector3 & value)
 void RigidBody::getGravity(Vector3 & output)
 {
 	gameObject->getPhysics().getGravity(output, gameObject);
+}
+
+void RigidBody::addForce(const Vector3 & directionWithScalar)
+{
+	gameObject->getPhysics().addForce(gameObject, directionWithScalar);
 }
 
 const unsigned long FbxModelRenderer::FbxModelVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
@@ -1790,5 +1793,13 @@ void AnimationFSM::updateAllTrasitions(const string & animationFileName)
 			currentState = it->second.first;
 			return;
 		}
+	}
+}
+
+void BulletScript::onCollisionStay(GameObjectWithCollision & other)
+{
+	if (other.gameObject->getTag() == "Ground")
+	{
+		GameObject::Destroy(gameObject);
 	}
 }

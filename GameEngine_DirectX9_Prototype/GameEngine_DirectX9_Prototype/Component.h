@@ -338,24 +338,22 @@ public:
 
 //class AnimationFSM;
 
-class MoveScript : public Component
+class PlayerScript : public Component
 {
 private:
-	//AnimationFSM * animationFSM;
 protected:
 	virtual void update();
 	virtual void start();
 	virtual void onCollisionStay(GameObjectWithCollision & other);
+
 public:
-	MoveScript(GameObject * go, Transform * tf)
+	PlayerScript(GameObject * go, Transform * tf)
 		: Component(go, tf)
 	{
-		// 만약에 그냥 Component 클래스 생성자 함수바디에서 start()함수 호출?
-		// 생성되는 과정이기 때문에 오버라이딩이 적용되지 않는다 // 부모생성완료(이과정에서 자식의 재정의함수를 찾을수없다.) > 자식생성완료
 		start();
 	}
 	
-	virtual ~MoveScript()
+	virtual ~PlayerScript()
 	{
 		onDestroy();
 	}
@@ -386,6 +384,31 @@ public:
 	}
 
 };
+
+class BulletScript : public Component
+{
+private:
+
+protected:
+	virtual void start() {};
+	virtual void update() {};
+	virtual void onCollisionStay(GameObjectWithCollision & other);
+
+public:
+	BulletScript(GameObject * go, Transform * tf)
+		: Component(go, tf)
+	{
+		start();
+	}
+
+	virtual ~BulletScript()
+	{
+		onDestroy();
+	}
+
+};
+
+
 
 //class Scene;
 //enum MainObjTag;
@@ -503,6 +526,8 @@ public:
 	void setGravity(Vector3 & value);
 	void getGravity(Vector3 & output);
 
+	void addForce(const Vector3 & directionWithScalar);
+
 };
 class FbxModelAnimations;
 class FbxModelSkeletonBones;
@@ -580,17 +605,17 @@ protected:
 	virtual void update()
 	{
 		render();
-		if (::GetAsyncKeyState('F') & 0x8000f)
-			setScale(Vector3(1, 1, 1));
+		//if (::GetAsyncKeyState('F') & 0x8000f)
+		//	setScale(Vector3(1, 1, 1));
 
-		if (::GetAsyncKeyState('G') & 0x8000f)
-			setScale(Vector3(1, 3, 1));
+		//if (::GetAsyncKeyState('G') & 0x8000f)
+		//	setScale(Vector3(1, 3, 1));
 
-		if (::GetAsyncKeyState('H') & 0x8000f)
-			setScale(Vector3(3, 1, 3));
+		//if (::GetAsyncKeyState('H') & 0x8000f)
+		//	setScale(Vector3(3, 1, 3));
 
-		if (::GetAsyncKeyState('J') & 0x8000f)
-			setScale(Vector3(3, 3, 3));
+		//if (::GetAsyncKeyState('J') & 0x8000f)
+		//	setScale(Vector3(3, 3, 3));
 	}
 	virtual void onDestroy();
 
@@ -797,11 +822,7 @@ public:
 	//	int factor, ValueType type, float valueToCompare)
 	
 	void makeTransition(const string & from, const string & to, const string & valueName, int factor, ValueType type, float valueToCompare);
-
-
 	void updateAllTrasitions(const string & animationFileName);
-
-
 };
 
 #endif

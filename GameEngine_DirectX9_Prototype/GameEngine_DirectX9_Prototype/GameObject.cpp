@@ -26,23 +26,11 @@ GameObject::~GameObject()
 		FinalDestroy(tGameObject);
 	}
 
-
-
-
-	//for (auto it2 = children.begin(); it2 != children.end(); ++it2)
-	//{
-	//	tGameObject = *it2;
-	//	++it2;
-	//	FinalDestroy (tGameObject);
-	//}
-
 	// 최종적으로 삭제한다.
 	// 내부적으로 delete호출하기 때문에 무한루프 돈다
 	// 다른 작업을 해주자
 	//FinalDestroy(this);
 	getScene().baseDestroy(this, isRootObj());
-
-
 }
 
 Scene & GameObject::getScene()
@@ -159,14 +147,14 @@ void GameObject::fixedUpdate()
 // 차일드 객체를 순회하는 도중 차일드 객체 본인이 부모객체의 차일드리스트에서 삭제되어야 할경우
 // FinalDestroy에서 같이 해주는게 낫다고 생각했다.
 // 다른곳에서 호출을 해줘야 할 경우 잊어버리고 부모객체의 차일드리스트에서 삭제 안하는 경우가 생길 수 있기 때문이다.
-void GameObject::destroyUpdate()
+bool GameObject::destroyUpdate()
 {
 	// 먼저 삭제되어야 한다면 삭제해주고 리턴한다.
 	// 소멸자에서 하위 객체들 모두 삭제 // 컴포넌트 / 자식오브젝트
 	if (destroyed)
 	{
 		FinalDestroy(this);
-		return;
+		return true;
 	}
 
 	auto it = children.begin();
@@ -179,7 +167,7 @@ void GameObject::destroyUpdate()
 
 		if ((*it)->destroyed)
 		{
-			// 루트오브젝트라면 부모객체의 리스트에서 삭제할 필요가 없다.
+			// 루트오브젝트라면 부모객체의 children 리스트에서 삭제할 필요가 없다.
 			if ((*it)->isRootObj() == true)
 			{
 				FinalDestroy(temp); continue;
@@ -209,6 +197,7 @@ void GameObject::destroyUpdate()
 			temp->destroyUpdate();
 		}
 	}
+	return false;
 
 }
 

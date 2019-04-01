@@ -8,12 +8,6 @@
 
 using namespace std;
 
-
-/*
-필요한 기능
-1. 
-
-*/
 class GameObject;
 class Transform;
 
@@ -40,7 +34,7 @@ private:
 	void release();
 	bool exists(GameObject * other) const;
 	void setBaseConstructionInfo(btRigidBody::btRigidBodyConstructionInfo & info) const;
-	static void collisionCallBack(btDynamicsWorld *world, btScalar timeStep);
+	friend void collisionCallBack(btDynamicsWorld *world, btScalar timeStep);
 
 
 protected:

@@ -3,22 +3,29 @@
 
 Physics * Physics::currentPhysics = nullptr;
 
-void Physics::collisionCallBack(btDynamicsWorld * world, btScalar timeStep)
+// 멤버함수를 포인터로 넘겨주기에는 포인터 형이 맞지 않는다 
+// 멤버함수 포인터형 : void (Physics::*)(btDynamicsWorld * world, btScalar timeStep);
+// 파라미터에서의 포인터형 : void (*btInternalTickCallback)(btDynamicsWorld *world, btScalar timeStep);
+/*
+2가지 방법
+1. global로 함수를 friend선언해 만들어 넘겨준다.
+2. static 멤버함수를 만들어서 넘겨준다.
+
+결국 둘다 내부 변수에 접근하려면 static 멤버변수를 통해서 접근해야한다.
+이 static멤버변수는 현재 Physics시스템을 가리키는 포인터이다.
+*/
+void collisionCallBack(btDynamicsWorld * world, btScalar timeStep)
 {
+	Physics * currentPhysics = Physics::currentPhysics;
 	if (!world || !currentPhysics) return;
 
 	int numManifolds = currentPhysics->dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i = 0; i < numManifolds; i++)
 	{
 		btPersistentManifold *contactManifold = currentPhysics->dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-		// TODO those are unused. What can be done with them?
-		// I think they are the same objects as those in the main loop
-		// dynamicsWorld->getCollisionObjectArray() and we could compare
-		// the pointers to see which object collided with which.
 
 		const btCollisionObject *objA = contactManifold->getBody0();
 		const btCollisionObject *objB = contactManifold->getBody1();
-
 
 		// 두개의 충돌체를 기준으로 GameObject를 찾아준다.
 		map<btCollisionObject *, GameObject *>::iterator gameObjA = currentPhysics->gameObjectsTable.find((btCollisionObject *)(objA));
@@ -27,28 +34,28 @@ void Physics::collisionCallBack(btDynamicsWorld * world, btScalar timeStep)
 		// 만약 하나라도 등록되어 있지 않다면 컨티뉴
 		if (gameObjA == currentPhysics->gameObjectsTable.end() || gameObjB == currentPhysics->gameObjectsTable.end()) continue;
 
-
-
 		btVector3 contactPoint{ 0,0,0 };
 		int numContacts = contactManifold->getNumContacts();
 		// 접촉지점 하나에 대해서 A B의 지점을 구하고 그 평균을 내서 콜리전 업데이트를 해준다.
-		for (int j = 0; j < 1/*numContacts*/; j++)
+		if (numContacts > 0)
 		{
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			const btVector3& ptA = pt.getPositionWorldOnA();
-			const btVector3& ptB = pt.getPositionWorldOnB();
-			//const btVector3& normalOnB = pt.m_normalWorldOnB;
+			for (int j = 0; j < 1/*numContacts*/; j++)
+			{
+				btManifoldPoint& pt = contactManifold->getContactPoint(j);
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				//const btVector3& normalOnB = pt.m_normalWorldOnB;
 
-			contactPoint = (ptA + ptB) / 2;
+				contactPoint = (ptA + ptB) / 2;
+			}
 		}
 
 		// 두 충돌체에 대해서 콜리전 업데이트를 해준다. // 크로스로 파라미터를 넘겨준다
 		gameObjA->second->collisionUpdate(GameObjectWithCollision{ gameObjB->second, Vector3{ contactPoint.getX(),contactPoint.getY(),contactPoint.getZ() } });
 		gameObjB->second->collisionUpdate(GameObjectWithCollision{ gameObjA->second, Vector3{ contactPoint.getX(),contactPoint.getY(),contactPoint.getZ() } });
-
-
 	}
 }
+
 
 void Physics::init()
 {
@@ -68,12 +75,12 @@ void Physics::init()
 
 	// 다이나믹 월드에 중력 적용한다.
 	// y방향으로 -10만큼 설정
-	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+	dynamicsWorld->setGravity(btVector3(0, -20, 0));
 
 	currentPhysics = this;
 	// 콜백함수 등록
 	// 현재 객체 기준으로 콜백함수를 등록해줘야 한다.
-	dynamicsWorld->setInternalTickCallback(&(Physics::collisionCallBack));
+	dynamicsWorld->setInternalTickCallback(&(collisionCallBack));
 }
 
 void Physics::release()
@@ -500,6 +507,5 @@ void Physics::setSphereCollider(GameObject * other, float radius)
 	// 다시 등록해준다
 	registerRigidBody(other, shape, mass);
 }
-
 
 

@@ -301,7 +301,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	//player->getTransform()->setRotation(Vector3( 0,180,0 ));
 	//player->getTransform()->setPosition(Vector3(0, 00, 0));
-	//player->addComponent<MoveScript>();
+	//player->addComponent<PlayerScript>();
 	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	//playerRigidBody->setSphereCollider(2);
 
@@ -317,7 +317,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car1->addComponent<MoveScript>();
+	car1->addComponent<PlayerScript>();
 	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
 	car1RigidBody->setSphereCollider(2);
 	//car1RigidBody->setGravity(Vector3(0, 0, 0));

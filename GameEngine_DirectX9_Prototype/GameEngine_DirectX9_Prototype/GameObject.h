@@ -122,7 +122,7 @@ public:
 	//	}
 	//}
 
-	void destroyUpdate();
+	bool destroyUpdate();
 
 	// 충돌처리 함수 업데이트
 	void collisionUpdate(GameObjectWithCollision & other);

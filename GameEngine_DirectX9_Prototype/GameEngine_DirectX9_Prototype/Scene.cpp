@@ -150,18 +150,26 @@
 	// 현재 게임오브젝트 리스트를 업데이트 시킨다.
 	void Scene::update()
 	{
-		for (auto it : rootGameObjects)
+		for (int i = 0; i < rootGameObjects.size(); ++i)
 		{
-			it->update();
+			rootGameObjects[i]->update();
 		}
+		//for (auto it : rootGameObjects)
+		//{
+		//	it->update();
+		//}
 	}
 
 	void Scene::fixedUpdate()
 	{
-		for (auto it : rootGameObjects)
+		for (int i = 0; i < rootGameObjects.size(); ++i)
 		{
-			it->fixedUpdate();
+			rootGameObjects[i]->fixedUpdate();
 		}
+		//for (auto it : rootGameObjects)
+		//{
+		//	it->fixedUpdate();
+		//}
 	}
 
 	void Scene::audioUpdate()
@@ -214,19 +222,76 @@
 
 	void Scene::destroyUpdate()
 	{
-		auto it = rootGameObjects.begin();
-		auto end = rootGameObjects.end();
-		auto postIt = it;
-		// 자식객체가 삭제되었는지 알기 위한 플래그
-		while (it != end)
-		{
-			// 미리 다음걸 받아서 현재를 업데이트 시키고 나중에 최신화 시킨다
-			// 중간에 삭제된 반복자를 가리키고 있을 가능성이 있기 때문이다.
-			++postIt;
-			(*it)->destroyUpdate();
+		/*
+		이런식으로 하면 생기는 문제점
+		예를들어 5개의 원소가 있고
+		postIt이 마지막 5번째원소를 가리키고
+		it이 4번째원소를 가리킨다고 가정해보자
 
-			it = postIt;
+		// 여기서부터 추측
+		만약 it가 지워지면 총 크기는 4가 되고 postIt은 5번째를 그대로 가리키고 있다. 
+		// 내용물은 맞지만 // 카운트 자체는 5번째인듯
+		즉 ++할경우 end를 넘어가게 되어 오류가 발생한다.
+		*/
+		unsigned int index = 0;
+		bool isDestroyed = false;
+		while (index < rootGameObjects.size())
+		{
+			isDestroyed = rootGameObjects[index]->destroyUpdate();
+			if (!isDestroyed)
+			{
+				// 안지워진 경우는 그냥 증가시키면 된다.
+				++index;
+			}
+			else
+			{
+				// 지워진 경우라면 인덱스를 증가시키지 않는다
+			}
 		}
+
+
+
+		//------------------------------------------------------------------------------
+		
+		//auto it = rootGameObjects.begin();
+		//auto postIt = it;
+		//bool isDestroyed = false;
+		//// 자식객체가 삭제되었는지 알기 위한 플래그
+		//while (it != rootGameObjects.end())
+		//{
+		//	++postIt;
+		//	isDestroyed = (*it)->destroyUpdate();
+		//	// 지워지지않았을때만 반복자를 증가
+		//	// 내부적으로 FinalDestroy가 호출되어 지워졌을 경우는 it가
+		//	if (!isDestroyed)
+		//	{
+		//		// 안지워진 경우는 그냥 증가시키면 된다.
+		//		it = postIt;
+		//	}
+		//	else
+		//	{
+		//		// 지워진 경우라면 postIt의 하나전으로 만들어준다.
+
+		//		// 여기서 오류생긴다. 반복자로 전체 컨테이너에서 삭제되었을때
+		//		// 미리 받아둔 반복자를 사용하는 것은 피해야할것같다.
+		//		--postIt;
+		//		it = postIt;
+		//	}
+		//}
+		//------------------------------------------------------------------------------
+
+		//auto it = rootGameObjects.begin();
+		//auto end = rootGameObjects.end();
+		//auto postIt = it;
+		//// 자식객체가 삭제되었는지 알기 위한 플래그
+		//while (it != end)
+		//{
+		//	// 미리 다음걸 받아서 현재를 업데이트 시키고 나중에 최신화 시킨다
+		//	// 중간에 삭제된 반복자를 가리키고 있을 가능성이 있기 때문이다.
+		//	++postIt;
+		//	(*it)->destroyUpdate();
+		//	it = postIt;
+		//}
 	}
 
 	void Scene::changeNameIfItExists(GameObject * other)
