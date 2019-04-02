@@ -20,12 +20,10 @@ void PlayerScript::update()
 	//if (::GetAsyncKeyState('E') & 0x8000f)
 	//	transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
 
-
 	//if (::GetAsyncKeyState('Z') & 0x8000f)
 	//	transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
 	//if (::GetAsyncKeyState('C') & 0x8000f)
 	//	transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
-
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
 	{
@@ -60,9 +58,7 @@ void PlayerScript::update()
 
 		//car1RigidBody->setGravity(Vector3(0, 0, 0));
 		//car1->addComponent<BoxCollider>();
-
 	}
-
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
 			transform->setRotation(transform->getRotation() + FrameTime::getDeltaTime() *.1f * Vector3{ 0,-.05f,0 });
@@ -96,7 +92,6 @@ void MoveScript_C::update()
 {
 	if (::GetAsyncKeyState('K') & 0x8000f)
 	{
-
 		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
 		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
 		if (temp)

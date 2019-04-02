@@ -160,7 +160,6 @@ public:
 		return nullptr;
 		*/
 
-
 		T* temp = nullptr;
 		// 순회하면서 있는지 찾아본다.
 		for (auto it = components.begin(); it != components.end(); ++it)

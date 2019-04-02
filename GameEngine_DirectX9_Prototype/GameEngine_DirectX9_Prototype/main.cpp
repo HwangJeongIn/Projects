@@ -244,8 +244,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
 	////fbxModelRendererplayer->play("mixamo.com");
 	////fbxModelRendererplayer->setScale(Vector3(3,1,3));
-	////AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
-
+	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
 
 	/*
 	playerAnimationFSM->registerAnimation("standing run forward.fbx");
@@ -314,7 +313,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	///car0->addComponent<BoxCollider>();
 
 
-
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<PlayerScript>();
@@ -323,13 +321,13 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//car1RigidBody->setGravity(Vector3(0, 0, 0));
 	//car1->addComponent<BoxCollider>();
 	car1->getTransform()->setPosition(15, 0, 0);
+	car1->getTransform()->setRotation(0, 90, 0);
 
 	// 1단계
 	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
 	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	car1Child1->getTransform()->setPosition(0, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
-
 
 
 	//GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
@@ -346,7 +344,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	car1Child1Child2->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child2->getTransform()->setPosition(7, 0, 0);*/
 	
-
 	Scene & scene = mainCamera->getScene();
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.

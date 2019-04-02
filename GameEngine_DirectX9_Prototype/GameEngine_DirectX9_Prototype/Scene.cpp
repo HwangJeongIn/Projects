@@ -72,7 +72,6 @@
 		/*
 		기본적인 월드를 계산해서 그린다.
 		*/
-
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
 		if (previousTime == 0)
 			previousTime = clock();
@@ -150,7 +149,8 @@
 	// 현재 게임오브젝트 리스트를 업데이트 시킨다.
 	void Scene::update()
 	{
-		for (int i = 0; i < rootGameObjects.size(); ++i)
+		unsigned int count = rootGameObjects.size();
+		for (int i = 0; i < count; ++i)
 		{
 			rootGameObjects[i]->update();
 		}
@@ -162,7 +162,8 @@
 
 	void Scene::fixedUpdate()
 	{
-		for (int i = 0; i < rootGameObjects.size(); ++i)
+		unsigned int count = rootGameObjects.size();
+		for (int i = 0; i < count; ++i)
 		{
 			rootGameObjects[i]->fixedUpdate();
 		}
@@ -201,7 +202,7 @@
 		}
 	}
 
-	// 현재 물리라이브러리로 작업중
+	// 현재 물리라이브러리로 작업중 // 사용 X
 	void Scene::colliderUpdate()
 	{
 		BoxCollider * bc_obj1 = nullptr;

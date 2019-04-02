@@ -250,7 +250,7 @@ public:
 		// 만약 180도 보다 크다면
 		// 180도 내로 돌려준다.
 		if (value > 180)
-			value = value - 360;
+			value = value - 180;
 
 		// 만약 음수였다면 음수로 바꿔준다
 		if (angle < 0)
