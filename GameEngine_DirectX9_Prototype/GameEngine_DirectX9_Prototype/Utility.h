@@ -258,22 +258,23 @@ public:
 
 	//};
 
-
-
-
-
-
 	static const DWORD LineFVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
-
 
 	static void DrawLine(const D3DXVECTOR3 & from, const D3DXVECTOR3 & to, D3DCOLOR color = 0xffff)
 	{
 		if (!Device || !Line) return;
 
-		D3DXVECTOR3 lineVertices[2] = { {0,0,0},{0,1.0f,0} };//{ from, to };
+		D3DXVECTOR3 lineVertices[2] = { from, to };//{ {0,0,0}, {10,10,10} };//{ from, to };
+		D3DXMATRIX view;
+		D3DXMATRIX proj;
+
+		//D3DMATRIX finalMatrix = view * proj;
+
+		Device->GetTransform(D3DTS_VIEW, &view);
+		Device->GetTransform(D3DTS_PROJECTION, &proj);
 
 		Line->Begin();
-		Line->DrawTransform(lineVertices, 2, NULL, D3DCOLOR_XRGB(0, 255, 0));
+		Line->DrawTransform(lineVertices, 2, &(view * proj), D3DCOLOR_XRGB(0, 255, 0));
 		Line->End();
 
 		//device.DrawTransform
@@ -284,10 +285,8 @@ public:
 		//lineVertices[1].setInfo(to.getX(), to.getY(), to.getZ());
 		//lineVertices[1].color = D3DCOLOR_XRGB(0, 255, 0);// color;
 
-
 		//device.SetFVF(LineFVF);
 		//device.DrawPrimitiveUP(D3DPT_LINELIST, 1, lineVertices, sizeof(LineVertex));
-
 
 		//D3DRECT rect;
 		//// x1, y1 ÁÂ»ó
@@ -299,35 +298,42 @@ public:
 		//	rec.x2 = bx + bw;//makes line longer/shorter going right
 		//rec.y2 = by + 1;//makes line one pixel tall
 		//device.Clear(1, &rect, D3DCLEAR_TARGET, color, 0, 0);
-
 	}
 
 
 	static void DrawBox(const D3DXVECTOR3 & position, const D3DXVECTOR3 & xyz, D3DCOLOR color = 0xffff)
 	{
 		// À­¸é
-		D3DXVECTOR3 upLeftTop = position + D3DXVECTOR3(-xyz.x, xyz.y, -xyz.z);
-		D3DXVECTOR3 upLeftBottom = position + D3DXVECTOR3(-xyz.x, xyz.y, xyz.z);
+		D3DXVECTOR3 upLeftTop = position + D3DXVECTOR3(-xyz.x, xyz.y, xyz.z);
+		D3DXVECTOR3 upLeftBottom = position + D3DXVECTOR3(-xyz.x, xyz.y, -xyz.z);
 
-		D3DXVECTOR3 upRightTop = position + D3DXVECTOR3(xyz.x, xyz.y, -xyz.z);
-		D3DXVECTOR3 upRightBottom = position + D3DXVECTOR3(xyz.x, xyz.y, xyz.z);
+		D3DXVECTOR3 upRightTop = position + D3DXVECTOR3(xyz.x, xyz.y, xyz.z);
+		D3DXVECTOR3 upRightBottom = position + D3DXVECTOR3(xyz.x, xyz.y, -xyz.z);
 
 		// ¾Æ·§¸é
-		D3DXVECTOR3 downLeftTop = position + D3DXVECTOR3(-xyz.x, 0, -xyz.z);
-		D3DXVECTOR3 downLeftBottom = position + D3DXVECTOR3(-xyz.x, 0, xyz.z);
+		D3DXVECTOR3 downLeftTop = position + D3DXVECTOR3(-xyz.x, -xyz.y, xyz.z);
+		D3DXVECTOR3 downLeftBottom = position + D3DXVECTOR3(-xyz.x, -xyz.y, -xyz.z);
 
-		D3DXVECTOR3 downRightTop = position + D3DXVECTOR3(xyz.x, 0, -xyz.z);
-		D3DXVECTOR3 downRightBottom = position + D3DXVECTOR3(xyz.x, 0, xyz.z);
+		D3DXVECTOR3 downRightTop = position + D3DXVECTOR3(xyz.x, -xyz.y, xyz.z);
+		D3DXVECTOR3 downRightBottom = position + D3DXVECTOR3(xyz.x, -xyz.y, -xyz.z);
 
+		// À­¸é ±×¸®±â
 		DrawLine(upLeftTop, upLeftBottom, color);
 		DrawLine(upLeftTop, upRightTop, color);
 		DrawLine(upRightBottom, upRightTop, color);
 		DrawLine(upRightBottom, upLeftBottom, color);
 
+		// ¾Æ·§¸é ±×¸®±â
 		DrawLine(downLeftTop, downLeftBottom, color);
 		DrawLine(downLeftTop, downRightTop, color);
 		DrawLine(downRightBottom, downRightTop, color);
 		DrawLine(downRightBottom, downLeftBottom, color);
+
+		// ¿·¸é ±×¸®±â
+		DrawLine(upLeftTop, downLeftTop, color);
+		DrawLine(upRightTop, downRightTop, color);
+		DrawLine(upLeftBottom, downLeftBottom, color);
+		DrawLine(upRightBottom, downRightBottom, color);
 
 	}
 };

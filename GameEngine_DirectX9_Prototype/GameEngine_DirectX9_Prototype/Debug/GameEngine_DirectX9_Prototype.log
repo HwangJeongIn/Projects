@@ -1,18 +1,6 @@
 ﻿  Component.cpp
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1390): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1394): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1400): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-  코드를 생성하고 있습니다...
-  컴파일하고 있습니다...
-  main.cpp
-  d3dUtility.cpp
-  WeightOfBones.cpp
-  Utility.cpp
-  Scene.cpp
-  Physics.cpp
-  Locator.cpp
-  GameObject.cpp
-  FbxModelMesh.cpp
-  코드를 생성하고 있습니다...
-  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
-  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1400): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1404): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1410): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)

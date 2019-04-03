@@ -27,11 +27,19 @@ void PlayerScript::update()
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
 	{
-		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+		if (gameObject->getRigidBody())
+		{
+			gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+		}
+		//transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
 	}
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
 	{
-		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
+		if (gameObject->getRigidBody())
+		{
+			gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* -.1f *(transform->getForward()));
+		}
+		//transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
 
 	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
@@ -335,9 +343,9 @@ void MainCamera::update()
 	setViewSpace();
 
 	if (::GetAsyncKeyState('E') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ 0,5.05f,0 });
 	if (::GetAsyncKeyState('Q') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ 0,-5.05f,0 });
 
 	if (::GetAsyncKeyState('Z') & 0x8000f)
 	{
@@ -591,6 +599,8 @@ void RigidBody::update()
 		break;
 
 	case ColliderType::SPHERE:
+		Gizmos::DrawBox({ transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ() },
+		{ colliderInfo.size.getX(),colliderInfo.size.getY(),colliderInfo.size.getZ() });
 		break;
 
 	}

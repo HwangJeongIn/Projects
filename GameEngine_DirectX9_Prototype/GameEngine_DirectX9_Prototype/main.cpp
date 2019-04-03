@@ -208,11 +208,12 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// 디버깅용 txt파일을 로드
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
-
+	
+	// Gizmos클래스 초기화
+	Gizmos::InitGizmos(device);
 
 	/*
 	서비스 등록
-	: Scene / Device
 	*/
 	Locator::provideScene(Locator::SystemType::RELEASETYPE);
 	//Locator::provideAudio(Locator::SystemType::RELEASETYPE);
@@ -220,10 +221,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
 	
-	/*
-	Gizmos클래스 초기화
-	*/
-	Gizmos::InitGizmos(device);
+
 
 
 	/*
@@ -239,16 +237,26 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	remover->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	RigidBody * removerRigidBody = remover->addComponent<RigidBody>();
 	remover->getTransform()->setPosition(0, 0, 0);
-	removerRigidBody->setBoxCollider(Vector3{ 5, 5,5 });
-	removerRigidBody->turnOnIsTriggerFlag();
-	removerRigidBody->turnOnStaticFlag();
+	removerRigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
+	//removerRigidBody->turnOnIsTriggerFlag();
+	//removerRigidBody->turnOnStaticFlag();
+
+	// remover2
+	GameObject * remover2 = GameObject::Instantiate("remover2", "Remover");
+	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
+	remover2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	RigidBody * remover2RigidBody = remover2->addComponent<RigidBody>();
+	remover2->getTransform()->setPosition(10, 0, 0);
+	remover2RigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
+	remover2RigidBody->turnOnIsTriggerFlag();
+	remover2RigidBody->turnOnStaticFlag();
 
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
 	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
 	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
-	ground->getTransform()->setPosition(0, -15, 0);
-	groundRigidBody->setBoxCollider(Vector3{ 300,10,300 });
+	ground->getTransform()->setPosition(0, -10, 0);
+	groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
 	groundRigidBody->turnOnStaticFlag();
 
 	
