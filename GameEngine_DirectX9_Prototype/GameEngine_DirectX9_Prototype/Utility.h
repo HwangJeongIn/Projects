@@ -225,6 +225,113 @@ public :
 
 };
 
+class Gizmos
+{
+private :
+	static IDirect3DDevice9 * Device;
+	static ID3DXLine * Line;
+public:
+
+
+	static void InitGizmos(IDirect3DDevice9 * device)
+	{
+		Gizmos::Device = device;
+
+		// Line 생성
+		D3DXCreateLine(Device, &Line);
+		Line->SetWidth(2);
+	}
+
+
+	//struct LineVertex
+	//{
+	//	D3DXVECTOR3 position;
+	//	/*float x, y, z;
+	//	D3DCOLOR color;*/
+	//	
+	//	//LineVertex(float x=0, float y=0, float z=0, D3DCOLOR color= 0xffff)
+	//	//	: x(x), y(y), z(z), color(color) {}
+	//	//void setInfo(float x, float y, float z, D3DCOLOR color = 0xffff)
+	//	//{
+	//	//	this->x = x; this->y = y; this->z = z; this->color = color;
+	//	//}
+
+	//};
+
+
+
+
+
+
+	static const DWORD LineFVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+
+
+	static void DrawLine(const D3DXVECTOR3 & from, const D3DXVECTOR3 & to, D3DCOLOR color = 0xffff)
+	{
+		if (!Device || !Line) return;
+
+		D3DXVECTOR3 lineVertices[2] = { {0,0,0},{0,1.0f,0} };//{ from, to };
+
+		Line->Begin();
+		Line->DrawTransform(lineVertices, 2, NULL, D3DCOLOR_XRGB(0, 255, 0));
+		Line->End();
+
+		//device.DrawTransform
+
+		//lineVertices[0].setInfo(from.getX(), from.getY(), from.getZ());
+		//lineVertices[0].color = D3DCOLOR_XRGB(0, 255, 0);// color;
+
+		//lineVertices[1].setInfo(to.getX(), to.getY(), to.getZ());
+		//lineVertices[1].color = D3DCOLOR_XRGB(0, 255, 0);// color;
+
+
+		//device.SetFVF(LineFVF);
+		//device.DrawPrimitiveUP(D3DPT_LINELIST, 1, lineVertices, sizeof(LineVertex));
+
+
+		//D3DRECT rect;
+		//// x1, y1 좌상
+		//// x2, y2 우하
+
+		//rect.x1 = position.getX()
+		//rec.x1 = bx - bw;//makes line longer/shorter going lef
+		//rec.y1 = by; / base y
+		//	rec.x2 = bx + bw;//makes line longer/shorter going right
+		//rec.y2 = by + 1;//makes line one pixel tall
+		//device.Clear(1, &rect, D3DCLEAR_TARGET, color, 0, 0);
+
+	}
+
+
+	static void DrawBox(const D3DXVECTOR3 & position, const D3DXVECTOR3 & xyz, D3DCOLOR color = 0xffff)
+	{
+		// 윗면
+		D3DXVECTOR3 upLeftTop = position + D3DXVECTOR3(-xyz.x, xyz.y, -xyz.z);
+		D3DXVECTOR3 upLeftBottom = position + D3DXVECTOR3(-xyz.x, xyz.y, xyz.z);
+
+		D3DXVECTOR3 upRightTop = position + D3DXVECTOR3(xyz.x, xyz.y, -xyz.z);
+		D3DXVECTOR3 upRightBottom = position + D3DXVECTOR3(xyz.x, xyz.y, xyz.z);
+
+		// 아랫면
+		D3DXVECTOR3 downLeftTop = position + D3DXVECTOR3(-xyz.x, 0, -xyz.z);
+		D3DXVECTOR3 downLeftBottom = position + D3DXVECTOR3(-xyz.x, 0, xyz.z);
+
+		D3DXVECTOR3 downRightTop = position + D3DXVECTOR3(xyz.x, 0, -xyz.z);
+		D3DXVECTOR3 downRightBottom = position + D3DXVECTOR3(xyz.x, 0, xyz.z);
+
+		DrawLine(upLeftTop, upLeftBottom, color);
+		DrawLine(upLeftTop, upRightTop, color);
+		DrawLine(upRightBottom, upRightTop, color);
+		DrawLine(upRightBottom, upLeftBottom, color);
+
+		DrawLine(downLeftTop, downLeftBottom, color);
+		DrawLine(downLeftTop, downRightTop, color);
+		DrawLine(downRightBottom, downRightTop, color);
+		DrawLine(downRightBottom, downLeftBottom, color);
+
+	}
+};
+
 enum class KeyCode
 {
 	None,
@@ -286,15 +393,15 @@ public:
 class FrameTime
 {
 private :
-	static long deltaTime;
+	static long DeltaTime;
 public :
-	static long getDeltaTime() { return deltaTime; }
-	static void setDeltaTime(long other)
+	static long GetDeltaTime() { return DeltaTime; }
+	static void SetDeltaTime(long other)
 	{
 		// 간격이기 때문에 음수가 없다.
 		if (other < 0)
 			other = 0;
-		deltaTime = other;
+		DeltaTime = other;
 	}
 
 };

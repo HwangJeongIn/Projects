@@ -121,7 +121,7 @@
 		update();
 
 		clock_t temp = currentTime - previousTime;
-		FrameTime::setDeltaTime(temp);
+		FrameTime::SetDeltaTime(temp);
 		//Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
 		previousTime = currentTime;
 
@@ -138,8 +138,8 @@
 		
 		//Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
 		
-		if(MS_PER_FRAME - FrameTime::getDeltaTime()>0)
-			Sleep(MS_PER_FRAME - FrameTime::getDeltaTime());
+		if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)
+			Sleep(MS_PER_FRAME - FrameTime::GetDeltaTime());
 
 		device_s.EndScene();
 		device_s.Present(0, 0, 0, 0);
@@ -198,7 +198,7 @@
 	{
 		for (auto it : rootGameObjects)
 		{
-			it->getTransform()->transformUpdate(it->getTransform()->getDirty(), Transform::IdentityMatrix_DX, Transform::IdentityMatrix_DX);
+			it->getTransform()->transformUpdate(it->getTransform()->getDirty(), Transform::IdentityMatrix);
 		}
 	}
 

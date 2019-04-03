@@ -16,6 +16,8 @@ Physics * Physics::currentPhysics = nullptr;
 */
 void collisionCallBack(btDynamicsWorld * world, btScalar timeStep)
 {
+	// collision / trigger 모두 이함수를 거침
+
 	Physics * currentPhysics = Physics::currentPhysics;
 	if (!world || !currentPhysics) return;
 

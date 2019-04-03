@@ -27,21 +27,21 @@ void PlayerScript::update()
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
 	{
-		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()* .1f *(transform->getForward()));
+		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
 	}
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
 	{
-		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f *(-1)*(transform->getForward()));
+		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
 
 	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
 	{
-		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (transform->getRight()));
+		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
 	}
 
 	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
 	{
-		transform->setPosition(transform->getPosition() + FrameTime::getDeltaTime()*.1f * (-1)*(transform->getRight()));
+		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
 	}
 
 	if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
@@ -61,10 +61,10 @@ void PlayerScript::update()
 	}
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
-			transform->setRotation(transform->getRotation() + FrameTime::getDeltaTime() *.1f * Vector3{ 0,-.05f,0 });
+			transform->setRotation(transform->getRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,-1,0 });
 
 	if (::GetAsyncKeyState('M') & 0x8000f)
-			transform->setRotation(transform->getRotation() + FrameTime::getDeltaTime() *.1f * Vector3{ 0,.05f,0 });
+			transform->setRotation(transform->getRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,1,0 });
 }
 
 void PlayerScript::start()
@@ -118,24 +118,54 @@ void MoveScript_C::update()
 		GameObject::Destroy(gameObject);
 }
 
-const D3DXVECTOR3 Transform::WorldRight_DX{ 1,0,0 };
-const D3DXVECTOR3 Transform::WorldUp_DX{ 0,1,0 };
-const D3DXVECTOR3 Transform::WorldForward_DX{ 0, 0, 1 };
-
-const D3DXMATRIX Transform::IdentityMatrix_DX
+const D3DXVECTOR3 Transform::WorldRight{ 1,0,0 };
+const D3DXVECTOR3 Transform::WorldUp{ 0,1,0 };
+const D3DXVECTOR3 Transform::WorldForward{ 0, 0, 1 };
+const D3DXMATRIX Transform::IdentityMatrix
 {
 	1,0,0,0,
 	0,1,0,0,
 	0,0,1,0,
 	0,0,0,1
 };
+const float Transform::Pi = 3.14159f;
 
 
-void Transform::transformUpdate(bool dirty,  const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
+//void Transform::transformUpdate(bool dirty,  const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
+//{
+//	// 비트 연산으로 최종적으로 위에서 최신화 메시지를 받았거나, 
+//	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화를 전달해준다.
+//	
+//	dirty |= this->dirty;
+//	if (dirty)
+//	{
+//		// 현재 변환을 부모 변환과 결합해서 계산한다.
+//		// 로테이션행렬과 포지션 행렬을 따로 계산해주어야 한다.
+//		//setRotationMatrix_DX(parentRotationMatrix);
+//		//setPositionMatrix_DX(parentPositionMatrix);
+//		// 최종 transformMatrix = 계산한 로테이션 * 포지션
+//		setTransformMatrix_DX(parentPositionMatrix, parentRotationMatrix);
+//		this->dirty = false;
+//	}
+//
+//
+//	vector<GameObject*> & children = gameObject->getChildren();
+//
+//
+//	// 현재는 더티플래그가 꺼져있어도 중간 차일드에 켜져있을 가능성이 있기 때문에
+//	// 모든 객체에 대해서 전달해준다.
+//	for (auto it : children)
+//	{
+//		it->getTransform()->transformUpdate(dirty, getPositionMatrix_DX(),getRotationMatrix_DX());
+//	}
+//
+//}
+
+void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMatrix)
 {
 	// 비트 연산으로 최종적으로 위에서 최신화 메시지를 받았거나, 
 	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화를 전달해준다.
-	
+
 	dirty |= this->dirty;
 	if (dirty)
 	{
@@ -144,7 +174,7 @@ void Transform::transformUpdate(bool dirty,  const D3DXMATRIX & parentPositionMa
 		//setRotationMatrix_DX(parentRotationMatrix);
 		//setPositionMatrix_DX(parentPositionMatrix);
 		// 최종 transformMatrix = 계산한 로테이션 * 포지션
-		setTransformMatrix_DX(parentPositionMatrix, parentRotationMatrix);
+		setTransformMatrix(parentTransformMatrix);
 		this->dirty = false;
 	}
 
@@ -156,39 +186,83 @@ void Transform::transformUpdate(bool dirty,  const D3DXMATRIX & parentPositionMa
 	// 모든 객체에 대해서 전달해준다.
 	for (auto it : children)
 	{
-		it->getTransform()->transformUpdate(dirty, getPositionMatrix_DX(),getRotationMatrix_DX());
+		it->getTransform()->transformUpdate(dirty, getTransformMatrix());
 	}
-
 }
 
-void Transform::calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
+void Transform::setTransformMatrix(const D3DXMATRIX & parentTransformMatrix)
 {
-	D3DXMATRIX temp;
-	D3DXMatrixIdentity(&rotationMatrix_DX);
-	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationX(&temp, rotation.getX()));
-	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationY(&temp, rotation.getY()));
-	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationZ(&temp, rotation.getZ()));
-	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, &parentRotationMatrix);
+	// 먼저 자식의 부모좌표계 기준으로 로테이션과 포지션 행렬을 구해준다.
+	calcRotationMatrix(); calcPositionMatrix();
+
+	// 먼저 자식기준(월드 기준 X / 부모를 월드로 생각했을때 기준이다) trasnformMatrix를 구하고 
+	// rotationMatrix * positionMatrix
+	// 최종적으로 위에서 부터 최신화된 부모의 transform행렬을 곱해준다.
+	// 따라서 최종 행렬은
+	transformMatrix = (rotationMatrix * positionMatrix) * parentTransformMatrix;
 }
 
-void Transform::calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
+void Transform::calcRotationMatrix()
 {
-	Vector3 result{};
-	GameObject * parent = gameObject->getParent();
-	// 부모객체 기준으로 right up forward기준으로 계산해준다.
-	// 부모객체가 없는 루트 오브젝트인 경우 월드 right up forward를 사용한다.
-	if (!parent)
-		result = Vector3::Right * position.getX() + Vector3::Up * position.getY() + Vector3::Forward * position.getZ();
-	else
-		result = parent->getTransform()->getRight() * position.getX() + parent->getTransform()->getUp() * position.getY()
-		+ parent->getTransform()->getForward() * position.getZ();
+	D3DXMatrixIdentity(&rotationMatrix);
+	//	D3DXMATRIX temp;
+	//	D3DXMatrixIdentity(&rotationMatrix_DX);
+	//
+	//	D3DXMatrixRotationYawPitchRoll(&rotationMatrix_DX, rotation.getY(), rotation.getX(), rotation.getZ());
+	//
+	//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationX(&temp, rotation.getX()));
+	//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationY(&temp, rotation.getY()));
+	//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationZ(&temp, rotation.getZ()));
+	//	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, &parentRotationMatrix);
 
-	D3DXMatrixIdentity(&positionMatrix_DX);
-
-	D3DXMatrixTranslation(&positionMatrix_DX, result.getX(), result.getY(), result.getZ());
-	// 마지막으로 부모객체의 위치만큼 이동시킨다.
-	D3DXMatrixMultiply(&positionMatrix_DX, &positionMatrix_DX, &parentPositionMatrix);
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, degreeToRadian( rotation.getY()), degreeToRadian(rotation.getX()), degreeToRadian(rotation.getZ()));
 }
+
+void Transform::calcPositionMatrix()
+{
+	D3DXMatrixIdentity(&positionMatrix);
+	D3DXMatrixTranslation(&positionMatrix, position.getX(), position.getY(), position.getZ());
+}
+
+//void Transform::setTransformMatrix_DX(const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
+//
+//	{
+//		// 중요 :: 부모에의해 부모의 로테이션만큼 더 돌게 되어있다. (부모 + 자식 로테이션) > 부모기준(forward up right) 자식 위치 + 부모위치
+//		calcRotationMatrix_DX(parentRotationMatrix); calcPositionMatrix_DX(parentPositionMatrix);
+//		transformMatrix_DX = rotationMatrix_DX* positionMatrix_DX;
+//	}
+
+//void Transform::calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix)
+//{
+//	D3DXMATRIX temp;
+//	D3DXMatrixIdentity(&rotationMatrix_DX);
+//
+//	D3DXMatrixRotationYawPitchRoll(&rotationMatrix_DX, rotation.getY(), rotation.getX(), rotation.getZ());
+//
+//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationX(&temp, rotation.getX()));
+//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationY(&temp, rotation.getY()));
+//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationZ(&temp, rotation.getZ()));
+//	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, &parentRotationMatrix);
+//}
+
+//void Transform::calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix)
+//{
+//	Vector3 result{};
+//	GameObject * parent = gameObject->getParent();
+//	// 부모객체 기준으로 right up forward기준으로 계산해준다.
+//	// 부모객체가 없는 루트 오브젝트인 경우 월드 right up forward를 사용한다.
+//	if (!parent)
+//		result = Vector3::Right * position.getX() + Vector3::Up * position.getY() + Vector3::Forward * position.getZ();
+//	else
+//		result = parent->getTransform()->getRight() * position.getX() + parent->getTransform()->getUp() * position.getY()
+//		+ parent->getTransform()->getForward() * position.getZ();
+//
+//	D3DXMatrixIdentity(&positionMatrix_DX);
+//
+//	D3DXMatrixTranslation(&positionMatrix_DX, result.getX(), result.getY(), result.getZ());
+//	// 마지막으로 부모객체의 위치만큼 이동시킨다.
+//	D3DXMatrixMultiply(&positionMatrix_DX, &positionMatrix_DX, &parentPositionMatrix);
+//}
 
 void Transform::setPosition_physics(const Vector3 & other)
 {
@@ -315,9 +389,13 @@ void MainCamera::setViewSpace()
 		-transform->getPosition().getY(), -transform->getPosition().getZ()));
 
 	// 로테이션 반대로 계산
-	D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationX(&temp, -transform->getRotation().getX()));
-	D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationY(&temp, -transform->getRotation().getY()));
-	D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationZ(&temp, -transform->getRotation().getZ()));
+	//D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationX(&temp, -transform->getRotation().getX()));
+	//D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationY(&temp, -transform->getRotation().getY()));
+	//D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationZ(&temp, -transform->getRotation().getZ()));
+	D3DXMatrixRotationYawPitchRoll(&temp,transform->degreeToRadian(-transform->getRotation().getY()), 
+		transform->degreeToRadian(-transform->getRotation().getX()), transform->degreeToRadian(-transform->getRotation().getZ()));
+	D3DXMatrixMultiply(&v, &v, &temp);
+
 
 	gameObject->getDevice().SetTransform(D3DTS_VIEW, &v);
 }
@@ -327,19 +405,20 @@ void MainCamera::getViewMatrix(D3DXMATRIX* v)
 	if (!v) return;
 
 
-	D3DXMATRIX temp;
-	D3DXMatrixIdentity(v);
+	//D3DXMATRIX temp;
+	//D3DXMatrixIdentity(v);
 
 
-	// 위치 반대로 계산
-	D3DXMatrixMultiply(v, v, D3DXMatrixTranslation(&temp, -transform->getPosition().getX(),
-		-transform->getPosition().getY(), -transform->getPosition().getZ()));
+	//// 위치 반대로 계산
+	//D3DXMatrixMultiply(v, v, D3DXMatrixTranslation(&temp, -transform->getPosition().getX(),
+	//	-transform->getPosition().getY(), -transform->getPosition().getZ()));
 
-	// 로테이션 반대로 계산
-	D3DXMatrixMultiply(v, v, D3DXMatrixRotationX(&temp, -transform->getRotation().getX()));
-	D3DXMatrixMultiply(v, v, D3DXMatrixRotationY(&temp, -transform->getRotation().getY()));
-	D3DXMatrixMultiply(v, v, D3DXMatrixRotationZ(&temp, -transform->getRotation().getZ()));
+	//// 로테이션 반대로 계산
+	//D3DXMatrixMultiply(v, v, D3DXMatrixRotationX(&temp, -transform->getRotation().getX()));
+	//D3DXMatrixMultiply(v, v, D3DXMatrixRotationY(&temp, -transform->getRotation().getY()));
+	//D3DXMatrixMultiply(v, v, D3DXMatrixRotationZ(&temp, -transform->getRotation().getZ()));
 
+	//-------------------------------------------------------------------------------------------------
 
 	// Keep camera's axes orthogonal to eachother
 	
@@ -417,7 +496,7 @@ void MeshRenderer::render()
 	if (!mesh) return;
 
 	// 현재 transform행렬로 적용시킨다.
-	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix_DX());
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
 
 	// 파일이 로드되어서 값이 있는 경우만 그려준다.
 	for (int i = 0; i < mtrls.size(); ++i)
@@ -493,6 +572,29 @@ void RigidBody::fixedUpdate()
 	gameObject->getPhysics().setTransformFromSystem(gameObject);
 	// 물리업데이트가 되었기 때문에 더티플래그를 켜준다.
 	transform->setDirty(true);
+
+
+}
+
+void RigidBody::update()
+{
+	if (colliderInfo.type == ColliderType::NONE) return;
+
+	// 콜라이더를 그려준다.
+	switch (colliderInfo.type)
+	{
+
+	case ColliderType::BOX:
+	
+		Gizmos::DrawBox({ transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ() },
+		{ colliderInfo.size.getX(),colliderInfo.size.getY(),colliderInfo.size.getZ() });
+		break;
+
+	case ColliderType::SPHERE:
+		break;
+
+	}
+
 }
 
 void RigidBody::onDestroy()
@@ -524,11 +626,17 @@ void RigidBody::turnOffIsTriggerFlag()
 void RigidBody::setBoxCollider(const Vector3 & size)
 {
 	gameObject->getPhysics().setBoxCollider(gameObject, size);
+	// 내부적으로 가지고 있는 colliderInfo도 바꿔준다.
+	colliderInfo.type = ColliderType::BOX;
+	colliderInfo.size = size;
 }
 
 void RigidBody::setSphereCollider(float radius)
 {
 	gameObject->getPhysics().setSphereCollider(gameObject, radius);
+	// 내부적으로 가지고 있는 colliderInfo도 바꿔준다.
+	colliderInfo.type = ColliderType::SPHERE;
+	colliderInfo.size = {radius,radius,radius};
 }
 
 //virtual void setGravity(GameObject * other, Vector3 & value);
@@ -559,7 +667,7 @@ void FbxModelRenderer::render()
 	if (meshes.size() ==0) return;
 
 	// 현재 transform행렬로 적용시킨다.
-	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix_DX());
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
 
 
 	int meshCount = meshes.size();
@@ -1793,7 +1901,7 @@ void AnimationFSM::updateAllTrasitions(const string & animationFileName)
 
 void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 {
-	if (other.gameObject->getTag() == "Ground")
+	if (other.gameObject->getTag() == "Remover")
 	{
 		GameObject::Destroy(gameObject);
 	}

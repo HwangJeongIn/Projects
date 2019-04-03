@@ -9,6 +9,10 @@ Vector3 Vector3::Up{ 0,1,0 };
 Vector3 Vector3::Right{ 1,0,0 };
 Vector3 Vector3::Forward{ 0,0,1 };
 
+
+
+
+
 map<KeyCode, pair<int, int>> InputManager::KeyCodeTable
 {
 	{ KeyCode::W,{ 119,0 } },
@@ -24,9 +28,16 @@ map<KeyCode, pair<int, int>> InputManager::KeyCodeTable
 	{ KeyCode::RightArrow,{ 224,77 } },
 	{ KeyCode::LeftArrow,{ 224,75 } },
 };
-
 int InputManager::Major = -1;
 int InputManager::Minor = -1;
 
-long FrameTime::deltaTime = 0;
 
+
+
+
+long FrameTime::DeltaTime = 0;
+
+
+
+IDirect3DDevice9 * Gizmos::Device = nullptr;
+ID3DXLine * Gizmos::Line = nullptr;

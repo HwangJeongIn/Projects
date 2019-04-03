@@ -100,7 +100,7 @@ public:
 	{
 		if (!currentAnimation) return;
 
-		elapsedTime += (float)FrameTime::getDeltaTime()/1000.0f;
+		elapsedTime += (float)FrameTime::GetDeltaTime()/1000.0f;
 		//float frameRate = currentAnimation->getFrameRate();
 		float oneFrame = 1.0f / currentAnimation->getFrameRate();
 		int frameCount = currentAnimation->getKeyFrameCount();

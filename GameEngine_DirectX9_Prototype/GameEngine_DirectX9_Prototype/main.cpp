@@ -198,6 +198,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	device->SetLight(0, &light);
 	device->LightEnable(0, true);
+
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
 
@@ -220,11 +221,27 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Locator::provideDevice(device);
 	
 	/*
+	Gizmos클래스 초기화
+	*/
+	Gizmos::InitGizmos(device);
+
+
+	/*
 	Scene의 카메라와 기본 월드 세팅을 해준다.
 	*/
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -100);
+
+	// remover
+	GameObject * remover = GameObject::Instantiate("remover", "Remover");
+	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
+	remover->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	RigidBody * removerRigidBody = remover->addComponent<RigidBody>();
+	remover->getTransform()->setPosition(0, 0, 0);
+	removerRigidBody->setBoxCollider(Vector3{ 5, 5,5 });
+	removerRigidBody->turnOnIsTriggerFlag();
+	removerRigidBody->turnOnStaticFlag();
 
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
@@ -305,11 +322,11 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//playerRigidBody->setSphereCollider(2);
 
 
-
+	
 	// 0단계
-	GameObject * car0 = GameObject::Instantiate("car0", "Car");
-	car0->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car0->addComponent<RigidBody>()->setSphereCollider(2);
+	//GameObject * car0 = GameObject::Instantiate("car0", "Car");
+	//car0->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//car0->addComponent<RigidBody>()->setSphereCollider(2);
 	///car0->addComponent<BoxCollider>();
 
 
@@ -320,13 +337,13 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	car1RigidBody->setSphereCollider(2);
 	//car1RigidBody->setGravity(Vector3(0, 0, 0));
 	//car1->addComponent<BoxCollider>();
-	car1->getTransform()->setPosition(15, 0, 0);
-	car1->getTransform()->setRotation(0, 90, 0);
+	car1->getTransform()->setPosition(-15, 10, 0);
+	car1->getTransform()->setRotation(0, 180, 0);
 
 	// 1단계
 	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
 	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	car1Child1->getTransform()->setPosition(0, 3, 0);
+	car1Child1->getTransform()->setPosition(5, 3, 0);
 	car1Child1->addComponent<MoveScript_C>();
 
 

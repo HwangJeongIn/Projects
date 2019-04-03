@@ -65,13 +65,15 @@ private:
 	Vector3 forward;
 
 
-	D3DXMATRIX transformMatrix_DX;
-	D3DXMATRIX rotationMatrix_DX;
-	D3DXMATRIX positionMatrix_DX;
+	//D3DXMATRIX transformMatrix_DX;
+	//D3DXMATRIX rotationMatrix_DX;
+	//D3DXMATRIX positionMatrix_DX;
 
-	static const D3DXVECTOR3 WorldRight_DX;
-	static const D3DXVECTOR3 WorldUp_DX;
-	static const D3DXVECTOR3 WorldForward_DX;
+	D3DXMATRIX transformMatrix;
+	D3DXMATRIX rotationMatrix;
+	D3DXMATRIX positionMatrix;
+
+
 
 
 	// 현재 위치의 최신화 여부를 알기 위한 더티플래그
@@ -81,9 +83,9 @@ protected:
 	{ 		
 		// 절댓값 360 * n 날린다 + 이객체의 right up forward 벡터 계산
 		setRotation(rotation);
-		D3DXMatrixIdentity(&transformMatrix_DX);
-		D3DXMatrixIdentity(&rotationMatrix_DX);
-		D3DXMatrixIdentity(&positionMatrix_DX);
+		D3DXMatrixIdentity(&transformMatrix);
+		D3DXMatrixIdentity(&rotationMatrix);
+		D3DXMatrixIdentity(&positionMatrix);
 	}
 
 public:
@@ -107,7 +109,22 @@ public:
 		onDestroy();
 	}
 
-	static const D3DXMATRIX IdentityMatrix_DX;
+	static const D3DXMATRIX IdentityMatrix;
+	static const D3DXVECTOR3 WorldRight;
+	static const D3DXVECTOR3 WorldUp;
+	static const D3DXVECTOR3 WorldForward;
+	static const float Pi;
+
+	float degreeToRadian(float degree) const
+	{
+		return degree *(Pi / 180.0f);
+	}
+
+	float radianToDegree(float radian) const
+	{
+		return radian *(180.0f / Pi);
+	}
+
 
 	const Vector3 & getPosition() const { return position; }
 	const Vector3 & getRotation() const { return rotation; }
@@ -123,21 +140,29 @@ public:
 	//void transformUpdate(bool dirty, const D3DXMATRIX & parentRotationMatrix, const D3DXMATRIX & parentPositionMatrix);
 
 
-	void transformUpdate(bool dirty, const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix);
-	const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
-	void setTransformMatrix_DX(const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix)
-	{
-		// 중요 :: 부모에의해 부모의 로테이션만큼 더 돌게 되어있다. (부모 + 자식 로테이션) > 부모기준(forward up right) 자식 위치 + 부모위치
-		calcRotationMatrix_DX(parentRotationMatrix); calcPositionMatrix_DX(parentPositionMatrix);
-		transformMatrix_DX = rotationMatrix_DX* positionMatrix_DX;
-	}
+	//void transformUpdate(bool dirty, const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix);
+
+	void transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMatrix);
+
+	//const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
+	//void setTransformMatrix_DX(const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix);
+
+	const D3DXMATRIX & getTransformMatrix() const { return transformMatrix; }
+	void setTransformMatrix(const D3DXMATRIX & parentTransformMatrix);
 
 	
-	const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
-	void calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix);
+	//const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
+	//void calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix);
 
-	const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
-	void calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix);
+	const D3DXMATRIX & getRotationMatrix() const { return rotationMatrix; }
+	void calcRotationMatrix();
+
+
+	//const D3DXMATRIX & getPositionMatrix_DX() const { return positionMatrix_DX; }
+	//void calcPositionMatrix_DX(const D3DXMATRIX & parentPositionMatrix);
+
+	const D3DXMATRIX & getPositionMatrix() const { return positionMatrix; }
+	void calcPositionMatrix();
 
 
 
@@ -157,17 +182,17 @@ public:
 
 		// 월드 방향 벡터기준으로 각도만큼 각각을 회전시켜서 객체의 방향벡터를 구해준다.
 		// 월드벡터 기준 pitch
-		D3DXMatrixRotationAxis(&T, &WorldRight_DX, rotation.getX());
+		D3DXMatrixRotationAxis(&T, &WorldRight, degreeToRadian(rotation.getX()));
 		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
 		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
 
 		// 월드벡터 기준 yaw
-		D3DXMatrixRotationAxis(&T, &WorldUp_DX, rotation.getY());
+		D3DXMatrixRotationAxis(&T, &WorldUp, degreeToRadian(rotation.getY()));
 		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
 		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
 
 		// 월드벡터 기준 roll
-		D3DXMatrixRotationAxis(&T, &WorldForward_DX, rotation.getZ());
+		D3DXMatrixRotationAxis(&T, &WorldForward, degreeToRadian(rotation.getZ()));
 		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
 		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
 
@@ -250,7 +275,7 @@ public:
 		// 만약 180도 보다 크다면
 		// 180도 내로 돌려준다.
 		if (value > 180)
-			value = value - 180;
+			value = value - 360;
 
 		// 만약 음수였다면 음수로 바꿔준다
 		if (angle < 0)
@@ -497,12 +522,35 @@ public :
 class RigidBody : public Component
 {
 private:
+	enum ColliderType
+	{
+		NONE,
+		BOX,
+		SPHERE
+	};
+	struct ColliderInfo
+	{
+		ColliderType type;
+
+		// 만약 sphere의 경우 모두 같다.  // 반지름 3인 구체 : (3,3,3)
+		Vector3 size;
+
+		ColliderInfo()
+			: type(ColliderType::NONE), size{0,0,0} {}
+
+	};
+
+	ColliderInfo colliderInfo;
 
 protected:
 	virtual void start();
 	virtual void fixedUpdate();
+	virtual void update();
 	virtual void onDestroy();
 public:
+
+
+
 	RigidBody(GameObject * go, Transform * tf)
 		: Component(go, tf)
 	{
