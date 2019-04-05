@@ -202,7 +202,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
 
-	//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 
 	// 디버깅용 txt파일을 로드
@@ -231,6 +231,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -100);
 
+
+
 	// remover
 	GameObject * remover = GameObject::Instantiate("remover", "Remover");
 	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
@@ -251,6 +253,10 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	remover2RigidBody->turnOnIsTriggerFlag();
 	remover2RigidBody->turnOnStaticFlag();
 
+
+
+
+
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
 	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
@@ -258,6 +264,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	ground->getTransform()->setPosition(0, -10, 0);
 	groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
 	groundRigidBody->turnOnStaticFlag();
+	Terrain * groundTerrain = ground->addComponent<Terrain>();
+	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 5, .3f);
 
 	
 

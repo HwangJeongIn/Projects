@@ -13,6 +13,7 @@
 #include "Utility.h"
 #include "Trace.h"
 
+
 void PlayerScript::update()
 {
 	//if (::GetAsyncKeyState('Q') & 0x8000f)
@@ -337,6 +338,12 @@ void Transform::setRotation(float x, float y, float z)
 
 
 
+void MainCamera::start()
+{
+	mainObjTag = Scene::MainObjTag::MOT_MAINCAMERA;
+	gameObject->getScene().registerMainObject(gameObject, (Scene::MainObjTag)mainObjTag);
+}
+
 void MainCamera::update()
 {
 	// 메인카메라에서 오디오를 최신화 시킨다.
@@ -375,9 +382,6 @@ MainCamera::MainCamera(GameObject * go, Transform * tf)
 	: Component(go, tf)
 {
 	start();
-	
-	mainObjTag = Scene::MainObjTag::MOT_MAINCAMERA;
-	gameObject->getScene().registerMainObject(gameObject, (Scene::MainObjTag)mainObjTag);
 }
 
 MainCamera::~MainCamera()
@@ -765,6 +769,11 @@ void FbxModelRenderer::render()
 
 }
 
+void FbxModelRenderer::start()
+{
+	device = &(gameObject->getDevice());
+}
+
 void FbxModelRenderer::onDestroy()
 {
 	{
@@ -827,7 +836,7 @@ void FbxModelRenderer::onDestroy()
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
 	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr)
 {
-	device = &(gameObject->getDevice());
+	start();
 }
 
 void FbxModelRenderer::playWithFileName(const string & animationFileName)
@@ -1916,3 +1925,293 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 		GameObject::Destroy(gameObject);
 	}
 }
+
+const string Terrain::filePathToLoadTerrain = "../Terrain/";
+
+void Terrain::render()
+{
+	if (!mesh) return;
+
+	// 현재 transform행렬로 적용시킨다.
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
+
+	mesh->DrawSubset(0);
+
+	return;
+
+	// 파일이 로드되어서 값이 있는 경우만 그려준다.
+	for (int i = 0; i < mtrls.size(); ++i)
+	{
+		device->SetMaterial(&mtrls[i]);
+		device->SetTexture(0, textures[i]);
+		mesh->DrawSubset(i);
+	}
+}
+
+void Terrain::start()
+{
+	this->device = &(gameObject->getDevice());
+}
+
+const unsigned long Terrain::TerrainVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+
+
+void Terrain::loadRawFile(const string & fileName, unsigned int verticesPerRow, unsigned int verticesPerColumn, float distanceOfVertices, float heightValue)
+{
+	if (!device) return;
+
+	// 외부에서 받아온 값들을 복사해준다.
+	this->fileName = fileName;
+	this->verticesPerRow = verticesPerRow;
+	this->verticesPerColumn = verticesPerColumn;
+	this->distanceOfVertices = distanceOfVertices;
+
+	if (heightValue < 0) heightValue = 1.0f;
+	this->heightValue = heightValue;
+
+	// 나머지 값들도 초기화시켜준다.
+	heightMapSize = verticesPerRow * verticesPerColumn;
+	rectsPerRow = verticesPerRow - 1;
+	rectsPerColumn = verticesPerColumn - 1;
+	width = rectsPerRow * distanceOfVertices;
+	depth = rectsPerColumn * distanceOfVertices;
+
+	// 하이트맵 로드에 실패하면 리턴
+	if (!loadHeightMap(fileName))return;
+
+	// 메쉬 버퍼 생성에 실패하면 리턴
+	if (!generateMeshBuffer()) return;
+
+	// 버텍스와 인덱스 정보를 채워준다.
+	processVertices();
+	processIndices();
+	processSubsets();
+	//optimizeMesh();
+}
+
+bool Terrain::loadHeightMap(const string & fileName)
+{
+	vector<BYTE> infoToRead(heightMapSize);
+
+	ifstream iFStream((filePathToLoadTerrain + fileName).c_str(), ios_base::binary);
+
+	// 파일을 열 수 없을때 리턴 false
+	if (iFStream.is_open() == false)
+		return false;
+
+	iFStream.read
+	(
+		(char*)&infoToRead[0],
+		infoToRead.size()
+	);
+
+	iFStream.close();
+
+	// 하이트맵을 크기를 다시 조정하고
+	heightMap.resize(heightMapSize);
+
+	// 읽은 데이터를 다시 저장한다. // 이때 heightValue을 적용시켜준다.
+	for (int i = 0; i < infoToRead.size(); i++)
+		heightMap[i] = infoToRead[i] * heightValue;
+
+	return true;
+}
+
+bool Terrain::generateMeshBuffer()
+{
+	HRESULT hr = 0;
+
+	hr = D3DXCreateMeshFVF(
+		// 메쉬가 가질 면의 개수 // 총사각형 갯수 * 2
+		// 삼각형의 개수/3 = 인덱스의 수
+		rectsPerRow * rectsPerColumn * 2,
+
+		// 메쉬가 가질 버텍스의 수
+		heightMapSize,
+
+		// 메쉬를 만드는데 이용될 하나 이상의 플래그
+		// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
+		D3DXMESH_MANAGED,
+
+		// 복제된 메쉬를 만드는데 이용될 포맷
+		Terrain::TerrainVertex::DefaultFVF,
+		device,
+		// 복제된 메쉬가 담길 포인터
+		&mesh);
+
+	if (FAILED(hr))
+	{
+		mesh = nullptr;
+		return false;
+	}
+	return true;
+}
+
+void Terrain::processVertices()
+{
+	if (!mesh) return;
+	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
+	TerrainVertex * terrainV = nullptr;
+
+	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+	mesh->LockVertexBuffer(0, (void**)&terrainV);
+
+	if (!terrainV) return;
+
+	float distanceForU = 1.0f / (float)verticesPerRow;
+	float distanceForV = 1.0f / (float)verticesPerColumn;
+
+	float x = 0;
+	float z = 0;
+	float u = 0;
+	float v = 0;
+	// 맵사이즈 // 버텍스 총 개수(행 버텍스 개수 * 열 버텍스 개수) // 만큼 순회하면서 값들을 채워준다.
+	for (int i = 0; i < verticesPerColumn; ++i)
+	{
+
+		for (int j = 0; j < verticesPerRow; ++j)
+		{
+			// position 계산
+			x = j * distanceOfVertices;
+			z = i * distanceOfVertices;
+			//Trace::Write("TAG_DEBUG", "x", x);
+			//Trace::Write("TAG_DEBUG", "z", z);
+			//Trace::Write("TAG_DEBUG", "");
+
+			u = j * distanceForU;
+			v = i * distanceForV;
+
+			terrainV[i] =
+			{
+				// Position
+				x, heightMap[i], z,
+				// Normal // 일단 항상 up으로 설정
+				0,1,0,
+				// UV
+				u,v
+			};
+
+		}
+
+	}
+	mesh->UnlockVertexBuffer();
+
+}
+
+void Terrain::processIndices()
+{
+	if (!mesh) return;
+
+	unsigned short * terrainI = nullptr;
+
+	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+	mesh->LockIndexBuffer(0, (void**)&terrainI);
+
+	unsigned int indexCounter = 0;
+
+	if (!terrainI) return;
+
+	for (int i = 0; i < rectsPerColumn; ++i)
+	{
+		for (int j = 0; j < rectsPerRow; ++j)
+		{
+			/*
+			  a	      b
+				*	*
+				*	*
+			  c       d
+
+			   a기준으로 순회하는데 abc / cbd 삼각형 2개를 설정해주면 된다.
+			   
+			   각각의 버텍스의 인덱스는
+			   a = i * verticesPerRow + j
+			   b = i * verticesPerRow + j +1
+			   c = (i+1) * verticesPerRow + j
+			   d = (i+1) * verticesPerRow + j + 1
+			
+			*/
+
+			// abc
+			terrainI[indexCounter++] = i * verticesPerRow + j;
+			terrainI[indexCounter++] = i * verticesPerRow + j + 1;
+			terrainI[indexCounter++] = (i + 1) * verticesPerRow + j;
+
+			// cbd
+			terrainI[indexCounter++] = (i + 1) * verticesPerRow + j;
+			terrainI[indexCounter++] = i * verticesPerRow + j + 1;
+			terrainI[indexCounter++] = (i + 1) * verticesPerRow + j + 1;
+		}
+
+
+	}
+	indexCounter;
+	mesh->UnlockIndexBuffer();
+}
+
+
+void Terrain::processSubsets()
+{
+	if (!mesh) return;
+
+	unsigned long* attributeBuffer = nullptr;
+
+	// 다시 속성 데이터를 수정하기 위해서 버퍼를 잠궈준다.
+	mesh->LockAttributeBuffer(0, &attributeBuffer);
+
+	int ttt = mesh->GetNumFaces();
+
+	// 서브셋을 0번으로 지정해준다.
+	for (int i = 0; i < mesh->GetNumFaces(); ++i)
+		attributeBuffer[i] = 0;
+
+
+	// 설정이 완료되었으므로 다시 잠궈준다.
+	mesh->UnlockAttributeBuffer();
+}
+
+void Terrain::optimizeMesh()
+{
+	if (!mesh) return;
+
+	// 인접버퍼를 이용한 최적화 작업
+	vector<unsigned long> adjacencyBuffer(mesh->GetNumFaces() * 3);
+	// 메쉬의 인접정보를 받아온다.
+	mesh->GenerateAdjacency(0.0f, &adjacencyBuffer[0]);
+
+
+	int faceCount1 = mesh->GetNumFaces();
+	int vertexCount1 = mesh->GetNumVertices();
+
+	HRESULT hr = 0;
+	// 그 인접 정보를 기반으로 최적화 작업을 시작한다.
+	hr = mesh->OptimizeInplace
+	(
+		// 속성으로(서브셋기준) 삼각형으로 정렬하고, 별도의 속성테이블을 생성
+		// GetAttributeTable함수를 이용해서 D3DXATTRIBUTERANGE구조체 배열을 받아올 수 있다.
+		// 내부 정보에는 서브셋ID / 각 면과 버텍스의 수 / 각 시작 지점이 들어있다.
+		// 속성 테이블의 각항목은 메쉬의 각 서브셋과 대응되며, 
+		// 서브셋의 기하정보들이 보관되는 버텍스/ 인덱스 버퍼내의 메모리 블록을 지정한다.
+		D3DXMESHOPT_ATTRSORT |
+		// 메쉬에서 이용하지 않는 인덱스와 버텍스를 제거한다.
+		D3DXMESHOPT_COMPACT |
+		// 버텍스 캐시의 히트율을 높인다.
+		D3DXMESHOPT_VERTEXCACHE,
+
+		// 최적화 되지않은 메쉬의 인접 배열 포인터
+		// 인접배열이 필요한이유?	// 최적화 목록에 인접정보가 필요한 부분이 있어서 필요할듯
+		&adjacencyBuffer[0],
+		// 최적화된 메쉬의 인접 배열 포인터
+		nullptr,
+		// 리맵정보 Face
+		nullptr,
+		// 리맵정보 Vertex
+		nullptr
+	);
+
+	int faceCount = mesh->GetNumFaces();
+	int vertexCount = mesh->GetNumVertices();
+}
+
+

@@ -442,6 +442,7 @@ class MainCamera : public Component
 {
 private :
 	/*Scene::MainObjTag*/unsigned char mainObjTag;
+	virtual void start();
 	virtual void update();
 protected :
 public :
@@ -643,13 +644,12 @@ private:
 		}
 
 		static const unsigned long DefaultFVF;
-		// 속성으로 삼각형을 정렬하고 속성테이블을 생성 | 사용되지 않는 인덱스와 버텍스 제거 | 버텍스 캐시의 히트율 높임
 	};
 
 
 protected:
 
-
+	virtual void start();
 	virtual void update()
 	{
 		render();
@@ -871,6 +871,112 @@ public:
 	
 	void makeTransition(const string & from, const string & to, const string & valueName, int factor, ValueType type, float valueToCompare);
 	void updateAllTrasitions(const string & animationFileName);
+};
+
+
+class Terrain : public Component
+{
+private:
+	ID3DXMesh*  mesh;
+	vector<D3DMATERIAL9> mtrls;
+	vector<IDirect3DTexture9*> textures;
+	IDirect3DDevice9 * device;
+
+	string fileName;
+
+	vector<float> heightMap;
+
+	unsigned int verticesPerRow;
+	unsigned int verticesPerColumn;
+
+	// verticesPerRow * verticesPerColumn
+	unsigned int heightMapSize;
+
+	unsigned int rectsPerRow;
+	unsigned int rectsPerColumn;
+
+	// 이값에 의해서 전체적인 높이가 결정된다.
+	float heightValue;
+
+	float distanceOfVertices;
+
+	// verticesPerRow * distanceOfVertices // x
+	float width;
+
+	// verticesPerColumn * distanceOfVertices // z
+	float depth;
+
+	static const string filePathToLoadTerrain;
+
+
+	void render();
+
+	struct TerrainVertex
+	{
+		float position[3];
+		float normal[3];
+		float uv[2];
+
+		TerrainVertex()
+			: position{}, normal{}, uv{}
+		{
+
+		}
+
+		TerrainVertex(float x, float y, float z,
+			float nx, float ny, float nz, float u, float v)
+		{
+			position[0] = x; position[1] = y; position[2] = z;
+			normal[0] = nx; normal[1] = ny; normal[2] = nz;
+			uv[0] = u; uv[1] = v;
+		}
+
+		float& operator[] (unsigned int index)
+		{
+			// 0보다 작거나 8보다 크거나 같으면 프로그램 멈춘다.
+			// 항상 0보다 크거나 같거나 8보다는 작아야한다.
+			assert(index >= 0 && index < sizeof(TerrainVertex) / sizeof(float));
+
+			float * result = (float*)this;
+			result += index;
+			return *result;
+		}
+
+		static const unsigned long DefaultFVF;
+	};
+
+
+protected:
+	virtual void start();
+	virtual void update() { render(); }
+
+public:
+	Terrain(GameObject * go, Transform * tf)
+		: Component(go, tf), mesh(nullptr), device(nullptr), fileName(""),
+		verticesPerRow(0), verticesPerColumn(0), rectsPerRow(0), rectsPerColumn(0), distanceOfVertices(0), width(0), depth(0), heightValue(0)
+	{
+		start();
+	}
+
+	virtual ~Terrain()
+	{
+		onDestroy();
+	}
+
+
+	void loadRawFile(const string & fileName, unsigned int verticesPerRow, unsigned int verticesPerColumn, float distanceOfVertices, float heightValue);
+
+	bool loadHeightMap(const string & fileName);
+	bool generateMeshBuffer();
+	void processVertices();
+	void processIndices();
+
+	void processSubsets();
+
+	void optimizeMesh();
+
+
+
 };
 
 #endif
