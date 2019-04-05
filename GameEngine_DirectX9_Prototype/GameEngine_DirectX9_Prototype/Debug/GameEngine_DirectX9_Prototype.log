@@ -1,6 +1,3 @@
-﻿  Component.cpp
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1409): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1413): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1419): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
-  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)
+﻿  main.cpp
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)

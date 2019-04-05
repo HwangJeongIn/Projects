@@ -824,8 +824,6 @@ public:
 
 	friend class Transition;
 
-
-
 	// 애니메이션 목록
 	/*
 	Standing Aim Recoil.fbx
@@ -878,8 +876,12 @@ class Terrain : public Component
 {
 private:
 	ID3DXMesh*  mesh;
-	vector<D3DMATERIAL9> mtrls;
-	vector<IDirect3DTexture9*> textures;
+	IDirect3DTexture9 * texture;
+	D3DMATERIAL9 mtrl;
+
+	// 터레인에 여러가지 머티리얼과 텍스처 적용은 나중 작업 // 메쉬1 : 텍스처1로 대응
+	//vector<D3DMATERIAL9> mtrls;
+	//vector<IDirect3DTexture9*> textures;
 	IDirect3DDevice9 * device;
 
 	string fileName;
@@ -906,7 +908,8 @@ private:
 	// verticesPerColumn * distanceOfVertices // z
 	float depth;
 
-	static const string filePathToLoadTerrain;
+	static const string filePathToLoadTerrainFiles;
+	static const string filePathToLoadTerrainTextureFiles;
 
 
 	void render();
@@ -952,7 +955,7 @@ protected:
 
 public:
 	Terrain(GameObject * go, Transform * tf)
-		: Component(go, tf), mesh(nullptr), device(nullptr), fileName(""),
+		: Component(go, tf), mesh(nullptr), device(nullptr), fileName(""), texture(nullptr),
 		verticesPerRow(0), verticesPerColumn(0), rectsPerRow(0), rectsPerColumn(0), distanceOfVertices(0), width(0), depth(0), heightValue(0)
 	{
 		start();
@@ -970,12 +973,44 @@ public:
 	bool generateMeshBuffer();
 	void processVertices();
 	void processIndices();
-
 	void processSubsets();
-
 	void optimizeMesh();
 
+	//grass.bmp
+	void loadTextureFromFile(const string & fileName);
+	bool getHeight(const Vector3 & position, float * output);
+	void setMaterial(const D3DMATERIAL9 & mtrl)
+	{
+		this->mtrl = mtrl;
+	}
 
+};
+
+class MoveOnTerrainScript : public Component
+{
+private:
+	Terrain * terrain;
+protected:
+	virtual void start() {};
+	virtual void update();
+	virtual void onCollisionStay(GameObjectWithCollision & other) {};
+
+public:
+	MoveOnTerrainScript(GameObject * go, Transform * tf)
+		: Component(go, tf), terrain(nullptr)
+	{
+		start();
+	}
+
+	virtual ~MoveOnTerrainScript()
+	{
+		onDestroy();
+	}
+
+	void setTerrain(Terrain * terrain)
+	{
+		this->terrain = terrain;
+	}
 
 };
 

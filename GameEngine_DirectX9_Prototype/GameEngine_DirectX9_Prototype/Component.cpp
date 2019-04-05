@@ -357,24 +357,24 @@ void MainCamera::update()
 	if (::GetAsyncKeyState('Z') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,.05f });
-		transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ 5.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('C') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,-.05f });
-		transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ -5.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('W') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (transform->getForward()));
+		transform->setPosition(transform->getPosition() + 2*(transform->getForward()));
 	if (::GetAsyncKeyState('S') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (-1)*(transform->getForward()));
+		transform->setPosition(transform->getPosition() + 2*(-1)*(transform->getForward()));
 
 	if (::GetAsyncKeyState('D') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (transform->getRight()));
+		transform->setPosition(transform->getPosition() + 2*(transform->getRight()));
 	if (::GetAsyncKeyState('A') & 0x8000f)
-		transform->setPosition(transform->getPosition() + (-1)*(transform->getRight()));
+		transform->setPosition(transform->getPosition() + 2*(-1)*(transform->getRight()));
 
 }
 
@@ -1926,7 +1926,9 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 	}
 }
 
-const string Terrain::filePathToLoadTerrain = "../Terrain/";
+const string Terrain::filePathToLoadTerrainFiles = "../Terrain/";
+const string Terrain::filePathToLoadTerrainTextureFiles = "../Terrain/Texture/";
+
 
 void Terrain::render()
 {
@@ -1935,22 +1937,53 @@ void Terrain::render()
 	// 현재 transform행렬로 적용시킨다.
 	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
 
+	if(texture)
+		device->SetTexture(0, texture);
+
+	device->SetMaterial(&mtrl);
+
 	mesh->DrawSubset(0);
 
 	return;
 
-	// 파일이 로드되어서 값이 있는 경우만 그려준다.
-	for (int i = 0; i < mtrls.size(); ++i)
-	{
-		device->SetMaterial(&mtrls[i]);
-		device->SetTexture(0, textures[i]);
-		mesh->DrawSubset(i);
-	}
+	//// 파일이 로드되어서 값이 있는 경우만 그려준다.
+	//for (int i = 0; i < mtrls.size(); ++i)
+	//{
+	//	device->SetMaterial(&mtrls[i]);
+	//	device->SetTexture(0, textures[i]);
+	//	mesh->DrawSubset(i);
+	//}
 }
 
 void Terrain::start()
 {
 	this->device = &(gameObject->getDevice());
+
+	// material 기본 설정
+	// Set the RGBA for diffuse reflection.
+	mtrl.Diffuse.r = 0.0f;
+	mtrl.Diffuse.g = 0.5f;
+	mtrl.Diffuse.b = 0.5f;
+	mtrl.Diffuse.a = 1.0f;
+
+	// Set the RGBA for ambient reflection.
+	mtrl.Ambient.r = 0.5f;
+	mtrl.Ambient.g = 0.0f;
+	mtrl.Ambient.b = 0.5f;
+	mtrl.Ambient.a = 1.0f;
+
+	// Set the color and sharpness of specular highlights.
+	mtrl.Specular.r = 1.0f;
+	mtrl.Specular.g = 1.0f;
+	mtrl.Specular.b = 1.0f;
+	mtrl.Specular.a = 1.0f;
+	mtrl.Power = 500.0f;
+
+	// Set the RGBA for emissive color.
+	mtrl.Emissive.r = 0.0f;
+	mtrl.Emissive.g = 0.0f;
+	mtrl.Emissive.b = 0.0f;
+	mtrl.Emissive.a = 0.0f;
 }
 
 const unsigned long Terrain::TerrainVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
@@ -1993,7 +2026,7 @@ bool Terrain::loadHeightMap(const string & fileName)
 {
 	vector<BYTE> infoToRead(heightMapSize);
 
-	ifstream iFStream((filePathToLoadTerrain + fileName).c_str(), ios_base::binary);
+	ifstream iFStream((filePathToLoadTerrainFiles + fileName).c_str(), ios_base::binary);
 
 	// 파일을 열 수 없을때 리턴 false
 	if (iFStream.is_open() == false)
@@ -2066,28 +2099,103 @@ void Terrain::processVertices()
 	float z = 0;
 	float u = 0;
 	float v = 0;
+	Vector3 normal{ 0,0,0 };
+	Vector3 a{ 0,0,0 };
+	Vector3 b{ 0,0,0 };
+	Vector3 c{ 0,0,0 };
+
+	Vector3 vector1{ 0,0,0 };
+	Vector3 vector2{ 0,0,0 };
+
 	// 맵사이즈 // 버텍스 총 개수(행 버텍스 개수 * 열 버텍스 개수) // 만큼 순회하면서 값들을 채워준다.
 	for (int i = 0; i < verticesPerColumn; ++i)
 	{
-
+		// 여기서 각각 -width/2 와 depth/2을 해주는 이유는 원점을 기준으로 정렬을 시켜주기 위함이다.
 		for (int j = 0; j < verticesPerRow; ++j)
 		{
 			// position 계산
-			x = j * distanceOfVertices;
-			z = i * distanceOfVertices;
+			x = j * distanceOfVertices - width/2;
+
+			// 파일의 xz좌표와 directx 의 xz좌표에서 z축의 부호가 서로 반대이기 때문에 이렇게 처리해준다.
+			// 이렇게 처리를 안하면 읽은 하이트 맵과 반대로 출력된다. 
+			// 또 파일 기준으로 삼각형으로 그려주기 때문에 삼각형이 뒷면처리 되어 컬링되는 현상이 발생한다.
+			z = -i * distanceOfVertices + depth/2;
+
+			u = (float)j / 2.0f;// *distanceForU;
+			v = (float)i / 2.0f;// *distanceForV;
+
+			//Trace::Write("TAG_DEBUG", "index", i * verticesPerRow + j);
 			//Trace::Write("TAG_DEBUG", "x", x);
+			//Trace::Write("TAG_DEBUG", "y", heightMap[i]);
 			//Trace::Write("TAG_DEBUG", "z", z);
 			//Trace::Write("TAG_DEBUG", "");
+			//Trace::Write("TAG_DEBUG", "index", i * verticesPerRow + j);
+			//Trace::Write("TAG_DEBUG", "u", u);
+			//Trace::Write("TAG_DEBUG", "v", v);
 
-			u = j * distanceForU;
-			v = i * distanceForV;
+			// 노멀벡터를 구해준다. // 윗삼각형 기준으로 ac X ab 를 하면된다.
+			/*
+			  a	      b
+				*	*
+				*	*
+			  c       d
 
-			terrainV[i] =
+			a기준으로 순회하는데 abc / cbd 삼각형 2개를 설정해주면 된다.
+
+			각각의 버텍스의 인덱스는
+			a = i * verticesPerRow + j
+			b = i * verticesPerRow + j +1
+			c = (i+1) * verticesPerRow + j
+			d = (i+1) * verticesPerRow + j + 1
+			*/
+			if (i < rectsPerColumn && j < rectsPerRow)
+			{
+				a = { x, heightMap[i * verticesPerRow + j] ,z };
+				b = { x + distanceOfVertices, heightMap[i * verticesPerRow + j + 1] ,z };
+				c = { x, heightMap[(i + 1) * verticesPerRow + j] ,z - distanceOfVertices };
+
+			}
+			else if(i < rectsPerColumn && j >= rectsPerRow)
+			{
+
+				// 맨오른쪽 열일때 더이상 오른쪽의 인덱스가 없다.
+				a = { x, heightMap[i * verticesPerRow + j] ,z };
+				b = { x, heightMap[(i + 1) * verticesPerRow + j] ,z - distanceOfVertices };
+				c = { x - distanceOfVertices, heightMap[(i + 1) * verticesPerRow + j - 1] ,z - distanceOfVertices };
+
+			}
+			else if (i >= rectsPerColumn && j < rectsPerRow)
+			{
+				// 맨아래 행일때 더이상 아래의 인덱스가 없다.
+				a = { x, heightMap[i * verticesPerRow + j] ,z };
+				b = { x + distanceOfVertices, heightMap[(i - 1) * verticesPerRow + j + 1] ,z + distanceOfVertices };
+				c = { x + distanceOfVertices, heightMap[i * verticesPerRow + j + 1] ,z };
+
+			}
+			else // if(i >= rectsPerColumn && j < rectsPerRow) // 맨오른쪽 맨아래 인덱스일때
+			{
+				a = { x, heightMap[i * verticesPerRow + j] ,z };
+				b = { x - distanceOfVertices, heightMap[i * verticesPerRow + j - 1] ,z };
+				c = { x, heightMap[(i - 1) * verticesPerRow + j] ,z + distanceOfVertices };
+			}
+
+			// ab // b - a
+			vector1 = b - c;
+			// ac // c - a
+			vector2 = c - a;
+
+			Vector3::Cross(normal, vector1, vector2);
+
+
+
+			// 인덱스를 제대로 설정해주지 않아서 제대로 렌더링이되지 않는 버그가 발생했다.
+			// 주의해서 인덱스를 넣어주자
+			terrainV[i * verticesPerRow + j] =
 			{
 				// Position
-				x, heightMap[i], z,
+				x, heightMap[i * verticesPerRow + j], z,
 				// Normal // 일단 항상 up으로 설정
-				0,1,0,
+				normal.getX(), normal.getY(), normal.getZ(),
 				// UV
 				u,v
 			};
@@ -2124,29 +2232,32 @@ void Terrain::processIndices()
 			  c       d
 
 			   a기준으로 순회하는데 abc / cbd 삼각형 2개를 설정해주면 된다.
-			   
+
 			   각각의 버텍스의 인덱스는
 			   a = i * verticesPerRow + j
 			   b = i * verticesPerRow + j +1
 			   c = (i+1) * verticesPerRow + j
 			   d = (i+1) * verticesPerRow + j + 1
-			
+
 			*/
+			int a = i * verticesPerRow + j;
+			int b = i * verticesPerRow + j + 1;
+			int c = (i + 1) * verticesPerRow + j;
+			int d = (i + 1) * verticesPerRow + j + 1;
 
 			// abc
-			terrainI[indexCounter++] = i * verticesPerRow + j;
-			terrainI[indexCounter++] = i * verticesPerRow + j + 1;
-			terrainI[indexCounter++] = (i + 1) * verticesPerRow + j;
+			terrainI[indexCounter++] = a;//i * verticesPerRow + j;
+			terrainI[indexCounter++] = b;//i * verticesPerRow + j + 1;
+			terrainI[indexCounter++] = c;// (i + 1) * verticesPerRow + j;
 
 			// cbd
-			terrainI[indexCounter++] = (i + 1) * verticesPerRow + j;
-			terrainI[indexCounter++] = i * verticesPerRow + j + 1;
-			terrainI[indexCounter++] = (i + 1) * verticesPerRow + j + 1;
+			terrainI[indexCounter++] = c;// (i + 1) * verticesPerRow + j;
+			terrainI[indexCounter++] = b;// i * verticesPerRow + j + 1;
+			terrainI[indexCounter++] = d;// (i + 1) * verticesPerRow + j + 1;
 		}
 
 
 	}
-	indexCounter;
 	mesh->UnlockIndexBuffer();
 }
 
@@ -2214,4 +2325,72 @@ void Terrain::optimizeMesh()
 	int vertexCount = mesh->GetNumVertices();
 }
 
+void Terrain::loadTextureFromFile(const string & fileName)
+{
+	HRESULT hr = 0;
 
+	// 파일을 로드시켜서 텍스처를 불러오는 방식 
+	hr = D3DXCreateTextureFromFile
+	(
+		device,
+		(filePathToLoadTerrainTextureFiles + fileName).c_str(),
+		&texture
+	);
+
+	if (FAILED(hr))
+		texture = nullptr;
+}
+
+bool Terrain::getHeight(const Vector3 & position, float * output)
+{
+	if (!output) return false;
+
+	// 구하고자 하는 점을 Terrain의 로컬좌표계로 변환한다.
+	// 로컬좌표계로 변환하기 위해서는 Terrain의 transform행렬의 역행렬을 곱해주면 된다.
+	D3DXMATRIX terrainInverseTransformMatrix;
+	D3DXVECTOR3 positionInTerrainLocal;
+
+	float determinant = 0.0f;
+	terrainInverseTransformMatrix = transform->getTransformMatrix();
+	D3DXMatrixInverse(&terrainInverseTransformMatrix, &determinant, &terrainInverseTransformMatrix);
+	// 만약 역행렬이 존재하지 않으면 리턴
+	if (determinant == 0.0f) return false;
+
+	Vector3::ToD3DXVECTOR3(positionInTerrainLocal, position);
+
+	D3DXVec3TransformCoord(&positionInTerrainLocal, &positionInTerrainLocal, &terrainInverseTransformMatrix);
+
+	// 이제부터 터레인의 로컬좌표계 기준으로 계산하면 된다. // 위치를 로컬좌표계로 끌어왔다.
+	// 이렇게 로컬좌표계로 변경하는 이유는 터레인이 로테이션됐을경우 1칸의 계산이 어렵기 때문이다.
+
+	float startX = -width/2;
+	float startZ = depth/2;
+	float endX = width/2;
+	float endZ = -depth/2;
+
+	// 만약에 벗어난다면 리턴
+	if (startX > positionInTerrainLocal.x || startZ < positionInTerrainLocal.z
+		|| endX < positionInTerrainLocal.x || endZ > positionInTerrainLocal.z)
+		return false;
+
+	// 처음지점과 차이를 계산해서 버린 인덱스의 값을 구해본다.
+	int columnIndex = (startZ - positionInTerrainLocal.z) / distanceOfVertices;
+	int rowIndex = (positionInTerrainLocal.x - startX) / distanceOfVertices;
+	*output = heightMap[columnIndex * verticesPerRow + rowIndex];
+	return true;
+
+	// 아직 보간적용 X
+}
+
+void MoveOnTerrainScript::update()
+{
+	if (terrain)
+	{
+		float height = 0.0f;
+		if (terrain->getHeight(transform->getPosition(), &height))
+		{
+			if (transform->getPosition().getY() < height)
+				transform->setPosition(transform->getPosition().getX(), height, transform->getPosition().getZ());
+		}
+	}
+}

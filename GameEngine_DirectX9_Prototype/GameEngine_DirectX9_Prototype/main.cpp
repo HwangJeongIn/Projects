@@ -178,8 +178,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 		&proj,
 		D3DX_PI * 0.25f, // 45 - degree
 		(float)Width / (float)Height,
-		1.0f,
-		1000.0f);
+		5.0f,
+		8000.0f);
 	device->SetTransform(D3DTS_PROJECTION, &proj);
 	// wrap adress mode로 텍스처 지정
 	device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
@@ -202,7 +202,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->SetRenderState(D3DRS_NORMALIZENORMALS, true);
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
 
-	device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 
 	// 디버깅용 txt파일을 로드
@@ -230,6 +230,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setPosition(0, 0, -100);
+	mainCamera->getTransform()->setRotation(0, 0, 0);
 
 
 
@@ -254,18 +255,41 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	remover2RigidBody->turnOnStaticFlag();
 
 
-
-
-
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
-	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
 	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
 	ground->getTransform()->setPosition(0, -10, 0);
+	ground->getTransform()->setRotation(0, 30, 0);
 	groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
 	groundRigidBody->turnOnStaticFlag();
 	Terrain * groundTerrain = ground->addComponent<Terrain>();
-	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 5, .3f);
+	// adsfasfdSsabgaw.raw / coastMountain64.raw / Ash.raw / adsfsaf.raw
+	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 20, .5f);
+	groundTerrain->loadTextureFromFile("grass.bmp");
+	//D3DMATERIAL9 mtrl;
+	//// Set the RGBA for diffuse reflection.
+	//mtrl.Diffuse.r = 1.0f;
+	//mtrl.Diffuse.g = 1.0f;
+	//mtrl.Diffuse.b = 1.0f;
+	//mtrl.Diffuse.a = 1.0f;
+	//// Set the RGBA for ambient reflection.
+	//mtrl.Ambient.r = 1.0f;
+	//mtrl.Ambient.g = 1.0f;
+	//mtrl.Ambient.b = 1.0f;
+	//mtrl.Ambient.a = 1.0f;
+	//// Set the color and sharpness of specular highlights.
+	//mtrl.Specular.r = 1.0f;
+	//mtrl.Specular.g = 1.0f;
+	//mtrl.Specular.b = 1.0f;
+	//mtrl.Specular.a = 1.0f;
+	//mtrl.Power = 500.0f;
+	//// Set the RGBA for emissive color.
+	//mtrl.Emissive.r = 0.0f;
+	//mtrl.Emissive.g = 0.0f;
+	//mtrl.Emissive.b = 0.0f;
+	//mtrl.Emissive.a = 0.0f;
+	//groundTerrain->setMaterial(mtrl);
+
 
 	
 
@@ -278,58 +302,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	////fbxModelRendererplayer->play("mixamo.com");
 	////fbxModelRendererplayer->setScale(Vector3(3,1,3));
 	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
-
-	/*
-	playerAnimationFSM->registerAnimation("standing run forward.fbx");
-	playerAnimationFSM->registerAnimation("standing run back.fbx");
-	playerAnimationFSM->registerAnimation("standing run right.fbx");
-	playerAnimationFSM->registerAnimation("standing run left.fbx");
-	playerAnimationFSM->setDefaultState("standing run forward.fbx");
-
-	string floatSpeed = "speed";
-	string floatSideSpeed = "sideSpeed";
-	// 변수 등록
-	playerAnimationFSM->registerFloat("speed");
-	playerAnimationFSM->setFloat("speed", 1.0f);
-	playerAnimationFSM->registerFloat("sideSpeed");
-	playerAnimationFSM->setFloat("sideSpeed", 1.0f);
-
-	// forward > back / left / right
-
-	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
-	playerAnimationFSM->makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
-	playerAnimationFSM->makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
-	playerAnimationFSM->makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-
-	// back > forward / left / right
-
-	// float형으로 등록된 "speed"가 0보다 클때 back > forward
-	playerAnimationFSM->makeTransition("standing run back.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
-	playerAnimationFSM->makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 클때 back > right
-	playerAnimationFSM->makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-
-	// left > forward / back / right
-
-	// float형으로 등록된 "speed"가 0보다 작을때 left > forward
-	playerAnimationFSM->makeTransition("standing run left.fbx", "standing run left.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 클때 left > back
-	playerAnimationFSM->makeTransition("standing run left.fbx", "standing run right.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
-	playerAnimationFSM->makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-
-	// right > forward / back / left
-
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
-	playerAnimationFSM->makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 right > forward
-	playerAnimationFSM->makeTransition("standing run right.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 작을때 right > back
-	playerAnimationFSM->makeTransition("standing run right.fbx", "standing run back.fbx", "sidepeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	*/
 
 	//player->getTransform()->setRotation(Vector3( 0,180,0 ));
 	//player->getTransform()->setPosition(Vector3(0, 00, 0));
@@ -351,6 +323,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	car1->addComponent<PlayerScript>();
 	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
 	car1RigidBody->setSphereCollider(2);
+
+	MoveOnTerrainScript * car1MoveOnTerrainScript = car1->addComponent<MoveOnTerrainScript>();
+	car1MoveOnTerrainScript->setTerrain(groundTerrain);
 	//car1RigidBody->setGravity(Vector3(0, 0, 0));
 	//car1->addComponent<BoxCollider>();
 	car1->getTransform()->setPosition(-15, 10, 0);
