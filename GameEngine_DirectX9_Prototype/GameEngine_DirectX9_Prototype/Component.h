@@ -115,12 +115,12 @@ public:
 	static const D3DXVECTOR3 WorldForward;
 	static const float Pi;
 
-	float degreeToRadian(float degree) const
+	static float DegreeToRadian(float degree)
 	{
 		return degree *(Pi / 180.0f);
 	}
 
-	float radianToDegree(float radian) const
+	static float RadianToDegree(float radian)
 	{
 		return radian *(180.0f / Pi);
 	}
@@ -182,17 +182,17 @@ public:
 
 		// 월드 방향 벡터기준으로 각도만큼 각각을 회전시켜서 객체의 방향벡터를 구해준다.
 		// 월드벡터 기준 pitch
-		D3DXMatrixRotationAxis(&T, &WorldRight, degreeToRadian(rotation.getX()));
+		D3DXMatrixRotationAxis(&T, &WorldRight, DegreeToRadian(rotation.getX()));
 		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
 		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
 
 		// 월드벡터 기준 yaw
-		D3DXMatrixRotationAxis(&T, &WorldUp, degreeToRadian(rotation.getY()));
+		D3DXMatrixRotationAxis(&T, &WorldUp, DegreeToRadian(rotation.getY()));
 		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
 		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
 
 		// 월드벡터 기준 roll
-		D3DXMatrixRotationAxis(&T, &WorldForward, degreeToRadian(rotation.getZ()));
+		D3DXMatrixRotationAxis(&T, &WorldForward, DegreeToRadian(rotation.getZ()));
 		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
 		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
 
@@ -288,6 +288,8 @@ public:
 	void setPosition_physics(const Vector3 & other);
 	void setRotation_physics(const Vector3 & other);
 	void setScale_physics(const Vector3 & other);
+	
+	void rotate(const Vector3 & other);
 
 	void setPosition(const Vector3 & other);
 	void setRotation(const Vector3 & other);
@@ -610,6 +612,27 @@ private:
 	//static const unsigned long DefaultOptimizeFlag = D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE;
 
 	void render();
+	// 스켈레톤 > 메쉬 노드 처리할때 사용
+	void processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * node, FbxNodeAttribute::EType attributeType);
+
+	// 애니메이션 처리할때 사용
+	void processAnimation(const string & animationFileName, FbxScene * _scene, FbxImporter * _importer);
+
+	// 애니메이션 처리시 본의 모든 키프레임 초기화할때 사용
+	void processKeyFramesOfAllNodes(FbxNode * node, const string & animationFileName, const string & animationName, float frameRate, float start, float stop);
+	//void processKeyFramesOfAllNodes(FbxNode * node, const string & animationName, float frameRate, float start, float stop);
+
+	// 애니메이션이 렌더링되고 있을때 본들의 애니메이션 행렬을 최신화 하기 위해 사용
+	void processSkeletonBonesAnimation(FbxModelAnimations * animations);
+
+	// FbxModelMesh -> DXMesh
+	void processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processSubsets(ID3DXMesh * mesh);
+	void optimizeMesh(ID3DXMesh * mesh);
+
 	//void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag);
 	//void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls);
 	struct FbxModelVertex
@@ -708,28 +731,7 @@ public:
 	// 외부 애니메이션 파일 불러올때 사용
 	void loadFbxFileForAnimation(const string & fileName);
 
-	// 스켈레톤 > 메쉬 노드 처리할때 사용
-	void processAllNodesWithSameAtrributeTypeFromRoot(FbxNode * node, FbxNodeAttribute::EType attributeType);
 
-	// 애니메이션 처리할때 사용
-	void processAnimation(const string & animationFileName, FbxScene * _scene, FbxImporter * _importer);
-
-
-
-	// 애니메이션 처리시 본의 모든 키프레임 초기화할때 사용
-	void processKeyFramesOfAllNodes(FbxNode * node, const string & animationFileName, const string & animationName, float frameRate, float start, float stop);
-	//void processKeyFramesOfAllNodes(FbxNode * node, const string & animationName, float frameRate, float start, float stop);
-
-	// 애니메이션이 렌더링되고 있을때 본들의 애니메이션 행렬을 최신화 하기 위해 사용
-	void processSkeletonBonesAnimation(FbxModelAnimations * animations);
-
-	// FbxModelMesh -> DXMesh
-	void processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processSubsets(ID3DXMesh * mesh);
-	void optimizeMesh(ID3DXMesh * mesh);
 
 };
 
@@ -806,6 +808,8 @@ private:
 	// 기본 상태
 	string defaultState;
 
+	void updateAllTrasitions(const string & animationFileName);
+
 protected:
 
 	virtual void start();
@@ -868,7 +872,7 @@ public:
 	//	int factor, ValueType type, float valueToCompare)
 	
 	void makeTransition(const string & from, const string & to, const string & valueName, int factor, ValueType type, float valueToCompare);
-	void updateAllTrasitions(const string & animationFileName);
+
 };
 
 
@@ -913,6 +917,13 @@ private:
 
 
 	void render();
+
+	bool loadHeightMap(const string & fileName);
+	bool generateMeshBuffer();
+	void processVertices();
+	void processIndices();
+	void processSubsets();
+	void optimizeMesh();
 
 	struct TerrainVertex
 	{
@@ -969,16 +980,16 @@ public:
 
 	void loadRawFile(const string & fileName, unsigned int verticesPerRow, unsigned int verticesPerColumn, float distanceOfVertices, float heightValue);
 
-	bool loadHeightMap(const string & fileName);
-	bool generateMeshBuffer();
-	void processVertices();
-	void processIndices();
-	void processSubsets();
-	void optimizeMesh();
-
 	//grass.bmp
 	void loadTextureFromFile(const string & fileName);
 	bool getHeight(const Vector3 & position, float * output);
+
+	// 터레인좌표계에서의 높이를 구해준다. 들어온 위치에 대해서 터레인 좌표계로 들어가기 위한 행렬을 안곱해주어도 된다.
+	bool getLocalHeight(const Vector3 & position, float * output);
+
+	float getDepth() const { return depth; }
+	float getWidth() const { return width; }
+
 	void setMaterial(const D3DMATERIAL9 & mtrl)
 	{
 		this->mtrl = mtrl;
@@ -1011,6 +1022,110 @@ public:
 	{
 		this->terrain = terrain;
 	}
+
+};
+
+
+
+class BillBoard : public Component
+{
+private:
+	GameObject * mainCamera;
+	Vector3 currentMainCameraPosition;
+
+	IDirect3DDevice9 * device;
+
+	ID3DXMesh*  mesh;
+	IDirect3DTexture9 * texture;
+	D3DMATERIAL9 mtrl;
+
+	float width;
+	float height;
+
+	static const string filePathToLoadBillBoardTextureFiles;
+
+	void render();
+	void rotateIfMainCameraMoves();
+
+	bool generateMeshBuffer();
+	void processVertices();
+	void processIndices();
+	void processSubsets();
+	void optimizeMesh();
+
+	struct BillBoardVertex
+	{
+		float position[3];
+		float normal[3];
+		float uv[2];
+
+		BillBoardVertex()
+			: position{}, normal{}, uv{}
+		{
+
+		}
+
+		BillBoardVertex(float x, float y, float z,
+			float nx, float ny, float nz, float u, float v)
+		{
+			position[0] = x; position[1] = y; position[2] = z;
+			normal[0] = nx; normal[1] = ny; normal[2] = nz;
+			uv[0] = u; uv[1] = v;
+		}
+
+		float& operator[] (unsigned int index)
+		{
+			// 0보다 작거나 8보다 크거나 같으면 프로그램 멈춘다.
+			// 항상 0보다 크거나 같거나 8보다는 작아야한다.
+			assert(index >= 0 && index < sizeof(BillBoardVertex) / sizeof(float));
+
+			float * result = (float*)this;
+			result += index;
+			return *result;
+		}
+
+		static const unsigned long DefaultFVF;
+	};
+
+protected:
+	virtual void start();
+	virtual void update();
+	virtual void onCollisionStay(GameObjectWithCollision & other) {};
+
+public:
+	BillBoard(GameObject * go, Transform * tf)
+		: Component(go, tf), width(100), height(100), mainCamera(nullptr), texture(nullptr), mesh(nullptr), currentMainCameraPosition{}
+	{
+		start();
+	}
+
+	virtual ~BillBoard()
+	{
+		onDestroy();
+	}
+
+	float getWidth() const { return width; }
+	float getHeight() const { return height; }
+
+	void setWidth(float width)
+	{
+		this->width = width; 
+		// 새롭게 버텍스를 설정해준다.
+		processVertices();
+	}
+	void setHeight(float height)
+	{
+		this->height = height;
+		// 새롭게 버텍스를 설정해준다.
+		processVertices();
+	}
+	void loadTextureFromFile(const string & fileName);
+
+	// 빌보드는 하이트맵과 같이 파일을 꼭 로드해야 생성할 수 있는 것은 아니다.
+	// 그렇기 때문에 모든 과정을 묶어주는 함수를 하나 정의했다. 
+	// 이함수호출후 loadTextureFromFile로 텍스처를 로딩하면 된다.
+	void generateBillBoard();
+
 
 };
 

@@ -424,3 +424,9 @@
 			mainObjectsTable.erase(tag);
 	}
 
+	GameObject * Scene::getMainCamera()
+	{
+		if (mainObjectsTable.find(MOT_MAINCAMERA) == mainObjectsTable.end()) return nullptr;
+		return mainObjectsTable[MOT_MAINCAMERA];
+	}
+

@@ -93,6 +93,11 @@ public:
 		return *this;
 	}
 
+	friend bool operator==(const Vector3 & other1, const Vector3 & other2)
+	{
+		return (other1.x == other2.x && other1.y == other2.y && other1.z == other2.z);
+	}
+
 	friend Vector3 operator+(const Vector3 & other1, const Vector3 & other2)
 	{
 		return{ other1.x + other2.x, other1.y + other2.y, other1.z + other2.z };

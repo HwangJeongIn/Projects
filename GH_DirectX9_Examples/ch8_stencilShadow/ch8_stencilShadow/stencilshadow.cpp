@@ -355,7 +355,7 @@ void RenderShadow()
 	Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	D3DMATERIAL9 mtrl = d3d::InitMtrl(d3d::BLACK, d3d::BLACK, d3d::BLACK, d3d::BLACK, 0.0f);
-	mtrl.Diffuse.a = 0.5f; // 50% transparency.
+	mtrl.Diffuse.a = .5f; // 50% transparency.
 
 	// Disable depth buffer so that z-fighting doesn't occur when we
 	// render the shadow on top of the floor.

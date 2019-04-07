@@ -224,7 +224,7 @@ void Transform::calcRotationMatrix()
 	//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationZ(&temp, rotation.getZ()));
 	//	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, &parentRotationMatrix);
 
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, degreeToRadian( rotation.getY()), degreeToRadian(rotation.getX()), degreeToRadian(rotation.getZ()));
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, DegreeToRadian( rotation.getY()), DegreeToRadian(rotation.getX()), DegreeToRadian(rotation.getZ()));
 }
 
 void Transform::calcPositionMatrix()
@@ -290,6 +290,11 @@ void Transform::setRotation_physics(const Vector3 & other)
 void Transform::setScale_physics(const Vector3 & other)
 {
 	scale = other;
+}
+
+void Transform::rotate(const Vector3 & other)
+{
+	setRotation(rotation.getX() + other.getX(), rotation.getY() + other.getY(), rotation.getZ() + other.getZ());
 }
 
 void Transform::setPosition(const Vector3 & other)
@@ -395,7 +400,10 @@ void MainCamera::setViewSpace()
 	D3DXMATRIX temp;
 	D3DXMatrixIdentity(&v);
 
-
+	v = transform->getTransformMatrix();
+	float t;
+	D3DXMatrixInverse(&v, &t, &v);
+	/*
 	// 위치 반대로 계산
 	D3DXMatrixMultiply(&v, &v, D3DXMatrixTranslation(&temp, -transform->getPosition().getX(),
 		-transform->getPosition().getY(), -transform->getPosition().getZ()));
@@ -404,10 +412,10 @@ void MainCamera::setViewSpace()
 	//D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationX(&temp, -transform->getRotation().getX()));
 	//D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationY(&temp, -transform->getRotation().getY()));
 	//D3DXMatrixMultiply(&v, &v, D3DXMatrixRotationZ(&temp, -transform->getRotation().getZ()));
-	D3DXMatrixRotationYawPitchRoll(&temp,transform->degreeToRadian(-transform->getRotation().getY()), 
-		transform->degreeToRadian(-transform->getRotation().getX()), transform->degreeToRadian(-transform->getRotation().getZ()));
+	D3DXMatrixRotationYawPitchRoll(&temp,transform->DegreeToRadian(-transform->getRotation().getY()), 
+		transform->DegreeToRadian(-transform->getRotation().getX()), transform->DegreeToRadian(-transform->getRotation().getZ()));
 	D3DXMatrixMultiply(&v, &v, &temp);
-
+	*/
 
 	gameObject->getDevice().SetTransform(D3DTS_VIEW, &v);
 }
@@ -1973,11 +1981,11 @@ void Terrain::start()
 	mtrl.Ambient.a = 1.0f;
 
 	// Set the color and sharpness of specular highlights.
-	mtrl.Specular.r = 1.0f;
-	mtrl.Specular.g = 1.0f;
-	mtrl.Specular.b = 1.0f;
+	mtrl.Specular.r = .20f;
+	mtrl.Specular.g = .30f;
+	mtrl.Specular.b = .20f;
 	mtrl.Specular.a = 1.0f;
-	mtrl.Power = 500.0f;
+	mtrl.Power = 50.0f;
 
 	// Set the RGBA for emissive color.
 	mtrl.Emissive.r = 0.0f;
@@ -2376,6 +2384,31 @@ bool Terrain::getHeight(const Vector3 & position, float * output)
 	// 처음지점과 차이를 계산해서 버린 인덱스의 값을 구해본다.
 	int columnIndex = (startZ - positionInTerrainLocal.z) / distanceOfVertices;
 	int rowIndex = (positionInTerrainLocal.x - startX) / distanceOfVertices;
+
+	*output = heightMap[columnIndex * verticesPerRow + rowIndex];
+	return true;
+
+	// 아직 보간적용 X
+}
+
+bool Terrain::getLocalHeight(const Vector3 & position, float * output)
+{
+	if (!output) return false;
+
+	float startX = -width / 2;
+	float startZ = depth / 2;
+	float endX = width / 2;
+	float endZ = -depth / 2;
+
+	// 만약에 벗어난다면 리턴
+	if (startX > position.getX() || startZ < position.getZ()
+		|| endX < position.getX() || endZ > position.getZ())
+		return false;
+
+	// 처음지점과 차이를 계산해서 버린 인덱스의 값을 구해본다.
+	int columnIndex = (startZ - position.getZ()) / distanceOfVertices;
+	int rowIndex = (position.getX() - startX) / distanceOfVertices;
+
 	*output = heightMap[columnIndex * verticesPerRow + rowIndex];
 	return true;
 
@@ -2389,8 +2422,352 @@ void MoveOnTerrainScript::update()
 		float height = 0.0f;
 		if (terrain->getHeight(transform->getPosition(), &height))
 		{
-			if (transform->getPosition().getY() < height)
-				transform->setPosition(transform->getPosition().getX(), height, transform->getPosition().getZ());
+			transform->setPosition(transform->getPosition().getX(), height, transform->getPosition().getZ());
 		}
+
+		//float height = 0.0f;
+		//if (terrain->getHeight(transform->getPosition(), &height))
+		//{
+		//	if (transform->getPosition().getY() < height)
+		//		transform->setPosition(transform->getPosition().getX(), height, transform->getPosition().getZ());
+		//}
 	}
 }
+
+const string BillBoard::filePathToLoadBillBoardTextureFiles = "../BillBoard/";
+const unsigned long BillBoard::BillBoardVertex::DefaultFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+
+
+void BillBoard::render()
+{
+	if (!mesh) return;
+
+	device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+	//device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
+	//device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+
+
+	// 현재 transform행렬로 적용시킨다.
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
+
+	if (texture)
+		device->SetTexture(0, texture);
+
+	device->SetMaterial(&mtrl);
+
+	mesh->DrawSubset(0);
+
+
+	device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+}
+
+void BillBoard::rotateIfMainCameraMoves()
+{
+	// 만약 이전 카메라 포지션과 변함 없다면 리턴
+	D3DXMATRIX mainCameraTransformMatrix = mainCamera->getTransform()->getTransformMatrix();
+	// 이런작업을 해주는 이유는 메인카메라가 어느 오브젝트의 하위 오브젝트일 가능성이 있기 때문이다.
+	// 하위오브젝트로 포함되는 경우 position은 로컬좌표이기 때문에 transformMatrix을 받아와서 글로벌 위치를 구해준다.
+	Vector3 mainCameraPosition{ mainCameraTransformMatrix._41,mainCameraTransformMatrix._42,mainCameraTransformMatrix._43 };
+
+	if (mainCameraPosition == currentMainCameraPosition) return;
+
+	// 카메라의 위치가 변경되었다면 위치 최신화를 해준다.
+	currentMainCameraPosition = mainCameraPosition;
+
+	// 현재물체에서 카메라방향으로의 벡터를 구해준다.
+	Vector3 direction = currentMainCameraPosition - transform->getPosition();
+
+	// y값은 적용을 안해주기 때문에 빼준다. // y축으로만 로테이션 해야한다.
+	direction.setY(0.0f);
+	
+	// 정규화해준다.
+	Vector3::Normalized(direction, direction);
+
+
+	// 초기 위치 forward  = (0,0, -1) dot direction을 해주어서 로테이션을 구해준다.
+	// 그 사이각을 구하기 위해서 각각의 크기(둘다 정규화된 벡터이므로 1)로 내적값을 나눠주고 
+	// 최종적으로 cos의 역함수를 적용해준다.
+	float angle =  (float)acos(Vector3::Dot({ 0,0,-1 }, direction)/ (1.0f * 1.0f) );
+
+	// 여기서 주의할점은 항상 사이각은 양수가 나온다는 점이다.
+	/*
+	양수각 음수각 판별법
+	1. 여기서 판별하기 위해서 좌표평면에 한벡터 기준으로 정렬시키고 (여기서는 World back 라는 기준벡터를 사용했기 때문에 따로 필요 없음)
+	   그 벡터 기준으로 음수각인지 판별한다. 
+	   // 여기서는 한벡터가 back벡터이므로 x값이 + 일때 음수각이다. // right벡터라면 y값이 -일때 양수각 +일때 음수각이다.
+
+	2. 두 벡터를 외적해서 방향이 어디인지 판별해본다. 
+	   빌보드에서는 빌보드방향 X 카메라까지방향 를 했을때 World up 이 나온다면 양수각이고
+	   빌보드방향 X 카메라까지방향 를 했을때 World down이 나온다면 음수각이다.
+	
+	*/
+
+
+	// 좀더 명확한 표현 필요할듯 나중에 수정할 예정
+	// 만약 음수일 조건이면 각을 음수로 바꿔준다.
+	if (direction.getX() > 0)
+		angle = -angle;
+	
+	
+	// Y기준으로 // 시계방향 + / 반시계 - 
+	// 만약에 빌보드의 로테이션가 카메라방향보다 더 시계방향쪽으로 돌아있다면 - 을 해주어야한다.
+	// 즉 빌보드의 현재각도가 카메라방향 벡터 각보다 크다면 각을 음수로 바꿔준다.
+	//if (transform->getRotation().getY() > mainCamera->getTransform()->getRotation().getY())
+	//	angle = -angle;
+
+	transform->setRotation({ 0, Transform::RadianToDegree(angle),0 });
+	
+	// 노멀벡터를 새로 계산하기 위해서 버텍스들을 다시 초기화시킨다.
+	// 현재 로테이션이 바뀌었기 때문에 노멀벡터도 바꿔줘야한다. // 항상 카메라에서 봤을때 잘보이게 하기 위해서
+	processVertices();
+	//processIndices();
+}
+
+void BillBoard::start()
+{
+	mainCamera = gameObject->getScene().getMainCamera();
+	this->device = &(gameObject->getDevice());
+
+	// material 기본 설정
+	// Set the RGBA for diffuse reflection.
+	mtrl.Diffuse.r = .50f;
+	mtrl.Diffuse.g = .50f;
+	mtrl.Diffuse.b = .50f;
+	mtrl.Diffuse.a = 0.0f;
+
+	// Set the RGBA for ambient reflection.
+	mtrl.Ambient.r = 0.3f;
+	mtrl.Ambient.g = 0.5f;
+	mtrl.Ambient.b = 0.3f;
+	mtrl.Ambient.a = 1.0f;
+
+	// Set the color and sharpness of specular highlights.
+	mtrl.Specular.r = 0.30f;
+	mtrl.Specular.g = 0.50f;
+	mtrl.Specular.b = 0.30f;
+	mtrl.Specular.a = 1.0f;
+	mtrl.Power = 20.0f;
+
+	// Set the RGBA for emissive color.
+	mtrl.Emissive.r = 0.0f;
+	mtrl.Emissive.g = 0.0f;
+	mtrl.Emissive.b = 0.0f;
+	mtrl.Emissive.a = 0.0f;
+
+}
+
+void BillBoard::update()
+{
+	// 만약 메인 카메라 or device 가 없으면 리턴한다.
+	if (!mainCamera || !device) return;
+
+	rotateIfMainCameraMoves();
+	render();
+}
+
+void BillBoard::loadTextureFromFile(const string & fileName)
+{
+	HRESULT hr = 0;
+
+	// 파일을 로드시켜서 텍스처를 불러오는 방식 
+	hr = D3DXCreateTextureFromFile
+	(
+		device,
+		(filePathToLoadBillBoardTextureFiles + fileName).c_str(),
+		&texture
+	);
+
+	if (FAILED(hr))
+		texture = nullptr;
+
+}
+
+void BillBoard::generateBillBoard()
+{
+	// 메쉬가 있거나 디바이스가 없으면 리턴
+	if (!device || mesh) return;
+
+	// 생성실패시 리턴
+	if (!generateMeshBuffer()) return;
+	processVertices();
+	processIndices();
+	processSubsets();
+	//optimizeMesh();
+}
+
+bool BillBoard::generateMeshBuffer()
+{
+	HRESULT hr = 0;
+
+	hr = D3DXCreateMeshFVF(
+		// 삼각형 2개
+		2,
+		// 버텍스 2개
+		4,
+		// 메쉬를 만드는데 이용될 하나 이상의 플래그
+		// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
+		D3DXMESH_MANAGED,
+		// 복제된 메쉬를 만드는데 이용될 포맷
+		BillBoard::BillBoardVertex::DefaultFVF,
+		device,
+		// 복제된 메쉬가 담길 포인터
+		&mesh);
+
+	if (FAILED(hr))
+	{
+		mesh = nullptr;
+		return false;
+	}
+	return true;
+}
+
+void BillBoard::processVertices()
+{
+	if (!mesh) return;
+	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
+	BillBoardVertex * billBoardV = nullptr;
+
+	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+	mesh->LockVertexBuffer(0, (void**)&billBoardV);
+
+	if (!billBoardV) return;
+
+	/*
+	  a	      b
+		*	*
+		*	*
+	  c       d
+
+	a : 0 / b : 1 / c : 2 / d : 3
+	// z값은 모두 0이다.
+	*/
+
+	Vector3 normal =(-1) * transform->getForward();
+
+	float halfWidth = width / 2;
+	float halfHeight = height / 2;
+	// 여기서는 빌보드 좌표계 기준으로 결정해준다. 
+	// 나중에 transformMatrix에 의해 위치와 로테이션이 결정된다.
+	// Normal // 항상 back으로 설정 z가 0인 xy평면 기준 // 로테이션 기준 항상 로컬 back으로 변경했다. // 저방식대로하면 다른 방향에서 어두워짐
+	billBoardV[0] =
+	{
+		// Position
+		-halfWidth, halfHeight, 0,
+		normal.getX(), normal.getY(), normal.getZ(),
+		// UV
+		0,0
+	};
+	billBoardV[1] =
+	{
+		// Position
+		halfWidth, halfHeight, 0,
+		normal.getX(), normal.getY(), normal.getZ(),
+		// UV
+		1,0
+	};
+	billBoardV[2] =
+	{
+		// Position
+		-halfWidth, -halfHeight, 0,
+		normal.getX(), normal.getY(), normal.getZ(),
+		// UV
+		0,1
+	};
+	billBoardV[3] =
+	{
+		// Position
+		halfWidth, -halfHeight, 0,
+		normal.getX(), normal.getY(), normal.getZ(),
+		// UV
+		1,1
+	};
+
+	mesh->UnlockVertexBuffer();
+
+}
+
+void BillBoard::processIndices()
+{
+	if (!mesh) return;
+
+	unsigned short * billBoardI = nullptr;
+
+	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+	mesh->LockIndexBuffer(0, (void**)&billBoardI);
+
+	if (!billBoardI) return;
+
+	billBoardI[0] = 0;
+	billBoardI[1] = 1;
+	billBoardI[2] = 2;
+
+	billBoardI[3] = 1;
+	billBoardI[4] = 3;
+	billBoardI[5] = 2;
+
+	mesh->UnlockIndexBuffer();
+}
+
+
+void BillBoard::processSubsets()
+{
+	if (!mesh) return;
+
+	unsigned long* attributeBuffer = nullptr;
+
+	// 다시 속성 데이터를 수정하기 위해서 버퍼를 잠궈준다.
+	mesh->LockAttributeBuffer(0, &attributeBuffer);
+
+	// 서브셋을 0번으로 지정해준다.
+	for (int i = 0; i < mesh->GetNumFaces(); ++i)
+		attributeBuffer[i] = 0;
+
+	// 설정이 완료되었으므로 다시 잠궈준다.
+	mesh->UnlockAttributeBuffer();
+}
+
+void BillBoard::optimizeMesh()
+{
+	if (!mesh) return;
+
+	// 인접버퍼를 이용한 최적화 작업
+	vector<unsigned long> adjacencyBuffer(mesh->GetNumFaces() * 3);
+	// 메쉬의 인접정보를 받아온다.
+	mesh->GenerateAdjacency(0.0f, &adjacencyBuffer[0]);
+
+
+	HRESULT hr = 0;
+	// 그 인접 정보를 기반으로 최적화 작업을 시작한다.
+	hr = mesh->OptimizeInplace
+	(
+		// 속성으로(서브셋기준) 삼각형으로 정렬하고, 별도의 속성테이블을 생성
+		// GetAttributeTable함수를 이용해서 D3DXATTRIBUTERANGE구조체 배열을 받아올 수 있다.
+		// 내부 정보에는 서브셋ID / 각 면과 버텍스의 수 / 각 시작 지점이 들어있다.
+		// 속성 테이블의 각항목은 메쉬의 각 서브셋과 대응되며, 
+		// 서브셋의 기하정보들이 보관되는 버텍스/ 인덱스 버퍼내의 메모리 블록을 지정한다.
+		D3DXMESHOPT_ATTRSORT |
+		// 메쉬에서 이용하지 않는 인덱스와 버텍스를 제거한다.
+		D3DXMESHOPT_COMPACT |
+		// 버텍스 캐시의 히트율을 높인다.
+		D3DXMESHOPT_VERTEXCACHE,
+
+		// 최적화 되지않은 메쉬의 인접 배열 포인터
+		// 인접배열이 필요한이유?	// 최적화 목록에 인접정보가 필요한 부분이 있어서 필요할듯
+		&adjacencyBuffer[0],
+		// 최적화된 메쉬의 인접 배열 포인터
+		nullptr,
+		// 리맵정보 Face
+		nullptr,
+		// 리맵정보 Vertex
+		nullptr
+	);
+}
+
+
+
+

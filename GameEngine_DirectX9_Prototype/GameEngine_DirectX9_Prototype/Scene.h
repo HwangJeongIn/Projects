@@ -87,6 +87,8 @@ public :
 	void registerMainObject(GameObject * other, MainObjTag tag);
 	void unregisterMainObject(GameObject * other, MainObjTag tag);
 
+	GameObject * getMainCamera();
+
 
 
 };

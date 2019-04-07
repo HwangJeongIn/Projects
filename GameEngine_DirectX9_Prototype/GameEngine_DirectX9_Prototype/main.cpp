@@ -138,6 +138,58 @@ bool Display(float timeDelta)
 //
 // WndProc
 //
+
+
+
+Terrain * GenerateTerrain()
+{
+	// ground
+	GameObject * ground = GameObject::Instantiate("ground", "Ground");
+	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
+	ground->getTransform()->setPosition(0, -10, 0);
+	ground->getTransform()->setRotation(0, 0, 0);
+	groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
+	groundRigidBody->turnOnStaticFlag();
+	Terrain * groundTerrain = ground->addComponent<Terrain>();
+	// adsfasfdSsabgaw.raw / coastMountain64.raw / Ash.raw / adsfsaf.raw
+	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 20, .5f);
+	groundTerrain->loadTextureFromFile("grass.bmp");
+
+	srand(time(0));
+
+	for (int i = 0; i < 15; ++i)
+	{
+		// 터레인의 로컬좌표계 기준으로 나무를 심어준다. // 즉 중심이 원점이고 xz평면으로 뻗어있는 터레인기준으로 생각해준다.
+
+		Vector3 pos = { 0,0,0 };
+		float depth = groundTerrain->getDepth();
+		float width = groundTerrain->getWidth();
+
+		float y = 0.0f;
+
+		pos.setX((rand() % (int)width) - width / 2);
+		pos.setZ((rand() % (int)depth) - depth / 2);
+		while (!groundTerrain->getLocalHeight(pos, &y))
+		{
+			// 범위안에 들어올때까지 뽑아준다. 
+			// 범위 맞춰서 랜덤값 적용해서 무조건 통과하긴하겠지만 그냥 예외처리하였다.
+			pos.setX((rand() % (int)width) - width / 2);
+			pos.setZ((rand() % (int)depth) - depth / 2);
+
+		}
+		pos.setY(y + 30);
+
+		GameObject * groundChild1 = ground->addChild("billBoard", "BillBoard");
+		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
+		billBoard1->generateBillBoard();
+		billBoard1->loadTextureFromFile("tree0.dds");
+		groundChild1->getTransform()->setPosition(pos);
+	}
+	return groundTerrain;
+}
+
+
+
 LRESULT CALLBACK d3d::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch( msg )
@@ -255,17 +307,12 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	remover2RigidBody->turnOnStaticFlag();
 
 
-	// ground
-	GameObject * ground = GameObject::Instantiate("ground", "Ground");
-	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
-	ground->getTransform()->setPosition(0, -10, 0);
-	ground->getTransform()->setRotation(0, 30, 0);
-	groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
-	groundRigidBody->turnOnStaticFlag();
-	Terrain * groundTerrain = ground->addComponent<Terrain>();
-	// adsfasfdSsabgaw.raw / coastMountain64.raw / Ash.raw / adsfsaf.raw
-	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 20, .5f);
-	groundTerrain->loadTextureFromFile("grass.bmp");
+
+	Terrain * groundTerrain = GenerateTerrain();
+
+
+
+
 	//D3DMATERIAL9 mtrl;
 	//// Set the RGBA for diffuse reflection.
 	//mtrl.Diffuse.r = 1.0f;
@@ -290,8 +337,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//mtrl.Emissive.a = 0.0f;
 	//groundTerrain->setMaterial(mtrl);
 
-
-	
 
 	// -1단계
 	//GameObject * player = GameObject::Instantiate("player", "Player");
@@ -319,6 +364,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 	GameObject * car1 = GameObject::Instantiate("car1", "Car");
+	car1->addChild(mainCamera);
 	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1->addComponent<PlayerScript>();
 	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
