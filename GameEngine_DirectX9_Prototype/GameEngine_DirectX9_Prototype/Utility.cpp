@@ -26,12 +26,36 @@ map<KeyCode, pair<int, int>> InputManager::KeyCodeTable
 	{ KeyCode::UpArrow,{ 224,72 } },
 	{ KeyCode::DownArrow,{ 224,80 } },
 	{ KeyCode::RightArrow,{ 224,77 } },
-	{ KeyCode::LeftArrow,{ 224,75 } },
+	{ KeyCode::LeftArrow,{ 224,75 } }
 };
+
+map<KeyCode, int> InputManager::VirtualKeyCodeTable
+{
+	{ KeyCode::W,0x57 },
+	{ KeyCode::A,0x41 },
+	{ KeyCode::S,0x53 },
+	{ KeyCode::D,0x44 },
+
+	{ KeyCode::Esc, 0x1B },
+	{ KeyCode::Space,0x20 },
+	{ KeyCode::Shift, 0x10 },
+
+	{ KeyCode::UpArrow,0x26 },
+	{ KeyCode::DownArrow,0x28 },
+	{ KeyCode::RightArrow,0x27 },
+	{ KeyCode::LeftArrow,0x25 },
+
+	{ KeyCode::LButton, 0x01 },
+	{ KeyCode::RButton, 0x02 },
+	{ KeyCode::MButton, 0x04 }
+};
+
+
 int InputManager::Major = -1;
 int InputManager::Minor = -1;
-
-
+bool InputManager::Prefetch = false;
+KeyCode InputManager::CurrentKeyCode = KeyCode::None;
+KeyCode InputManager::PreviousKeyCode = KeyCode::None;
 
 
 

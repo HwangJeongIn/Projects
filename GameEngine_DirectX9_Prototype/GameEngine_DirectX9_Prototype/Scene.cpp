@@ -17,48 +17,6 @@
 
 	}
 
-	void drawScene(IDirect3DDevice9 & device_s)
-	{
-		/*
-		
-		D3DXCreateTeapot(&device_s, &Teapot, 0);
-		D3DXMATRIX W;
-		D3DXMatrixIdentity(&W);
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 5, 0, 0);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 0, 0, 5);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, -5, 0, 0);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 0, 0, -5);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-
-		D3DXMatrixTranslation(&W, 0, 5, 0);
-
-		device_s.SetTransform(D3DTS_WORLD, &W);
-
-		Teapot->DrawSubset(0);
-		*/
-	}
 
 	void Scene::gameLoop()
 	{
@@ -113,12 +71,14 @@
 
 		// 화면을 지워준다.
 		device_s.Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0);
-
 		// 중간에 렌더링 작업도 들어가기 때문에 씬을 그리는 작업을 해준다.
 		device_s.BeginScene();
 
 
 		update();
+
+		device_s.EndScene();
+		device_s.Present(0, 0, 0, 0);
 
 		clock_t temp = currentTime - previousTime;
 		FrameTime::SetDeltaTime(temp);
@@ -141,9 +101,7 @@
 		if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)
 			Sleep(MS_PER_FRAME - FrameTime::GetDeltaTime());
 
-		device_s.EndScene();
-		device_s.Present(0, 0, 0, 0);
-
+		InputManager::Reset();
 	}
 
 	// 현재 게임오브젝트 리스트를 업데이트 시킨다.

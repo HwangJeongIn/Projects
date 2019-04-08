@@ -43,7 +43,7 @@ void PlayerScript::update()
 		//transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
 
-	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	if (InputManager::GetKeyDown(KeyCode::RightArrow))//(::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
 	{
 		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
 	}
@@ -2371,24 +2371,10 @@ bool Terrain::getHeight(const Vector3 & position, float * output)
 	// 이제부터 터레인의 로컬좌표계 기준으로 계산하면 된다. // 위치를 로컬좌표계로 끌어왔다.
 	// 이렇게 로컬좌표계로 변경하는 이유는 터레인이 로테이션됐을경우 1칸의 계산이 어렵기 때문이다.
 
-	float startX = -width/2;
-	float startZ = depth/2;
-	float endX = width/2;
-	float endZ = -depth/2;
-
-	// 만약에 벗어난다면 리턴
-	if (startX > positionInTerrainLocal.x || startZ < positionInTerrainLocal.z
-		|| endX < positionInTerrainLocal.x || endZ > positionInTerrainLocal.z)
+	if (!getLocalHeight({ positionInTerrainLocal.x,positionInTerrainLocal.y,positionInTerrainLocal.z }, output))
 		return false;
 
-	// 처음지점과 차이를 계산해서 버린 인덱스의 값을 구해본다.
-	int columnIndex = (startZ - positionInTerrainLocal.z) / distanceOfVertices;
-	int rowIndex = (positionInTerrainLocal.x - startX) / distanceOfVertices;
-
-	*output = heightMap[columnIndex * verticesPerRow + rowIndex];
 	return true;
-
-	// 아직 보간적용 X
 }
 
 bool Terrain::getLocalHeight(const Vector3 & position, float * output)
@@ -2401,18 +2387,60 @@ bool Terrain::getLocalHeight(const Vector3 & position, float * output)
 	float endZ = -depth / 2;
 
 	// 만약에 벗어난다면 리턴
-	if (startX > position.getX() || startZ < position.getZ()
-		|| endX < position.getX() || endZ > position.getZ())
+	if (startX >= position.getX() || startZ <= position.getZ()
+		|| endX <= position.getX() || endZ >= position.getZ())
 		return false;
 
-	// 처음지점과 차이를 계산해서 버린 인덱스의 값을 구해본다.
-	int columnIndex = (startZ - position.getZ()) / distanceOfVertices;
-	int rowIndex = (position.getX() - startX) / distanceOfVertices;
+	// 시작점으로 부터 얼마나 떨어져 있는지 구한다.
+	float z = (startZ - position.getZ());
+	float x = (position.getX() - startX);
+	// 인덱스의 값을 구해본다.
+	int columnIndex = z / distanceOfVertices;
+	int rowIndex = x / distanceOfVertices;
 
-	*output = heightMap[columnIndex * verticesPerRow + rowIndex];
+	// 그 인덱스 기준으로 얼마나 떨어져 있는지 구한다.
+	// 인덱스 기준 좌표로 초기화 시켜준다.
+	// distanceOfVertices인 정사각형이다. // 시작점 왼쪽위
+	z -= columnIndex * distanceOfVertices;
+	x -= rowIndex * distanceOfVertices;
+
+	/*
+	   a	  b
+		* -- *
+		l  / l
+		* __ *
+	   c      d
+
+	a기준으로 순회하는데 abc / cbd 삼각형 2개를 설정해주면 된다.
+	*/
+	float aHeight = heightMap[columnIndex * verticesPerRow + rowIndex];
+	float bHeight = heightMap[columnIndex * verticesPerRow + rowIndex + 1];
+	float cHeight = heightMap[(columnIndex + 1) * verticesPerRow + rowIndex];
+	float dHeight = heightMap[(columnIndex + 1) * verticesPerRow + rowIndex + 1];
+
+	float resultHeight = 0.0f;
+
+	// 어디로 치우쳐있는지에 대한 값을 구해준다 // 0 ~ 1사이 // 0 : x기준 맨왼쪽 z기준 맨위, 1 : x기준 맨오른쪽 z기준 맨아래
+	float zFactor = z / distanceOfVertices;
+	float xFactor = x / distanceOfVertices;
+
+	if (x + z < distanceOfVertices)
+	{
+		// 윗쪽 삼각형인 경우
+		// A Vector3 + (ab Vector3 * xFactor + ac Vector3 * zFactor) 의 y값
+		// 그냥 y값중심으로만 계산해도 된다. 
+		resultHeight = aHeight + ((bHeight - aHeight) * xFactor + (cHeight - aHeight) * zFactor);
+	}
+	else
+	{
+		// 아래쪽 삼각형인경우
+		// D Vector3 + (dc Vector3 * (1 - xFactor) + db Vector3 * (1 - zFactor)) 의 y값
+		// 그냥 y값중심으로만 계산해도 된다. 
+		resultHeight = dHeight + ((cHeight - dHeight) * (1 - xFactor) + (bHeight - dHeight) * (1 - zFactor));
+	}
+
+	*output = resultHeight;
 	return true;
-
-	// 아직 보간적용 X
 }
 
 void MoveOnTerrainScript::update()
@@ -2443,6 +2471,11 @@ void BillBoard::render()
 	if (!mesh) return;
 
 	device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+
+
+	// Color = TexelColor x SourceBlend + CurrentPixelColor x DestBlend
+	// 여기서 소스알파값이 0이면 뒷배경이 1이 적용되어서 뒷배경이 반영되고
+	// 소스 알파값이 .5이면 뒷배경이 .5로 적용되어서 .5만큼 반영된다.
 	device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
@@ -2536,7 +2569,7 @@ void BillBoard::start()
 	mtrl.Diffuse.r = .50f;
 	mtrl.Diffuse.g = .50f;
 	mtrl.Diffuse.b = .50f;
-	mtrl.Diffuse.a = 0.0f;
+	mtrl.Diffuse.a = 1.0f;
 
 	// Set the RGBA for ambient reflection.
 	mtrl.Ambient.r = 0.3f;
