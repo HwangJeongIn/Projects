@@ -27,9 +27,9 @@
 		GameObject * mainCamera = mainObjectsTable[MOT_MAINCAMERA];
 		IDirect3DDevice9 & device_s = mainCamera->getDevice();
 
-		/*
-		기본적인 월드를 계산해서 그린다.
-		*/
+		// 입력받은 키들을 모두 저장해준다.
+		InputManager::UpdateFrameStart();
+
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
 		if (previousTime == 0)
 			previousTime = clock();
@@ -97,11 +97,14 @@
 		// 60프레임 기준으로 시간이 남았다면 딜레이
 		
 		//Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
-		
+
+		// 이전프레임의 입력배열을 최신화 시켜준다.
+		InputManager::UpdateFrameEnd();
+
+
 		if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)
 			Sleep(MS_PER_FRAME - FrameTime::GetDeltaTime());
 
-		InputManager::Reset();
 	}
 
 	// 현재 게임오브젝트 리스트를 업데이트 시킨다.

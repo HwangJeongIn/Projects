@@ -149,18 +149,21 @@ int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void), Scene & scene)
 	MSG msg;
 	::ZeroMemory(&msg, sizeof(MSG));
 
-	static float lastTime = (float)timeGetTime(); 
+	//static float lastTime = (float)timeGetTime(); 
+
+
 
 	while(msg.message != WM_QUIT)
 	{
 		if(::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
+
 			::TranslateMessage(&msg);
 			::DispatchMessage(&msg);
+
 		}
 		else
         {	
-
 			//float currTime  = (float)timeGetTime();
 			//float timeDelta = (currTime - lastTime);// *0.001f;
 			

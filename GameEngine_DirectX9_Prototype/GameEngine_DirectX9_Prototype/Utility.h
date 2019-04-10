@@ -5,6 +5,7 @@
 #include <string>
 #include <conio.h>
 #include <map>
+#include <vector>
 #include <cmath>
 #include <d3dx9.h>
 #include <fbxsdk.h>
@@ -343,46 +344,114 @@ public:
 	}
 };
 
-enum class KeyCode
-{
-	None,
-	Space,
+//enum class KeyCode
+//{
+//	None,
+//	PNone,
+//	Space,
+//
+//	W,
+//	A,
+//	S,
+//	D,
+//
+//	Esc,
+//	Shift,
+//
+//	UpArrow,
+//	DownArrow,
+//	RightArrow,
+//	LeftArrow,
+//
+//	LButton,
+//	RButton,
+//	MButton
+//};
 
-	W,
-	A,
-	S,
-	D,
+//enum class KeyState
+//{
+//	NONE,
+//	STAY,
+//	UP,
+//	DOWN
+//};
 
-	Esc,
-	Shift,
 
-	UpArrow,
-	DownArrow,
-	RightArrow,
-	LeftArrow,
+/*
+* 기존 InputManager에서 수정된 사항
+- _kbhit()사용 =>> (GetAsyncKeyState(virtual keycode) & 0x8000f) 변경
+// 윈도우 프로그래밍에서는 _kbhit()사용할 수 없음 // msdn 참고
 
-	LButton,
-	RButton,
-	MButton
-};
-
+- 기존구조에서는 prefetch로 한프레임당 하나의 키를 받아올 수 있었다. // 즉 움직이면서 공격을 못한다. // ex. Arrow_up + Space
+=>> 모든 가상키에 대해서 (256개) 프레임이 시작될때 인풋을 모두 받아서 현재 가상키 상태 배열에 저장
+그 키가 눌렸는지 안눌렸는지는 그 가상키 상태 배열들(현재프레임 / 이전프레임) 참고해서 어떤상태인지 판별(up / down / stay)
+*/
 class InputManager
 {
 private:
 
+	// 이렇게 해주는 이유는 아무것도 안해주다가 다시 같은 키를 누르는 경우도 down처리를 해주기 위해서 이다.
+	// down 처리는 현재키코드와 이전키코드가 다르고 / 들어온 키코드가 현재키코드와 같을때 true를 반환한다.
+	// up 처리는 현재키코드와 이전키코드가 다르고 / 들어온 키코드가 이전 키코드와 같을때 true를 반환한다.
+	// stay 처리는 프리페치가 된 상태에서 현재키코드와 들어온 키코드가 같을때 true를 반환한다.
 
-	static map<KeyCode, pair<int, int>> KeyCodeTable;
-	static int Major;
-	static int Minor;
+	// 0 ~ 255의 virtual keycode 들의 현재 눌렸는지 여부를 저장
+	// 예를들어 0번키가 눌렸있으면 0번인덱스 값이 true이다.
+	static vector<bool> CurrentPressedState;
+	static vector<bool> PreviousPressedState;
 
-	// GetAsyncKeyState 함수를 싸는 함수를 만들어주기 위해서 정의
-	static map<KeyCode, int> VirtualKeyCodeTable;
-	static KeyCode CurrentKeyCode;
-	static KeyCode PreviousKeyCode;
 
-	static bool Prefetch;
+	//static map<KeyCode, pair<int, int>> KeyCodeTable;
+	//static int Major;
+	//static int Minor;
+
+	//// GetAsyncKeyState 함수를 싸는 함수를 만들어주기 위해서 정의
+	//// 특정키에 대해서만 검사를 하면 현재 어떤게 눌렸는지 확인하기 어렵다.
+	//static map<KeyCode, int> VirtualKeyCodeTable;
+
+	//// 어떤키가 최초에 다운되었는지 알기 위한 테이블 
+	//// 최초에 한번 true가 되고 다시 false가 된다.
+	////static map<KeyCode, bool> VirtualKeyCodeDownTable;
+
+	//static KeyCode CurrentKeyCode;
+	//static KeyCode PreviousKeyCode;
+
+	//static bool Prefetch;
 
 public:
+	static bool GetKeyDown(unsigned char virtualKeyCode)
+	{
+		// 이전프레임에서는 안눌렸지만 현재 프레임에서 눌린경우 true반환
+		return CurrentPressedState[virtualKeyCode] == true && PreviousPressedState[virtualKeyCode] == false;
+	}
+
+	static bool GetKeyStay(unsigned char virtualKeyCode)
+	{
+		// 현재프레임에서 눌려있으면 true반환
+		return CurrentPressedState[virtualKeyCode] == true;
+	}
+	static bool GetKeyUp(unsigned char virtualKeyCode)
+	{
+		// 이전프레임에서는 눌렀지만 현재 프레임에서 안눌린경우 true반환
+		return CurrentPressedState[virtualKeyCode] == false && PreviousPressedState[virtualKeyCode] == true;
+	}
+
+	// 프레임이 시작할때 입력된 키들 모두 저장
+	static void UpdateFrameStart()
+	{
+		for (int i = 0; i < 256; ++i)
+		{
+			CurrentPressedState[i] = (GetAsyncKeyState(i) & 0x8000f);
+		}
+	}
+
+	// 프레임이 끝날때 이전프레임 눌림상태를 현재프레임 눌림상태로 초기화해준다.
+	static void UpdateFrameEnd()
+	{
+		PreviousPressedState = CurrentPressedState;
+	}
+
+	// window programming에서는 _kbhit()을 사용할 수 없다.
 	//static bool GetKeyDown(KeyCode keyCode)
 	//{
 	//	if (!Prefetch)
@@ -414,47 +483,118 @@ public:
 
 	// 프리페치 이후
 	/*
-	 - current = previous
+	현재 키코드를 검사했을때
+
+	 - current == previous
 		stay : true
-	
+		down : false
+		up : false
+
+	- current != previous
+		stay : true
+		down : (current)true
+		up : (previous) true
 	*/
 	
 
-	static bool GetKeyDown(KeyCode keyCode)
-	{
-		if (!Prefetch)
-		{
-			// 키코드가 등록되어 있지않다면 리턴
-			map<KeyCode, int>::iterator it = VirtualKeyCodeTable.find(keyCode);
-			if (it == VirtualKeyCodeTable.end()) return false;
+	//static bool GetKeyStay(KeyCode keyCode)
+	//{
+	//	if (!Prefetch)
+	//	{
+	//		// 키코드가 등록되어 있지않다면 리턴
+	//		map<KeyCode, int>::iterator it = VirtualKeyCodeTable.find(keyCode);
+	//		if (it == VirtualKeyCodeTable.end()) return false;
 
-			// 키가 눌렸는지 확인
-			if (!(GetAsyncKeyState(it->second) & 0x8000f)) return false;
+	//		// 키가 눌렸는지 확인
+	//		if (!(GetAsyncKeyState(it->second) & 0x8000f)) return false;
 
-			// 키코드가 등록되어 있고 눌렸다면 키가눌린것을 한프레임에서 유지
-			Prefetch = true;
-			CurrentKeyCode = keyCode;
-			return true;
+	//		// 키코드가 등록되어 있고 눌렸다면 키가눌린것을 한프레임에서 유지
+	//		Prefetch = true;
+	//		CurrentKeyCode = keyCode;
+	//		return true;
 
-		}
-		
-		if (CurrentKeyCode != keyCode)
-			return false;
-		return true;
-	}
+	//	}
+	//	
+	//	// stay일때는 CurrentKeyCode와 비교하면된다.
+	//	// prefetch에 의해 항상 CurrentKeyCode가 최신화 되어 있다.
+	//	if (CurrentKeyCode != keyCode)
+	//		return false;
+	//	return true;
+	//}
+
+	//static bool GetKeyDown(KeyCode keyCode)
+	//{
+	//	if (!Prefetch)
+	//	{
+	//		// 키코드가 등록되어 있지않다면 리턴
+	//		map<KeyCode, int>::iterator it = VirtualKeyCodeTable.find(keyCode);
+	//		if (it == VirtualKeyCodeTable.end()) return false;
+
+	//		// 키가 눌렸는지 확인
+	//		if (!(GetAsyncKeyState(it->second) & 0x8000f)) return false;
+
+	//		// 키코드가 등록되어 있고 눌렸다면 키가눌린것을 한프레임에서 유지
+	//		Prefetch = true;
+	//		CurrentKeyCode = keyCode;
+	//		return true;
+
+	//	}
+	//	// 현재 키가 확정된 상태에서 // prefetch에 의해
+	//	// PreviousKeyCode 와 CurrentKeyCode와 다르고 들어온 키코드와 CurrentKeyCode가 같다면 true 반환
+	//	if (CurrentKeyCode != keyCode)
+	//		return false;
+	//	return true;
+	//}
+
+	//static bool GetKeyUp(KeyCode keyCode)
+	//{
+	//	if (!Prefetch)
+	//	{
+	//		// 키코드가 등록되어 있지않다면 리턴
+	//		map<KeyCode, int>::iterator it = VirtualKeyCodeTable.find(keyCode);
+	//		if (it == VirtualKeyCodeTable.end()) return false;
+
+	//		// 키가 눌렸는지 확인
+	//		if (!(GetAsyncKeyState(it->second) & 0x8000f)) return false;
+
+	//		// 키코드가 등록되어 있고 눌렸다면 키가눌린것을 한프레임에서 유지
+	//		Prefetch = true;
+	//		CurrentKeyCode = keyCode;
+	//		return true;
+
+	//	}
+
+	//	if (CurrentKeyCode != keyCode)
+	//		return false;
+	//	return true;
+	//}
 
 
-	static void Reset()
-	{
-		// for KeyCodeTable
-		Major = -1;
-		Minor = -1;
-		// for VirtualKeyCodeTable
-		CurrentKeyCode = KeyCode::None;
-		PreviousKeyCode = CurrentKeyCode;
-		Prefetch = false;
+	//static void Reset()
+	//{
+	//	// for KeyCodeTable
+	//	Major = -1;
+	//	Minor = -1;
+	//	// for VirtualKeyCodeTable
+	//	//CurrentKeyCode = KeyCode::None;
+	//	PreviousKeyCode = CurrentKeyCode;
 
-	}
+	//	// 만약에 현재 키가 최신화가 안된 상태라면 
+	//	if (Prefetch == false)
+	//	{
+	//		// None으로 현재 키를 바꿔준다.
+	//		CurrentKeyCode = KeyCode::None;
+	//		// PNone으로 이전 키를 바꿔준다.
+	//		PreviousKeyCode = KeyCode::PNone;
+
+	//		// 이렇게 해주는 이유는 아무것도 안해주다가 다시 같은 키를 누르는 경우도 down처리를 해주기 위해서 이다.
+	//		// down 처리는 현재키코드와 이전키코드가 다르고 / 들어온 키코드가 현재키코드와 같을때 true를 반환한다.
+	//		// up 처리는 현재키코드와 이전키코드가 다르고 / 들어온 키코드가 이전 키코드와 같을때 true를 반환한다.
+	//		// stay 처리는 프리페치가 된 상태에서 현재키코드와 들어온 키코드가 같을때 true를 반환한다.
+	//	}
+
+	//	Prefetch = false;
+	//}
 
 };
 

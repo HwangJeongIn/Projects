@@ -1001,6 +1001,7 @@ class MoveOnTerrainScript : public Component
 {
 private:
 	Terrain * terrain;
+	float objectHeight;
 protected:
 	virtual void start() {};
 	virtual void update();
@@ -1008,7 +1009,7 @@ protected:
 
 public:
 	MoveOnTerrainScript(GameObject * go, Transform * tf)
-		: Component(go, tf), terrain(nullptr)
+		: Component(go, tf), terrain(nullptr), objectHeight(0)
 	{
 		start();
 	}
@@ -1021,6 +1022,11 @@ public:
 	void setTerrain(Terrain * terrain)
 	{
 		this->terrain = terrain;
+	}
+
+	void setObjectHeight(float objectHeight)
+	{
+		this->objectHeight = objectHeight;
 	}
 
 };

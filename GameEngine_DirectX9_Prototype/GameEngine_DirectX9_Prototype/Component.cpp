@@ -28,22 +28,22 @@ void PlayerScript::update()
 
 	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
 	{
-		if (gameObject->getRigidBody())
-		{
-			gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
-		}
-		//transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+		//if (gameObject->getRigidBody())
+		//{
+		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+		//}
+		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
 	}
 	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
 	{
-		if (gameObject->getRigidBody())
-		{
-			gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* -.1f *(transform->getForward()));
-		}
-		//transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
+		//if (gameObject->getRigidBody())
+		//{
+		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* -.1f *(transform->getForward()));
+		//}
+		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
 
-	if (InputManager::GetKeyDown(KeyCode::RightArrow))//(::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
 	{
 		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
 	}
@@ -53,7 +53,7 @@ void PlayerScript::update()
 		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
 	}
 
-	if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
+	if (InputManager::GetKeyUp(VK_SPACE))
 	{
 		Vector3 direction = transform->getForward() + transform->getUp();
 		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
@@ -355,20 +355,20 @@ void MainCamera::update()
 	setViewSpace();
 
 	if (::GetAsyncKeyState('E') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,5.05f,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ 0,1.05f,0 });
 	if (::GetAsyncKeyState('Q') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,-5.05f,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ 0,-1.05f,0 });
 
 	if (::GetAsyncKeyState('Z') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,.05f });
-		transform->setRotation(transform->getRotation() + Vector3{ 5.05f,0,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ 1.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('C') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,-.05f });
-		transform->setRotation(transform->getRotation() + Vector3{ -5.05f,0,0 });
+		transform->setRotation(transform->getRotation() + Vector3{ -1.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('W') & 0x8000f)
@@ -1952,6 +1952,10 @@ void Terrain::render()
 
 	mesh->DrawSubset(0);
 
+	float height = 0.0f;
+	getLocalHeight({ 0,0,0 }, &height);
+	Gizmos::DrawLine({ 0,0,0 }, { 0,height,0 });
+
 	return;
 
 	//// 파일이 로드되어서 값이 있는 경우만 그려준다.
@@ -2053,7 +2057,7 @@ bool Terrain::loadHeightMap(const string & fileName)
 
 	// 읽은 데이터를 다시 저장한다. // 이때 heightValue을 적용시켜준다.
 	for (int i = 0; i < infoToRead.size(); i++)
-		heightMap[i] = infoToRead[i] * heightValue;
+		heightMap[i] = (float)infoToRead[i] * (float)heightValue;
 
 	return true;
 }
@@ -2413,6 +2417,7 @@ bool Terrain::getLocalHeight(const Vector3 & position, float * output)
 
 	a기준으로 순회하는데 abc / cbd 삼각형 2개를 설정해주면 된다.
 	*/
+
 	float aHeight = heightMap[columnIndex * verticesPerRow + rowIndex];
 	float bHeight = heightMap[columnIndex * verticesPerRow + rowIndex + 1];
 	float cHeight = heightMap[(columnIndex + 1) * verticesPerRow + rowIndex];
@@ -2439,7 +2444,8 @@ bool Terrain::getLocalHeight(const Vector3 & position, float * output)
 		resultHeight = dHeight + ((cHeight - dHeight) * (1 - xFactor) + (bHeight - dHeight) * (1 - zFactor));
 	}
 
-	*output = resultHeight;
+	// 여기서 현재 터레인의 높이만큼 더해준다.
+	*output = resultHeight + transform->getPosition().getY();
 	return true;
 }
 

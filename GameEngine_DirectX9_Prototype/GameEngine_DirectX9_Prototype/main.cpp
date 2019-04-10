@@ -13,7 +13,7 @@
 // 에러코드 무시
 //#pragma warning(disable:4244) // '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 //#pragma warning(disable:4018) // '<': signed 또는 unsigned가 일치하지 않습니다.
-
+#include <conio.h>
 #include "d3dUtility.h"
 #include "camera.h"
 #include "Locator.h"
@@ -145,11 +145,9 @@ Terrain * GenerateTerrain()
 {
 	// ground
 	GameObject * ground = GameObject::Instantiate("ground", "Ground");
-	RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
-	ground->getTransform()->setPosition(0, -10, 0);
-	ground->getTransform()->setRotation(0, 0, 0);
-	groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
-	groundRigidBody->turnOnStaticFlag();
+	//RigidBody * groundRigidBody = ground->addComponent<RigidBody>();
+	//groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
+	//groundRigidBody->turnOnStaticFlag();
 	Terrain * groundTerrain = ground->addComponent<Terrain>();
 	// adsfasfdSsabgaw.raw / coastMountain64.raw / Ash.raw / adsfsaf.raw
 	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 20, .5f);
@@ -177,7 +175,7 @@ Terrain * GenerateTerrain()
 			pos.setZ((rand() % (int)depth) - depth / 2);
 
 		}
-		pos.setY(y + 30);
+		pos.setY(y + 40);
 
 		GameObject * groundChild1 = ground->addChild("billBoard", "BillBoard");
 		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
@@ -308,8 +306,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 
-	Terrain * groundTerrain = GenerateTerrain();
-
 
 
 
@@ -371,10 +367,11 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	car1RigidBody->setSphereCollider(2);
 
 	MoveOnTerrainScript * car1MoveOnTerrainScript = car1->addComponent<MoveOnTerrainScript>();
-	car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	car1MoveOnTerrainScript->setObjectHeight(3.0f);
 	//car1RigidBody->setGravity(Vector3(0, 0, 0));
 	//car1->addComponent<BoxCollider>();
-	car1->getTransform()->setPosition(-15, 10, 0);
+	car1->getTransform()->setPosition(-15, 0, 0);
 	car1->getTransform()->setRotation(0, 180, 0);
 
 	// 1단계
@@ -398,7 +395,15 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	car1Child1Child2->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child2->getTransform()->setPosition(7, 0, 0);*/
 	
+
+
+
+	// 맵등록 + 맵을 사용할 Script 등록
+	Terrain * groundTerrain = GenerateTerrain();
+	car1MoveOnTerrainScript->setTerrain(groundTerrain);
+
 	Scene & scene = mainCamera->getScene();
+
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
