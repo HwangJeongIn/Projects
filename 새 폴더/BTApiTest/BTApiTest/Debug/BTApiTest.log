@@ -1,0 +1,4 @@
+﻿  main.cpp
+d:\github\projects\새 폴더\btapitest\btapitest\main.cpp(227): warning C4101: 'state' :참조되지 않은 지역 변수입니다.
+  BTApiTest.vcxproj -> D:\GitHub\Projects\새 폴더\BTApiTest\Debug\BTApiTest.exe
+  BTApiTest.vcxproj -> D:\GitHub\Projects\새 폴더\BTApiTest\Debug\BTApiTest.pdb (Full PDB)
