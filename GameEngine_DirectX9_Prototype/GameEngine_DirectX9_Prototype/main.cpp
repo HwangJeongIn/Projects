@@ -181,7 +181,7 @@ Terrain * GenerateTerrain()
 		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
 		billBoard1->generateBillBoard();
 		billBoard1->loadTextureFromFile("tree0.dds");
-		groundChild1->getTransform()->setPosition(pos);
+		groundChild1->getTransform()->setWorldPosition(pos);
 	}
 	return groundTerrain;
 }
@@ -279,33 +279,30 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	*/
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
-	mainCamera->getTransform()->setPosition(0, 0, -100);
-	mainCamera->getTransform()->setRotation(0, 0, 0);
+	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
+	mainCamera->getTransform()->setWorldRotation(30, 0, 0);
 
 
 
-	// remover
-	GameObject * remover = GameObject::Instantiate("remover", "Remover");
-	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
-	remover->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	RigidBody * removerRigidBody = remover->addComponent<RigidBody>();
-	remover->getTransform()->setPosition(0, 0, 0);
-	removerRigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
-	//removerRigidBody->turnOnIsTriggerFlag();
-	//removerRigidBody->turnOnStaticFlag();
+	//// remover
+	//GameObject * remover = GameObject::Instantiate("remover", "Remover");
+	////ground->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//remover->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//RigidBody * removerRigidBody = remover->addComponent<RigidBody>();
+	//remover->getTransform()->setPosition(0, 0, 0);
+	//removerRigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
+	////removerRigidBody->turnOnIsTriggerFlag();
+	////removerRigidBody->turnOnStaticFlag();
 
-	// remover2
-	GameObject * remover2 = GameObject::Instantiate("remover2", "Remover");
-	//ground->addComponent<MeshRenderer>()->loadXFile("car.x");
-	remover2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	RigidBody * remover2RigidBody = remover2->addComponent<RigidBody>();
-	remover2->getTransform()->setPosition(10, 0, 0);
-	remover2RigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
-	remover2RigidBody->turnOnIsTriggerFlag();
-	remover2RigidBody->turnOnStaticFlag();
-
-
-
+	//// remover2
+	//GameObject * remover2 = GameObject::Instantiate("remover2", "Remover");
+	////ground->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//remover2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//RigidBody * remover2RigidBody = remover2->addComponent<RigidBody>();
+	//remover2->getTransform()->setPosition(10, 0, 0);
+	//remover2RigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
+	//remover2RigidBody->turnOnIsTriggerFlag();
+	//remover2RigidBody->turnOnStaticFlag();
 
 
 
@@ -358,32 +355,57 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//car0->addComponent<RigidBody>()->setSphereCollider(2);
 	///car0->addComponent<BoxCollider>();
 
+	// player
+	GameObject * player = GameObject::Instantiate("player", "Player");
+	player->addChild(mainCamera);
+	player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	player->addComponent<PlayerScript>();
+	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	playerRigidBody->setSphereCollider(2);
 
-	GameObject * car1 = GameObject::Instantiate("car1", "Car");
-	car1->addChild(mainCamera);
-	car1->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car1->addComponent<PlayerScript>();
-	RigidBody * car1RigidBody = car1->addComponent<RigidBody>();
-	car1RigidBody->setSphereCollider(2);
-
-	MoveOnTerrainScript * car1MoveOnTerrainScript = car1->addComponent<MoveOnTerrainScript>();
+	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
-	car1MoveOnTerrainScript->setObjectHeight(3.0f);
-	//car1RigidBody->setGravity(Vector3(0, 0, 0));
-	//car1->addComponent<BoxCollider>();
-	car1->getTransform()->setPosition(-15, 0, 0);
-	car1->getTransform()->setRotation(0, 180, 0);
 
-	// 1단계
-	GameObject * car1Child1 = car1->addChild("bigShip1", "BigShip");
-	car1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	car1Child1->getTransform()->setPosition(5, 3, 0);
-	car1Child1->addComponent<MoveScript_C>();
+	playerMoveOnTerrainScript->setObjectHeight(3.0f);
+	player->getTransform()->setWorldPosition(-15, 0, 0);
+	player->getTransform()->setWorldRotation(0, 180, 0);
+
+	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
+	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1->addComponent<MoveScript_C>();
 
 
-	//GameObject * car1Child2 = car1->addChild("bigShip2", "BigShip");
-	//car1Child2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//car1Child2->getTransform()->setPosition(10, 0, 0);
+	// enemy
+	GameObject * enemy = GameObject::Instantiate("enemy", "Enemy");
+	//enemy->addChild(mainCamera);
+	enemy->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
+	//enemy->addComponent<PlayerScript>();
+	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
+	enemyRigidBody->setSphereCollider(2);
+
+	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
+	//enemyRangeCollider->getTransform()->setLocalPosition(0, 0, 0);
+	enemyRangeCollider->addComponent<MeshRenderer>()->loadXFile("car.x");
+
+	RigidBody * enemyRangeColliderRigidBody = enemyRangeCollider->addComponent<RigidBody>();
+	// 탐색 범위 10 // 안움직여야 하기 때문에 static객체 설정 + 뚫어야 하기 때문에 trigger객체 설정
+	enemyRangeColliderRigidBody->setSphereCollider(30.0f);
+	enemyRangeColliderRigidBody->turnOnIsTriggerFlag();
+	//enemyRangeColliderRigidBody->setGravity(Vector3{ 0, 0, 0 });
+	enemyRangeColliderRigidBody->turnOnStaticFlag();
+	enemyRangeCollider->addComponent<BasicEnemySearchRangeScript>();
+
+
+	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
+	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	enemyMoveOnTerrainScript->setObjectHeight(3.0f);
+	//enemy->getTransform()->setPosition(0, 0, 0);
+	//enemy->getTransform()->setRotation(0, 0, 0);
+
+
+
 
 	// 2단계
 	
@@ -400,9 +422,20 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// 맵등록 + 맵을 사용할 Script 등록
 	Terrain * groundTerrain = GenerateTerrain();
-	car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	playerMoveOnTerrainScript->setTerrain(groundTerrain);
+	enemyMoveOnTerrainScript->setTerrain(groundTerrain);
+
+	// 하드코딩 스타트지점 맞추기------------------------------------------------------------------------------
+	float tempHeight = 0.0f;
+	groundTerrain->getHeight(enemy->getTransform()->getWorldPosition(), &tempHeight);
+	const Vector3 & startPoint = enemyBasicEnemyScript->getStartPoint();
+	enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
+	//---------------------------------------------------------------------------------------------------------
+
+
 
 	Scene & scene = mainCamera->getScene();
+
 
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.

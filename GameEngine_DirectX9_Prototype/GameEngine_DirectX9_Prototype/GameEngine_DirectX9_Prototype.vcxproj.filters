@@ -116,6 +116,9 @@
     <ClInclude Include="FbxModelAnimationKeyFrames.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="BehaviorTree.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="DEBUG.txt">

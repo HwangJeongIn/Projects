@@ -8,7 +8,61 @@
 // 여기서도 여러가지 파라미터들을 받을때 마지막 파라미터가 NULL일때 까지 읽는다.
 #define BTNodeBranchEnd NULL
 
+
+//template <typename T, T> struct proxy;
+//
+//template <typename T, typename R, typename ...Args, R(T::*mf)(Args...)>
+//struct proxy<R(T::*)(Args...), mf>
+//{
+//	static R call(T & obj, Args &&... args)
+//	{
+//		return (obj.*mf)(std::forward<Args>(args)...);
+//	}
+//};
+
+
 using namespace std;
+
+/* 
+함수 객체 정의
+*/
+
+// 앞에서 선언해줘야 인식
+template <typename T, T> struct BoolFunc;
+
+template <typename T, bool(T::*fn)() /* typename R, typename ...Args, R(T::*mf)(Args...)*/>
+struct BoolFunc<bool (T::*)(), fn>
+{
+	T * obj;
+	BoolFunc(T * obj)
+		: obj(obj) 
+	{}
+
+	bool call(/*T & obj, Args &&... args*/)
+	{
+		if (!obj) return false;
+		return (obj->*fn)();
+	}
+};
+
+// 앞에서 선언해줘야 인식
+template <typename T, T> struct VoidFunc;
+
+template <typename T, void(T::*fn)() /* typename R, typename ...Args, R(T::*mf)(Args...)*/>
+struct VoidFunc<void (T::*)(), fn>
+{
+	T * obj;
+	VoidFunc(T * obj)
+		: obj(obj)
+	{}
+
+	void call(/*T & obj, Args &&... args*/)
+	{
+		if (!obj) return;
+		(obj->*fn)();
+	}
+};
+
 
 
 
@@ -43,35 +97,44 @@ public :
 
 };
 
+template <typename T, void(T::*fn)()>
 class Action : public BTNode
 {
 private :
-	void(*fn)();
+	//void(*fn)();
+	struct VoidFunc<void (T::*)(), fn> functionObj;
 public:
-	Action(void (* fn)())
-		: BTNode("Action"), fn(fn)
+	Action(T * obj)
+		: BTNode("Action"), functionObj(obj)
 	{}
 	virtual ~Action() {}
 	virtual BTNodeState tick()
 	{
-		fn();
+		functionObj.call();
 		return BTNodeState::Success;
 	}
 };
 
 
+template <typename T, bool(T::*fn)()>
 class Condition : public BTNode
 {
 private:
-	bool(*fn)();
+	//bool(*fn)();
+
+	struct BoolFunc<bool (T::*)(), fn> functionObj;
+
 public:
-	Condition(bool(*fn)())
-		: BTNode("Condition"), fn(fn)
+	Condition(T * obj)
+		: BTNode("Condition"), functionObj(obj)
 	{}
 	virtual ~Condition() {}
+
+
 	virtual BTNodeState tick()
 	{
-		bool result = fn();
+		bool result = functionObj.call();
+
 		if (result)
 			return BTNodeState::Success;
 
@@ -85,6 +148,8 @@ public:
  이 클래스를 상속받은 경우 자식 노드들을 추가할 수 있다. // openBranch
 */
 // 이클래스만 독립적으로 사용하는 경우는 없다. // 아직 제한해주지 않았음
+
+
 class Branch : public BTNode
 {
 protected : 
@@ -132,6 +197,8 @@ public :
 	}
 
 };
+
+
 
 /*
  블록단위로 실행시킬 수 있는 클래스
@@ -182,14 +249,17 @@ public:
 
 };
 
+
+
+template <typename T, bool(T::*fn)()>
 class While : public Block
 {
 private :
-	bool(*fn)();
-
+	//bool(*fn)();
+	struct BoolFunc<bool (T::*)(), fn> functionObj;
 public :
-	While(bool(*fn)())
-		: Block("While"), fn(fn)
+	While(T * obj)
+		: Block("While"), functionObj(obj)
 	{}
 
 	virtual ~While() {}
@@ -200,7 +270,7 @@ public :
 	*/
 	virtual BTNodeState tick()
 	{
-		bool result = fn();
+		bool result = functionObj.call();
 
 		if(result)
 		{
@@ -217,14 +287,16 @@ public :
 
 };
 
+
+template <typename T, bool(T::*fn)()>
 class If : public Block
 {
 private:
-	bool(*fn)();
-
+	//bool(*fn)();
+	struct BoolFunc<bool (T::*)(), fn> functionObj;
 public:
-	If(bool(*fn)())
-		: Block("If"), fn(fn)
+	If(T * obj)
+		: Block("If"), functionObj(obj)
 	{}
 
 	virtual ~If() {}
@@ -235,7 +307,7 @@ public:
 	*/
 	virtual BTNodeState tick()
 	{
-		bool result = fn();
+		bool result = functionObj.call();
 
 		if (result)
 		{
@@ -340,11 +412,25 @@ bool inRange3()
 
 float distance = 3.0f;
 
+
+class TempClass
+{
+public :
+	void func() { cout << "hello world!" << endl; }
+	bool boolTrueFunc() { return true; }
+	bool boolFalseFunc() { return false; }
+};
+
 #include <Windows.h>
 #include <conio.h>
 
+
+
+
 int main()
 {
+	TempClass temp;
+
 	BTNode * root = new Root();
 	root->openBranch
 	(
@@ -353,27 +439,27 @@ int main()
 			(new Suquence())->openBranch
 			(
 				// 타겟검사
-				new Condition([]()-> bool {return false; }),
+				new Condition<TempClass, &TempClass::boolTrueFunc>(&temp),
 				(new Selector())->openBranch
 				(
 					// Range1일때
-					(new If([]()-> bool {return false; }))->openBranch
+					(new If<TempClass, &TempClass::boolFalseFunc>(&temp))->openBranch
 					(
-						new Action([]()->void {cout << "action in Range1" << endl; }),
+						//new Action([]()->void {cout << "action in Range1" << endl; }),
 						BTNodeBranchEnd
 					),
 
 					// Range2일때
-					(new If([]()-> bool {return false; }))->openBranch
+					(new If<TempClass, &TempClass::boolFalseFunc>(&temp))->openBranch
 					(
-						new Action([]()->void {cout << "action in Range2" << endl; }),
+						//new Action([]()->void {cout << "action in Range2" << endl; }),
 						BTNodeBranchEnd
 					),
 
 					// Range3일때
-					(new If([]()-> bool {return false; }))->openBranch
+					(new If<TempClass, &TempClass::boolFalseFunc>(&temp))->openBranch
 					(
-						new Action([]()->void {cout << "action in Range3" << endl; }),
+						//new Action([]()->void {cout << "action in Range3" << endl; }),
 						BTNodeBranchEnd
 					),
 					BTNodeBranchEnd
@@ -382,16 +468,17 @@ int main()
 			),
 
 			// 복귀검사
-			(new If([]()-> bool {return false; }))->openBranch
+			(new If<TempClass, &TempClass::boolFalseFunc>(&temp))->openBranch
 			(
-				new Action([]()->void {cout << "action in return"<<endl; }),
+				//new Action([]()->void {cout << "action in return"<<endl; }),
 				BTNodeBranchEnd
 			),
 
 			// 대기할때 할일 정해주기
-			(new While([]()-> bool {return true; }))->openBranch
+			(new While<TempClass, &TempClass::boolTrueFunc>(&temp))->openBranch
 			(
-				new Action([]()->void {cout << "action in idle" << endl; }),
+				//new Action([]()->void {cout << "action in Range3" << endl; }),
+				new Action<TempClass, &TempClass::func>(&temp),
 				BTNodeBranchEnd
 			),
 			BTNodeBranchEnd

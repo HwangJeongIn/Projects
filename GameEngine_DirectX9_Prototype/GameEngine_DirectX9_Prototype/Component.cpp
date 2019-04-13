@@ -14,119 +14,6 @@
 #include "Trace.h"
 
 
-void PlayerScript::update()
-{
-	//if (::GetAsyncKeyState('Q') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
-	//if (::GetAsyncKeyState('E') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
-
-	//if (::GetAsyncKeyState('Z') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
-	//if (::GetAsyncKeyState('C') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
-
-	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
-	{
-		//if (gameObject->getRigidBody())
-		//{
-		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
-		//}
-		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
-	}
-	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
-	{
-		//if (gameObject->getRigidBody())
-		//{
-		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* -.1f *(transform->getForward()));
-		//}
-		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
-	}
-
-	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
-	{
-		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
-	}
-
-	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
-	{
-		transform->setPosition(transform->getPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
-	}
-
-	if (InputManager::GetKeyUp(VK_SPACE))
-	{
-		Vector3 direction = transform->getForward() + transform->getUp();
-		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
-		bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
-		bullet->getTransform()->setPosition(transform->getPosition()+direction);
-
-		RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
-		bulletRigidBody->setSphereCollider(1);
-		bulletRigidBody->addForce(direction * 20.0f);
-		bullet->addComponent<BulletScript>();
-
-		//car1RigidBody->setGravity(Vector3(0, 0, 0));
-		//car1->addComponent<BoxCollider>();
-	}
-
-	if (::GetAsyncKeyState('N') & 0x8000f)
-			transform->setRotation(transform->getRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,-1,0 });
-
-	if (::GetAsyncKeyState('M') & 0x8000f)
-			transform->setRotation(transform->getRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,1,0 });
-}
-
-void PlayerScript::start()
-{
-	//animationFSM = gameObject->getComponent<AnimationFSM>();
-	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
-	if (temp)
-	{
-		temp->play(false);
-		temp->setVolume(7.0f);
-	}
-}
-
-void PlayerScript::onCollisionStay(GameObjectWithCollision & other)
-{
-	
-}
-
-void MoveScript_C::start()
-{
-
-}
-
-void MoveScript_C::update()
-{
-	if (::GetAsyncKeyState('K') & 0x8000f)
-	{
-		transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
-		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
-		if (temp)
-		{
-			temp->play(false);
-			temp->setVolume(2.0f);
-		}
-	}
-
-	if (::GetAsyncKeyState('L') & 0x8000f)
-	{
-		transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
-		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
-		if (temp)
-		{
-			temp->play(false);
-			temp->setVolume(2.0f);
-		}
-	}
-
-
-
-	if (::GetAsyncKeyState('P') & 0x8000f)
-		GameObject::Destroy(gameObject);
-}
-
 const D3DXVECTOR3 Transform::WorldRight{ 1,0,0 };
 const D3DXVECTOR3 Transform::WorldUp{ 0,1,0 };
 const D3DXVECTOR3 Transform::WorldForward{ 0, 0, 1 };
@@ -170,7 +57,8 @@ const float Transform::Pi = 3.14159f;
 //
 //}
 
-void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMatrix)
+
+void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMatrix, bool toPhysicsSystem)
 {
 	// 비트 연산으로 최종적으로 위에서 최신화 메시지를 받았거나, 
 	// 자체적으로 최신화하는 경우에 최신화 해주고 자식객체에게도 최신화를 전달해준다.
@@ -184,6 +72,12 @@ void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMa
 		//setPositionMatrix_DX(parentPositionMatrix);
 		// 최종 transformMatrix = 계산한 로테이션 * 포지션
 		setTransformMatrix(parentTransformMatrix);
+
+		// 값이 변경되었을때 리지드바디가 있다면 물리에서도 transform값을 변경해준다.
+		if (gameObject->getRigidBody() && toPhysicsSystem)
+			gameObject->getPhysics().setTransformToSystem(gameObject);
+
+
 		this->dirty = false;
 	}
 
@@ -199,6 +93,13 @@ void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMa
 	}
 }
 
+void Transform::rootTransformUpdate(bool toPhysicsSystem)
+{
+	Transform * rootTransform = gameObject->getRoot()->getTransform();
+	// 부모객체 기준으로 TransformMatrix를 최신화 시켜준다.
+	rootTransform->transformUpdate(rootTransform->getDirty(), Transform::IdentityMatrix, toPhysicsSystem);
+}
+
 void Transform::setTransformMatrix(const D3DXMATRIX & parentTransformMatrix)
 {
 	// 먼저 자식의 부모좌표계 기준으로 로테이션과 포지션 행렬을 구해준다.
@@ -208,7 +109,8 @@ void Transform::setTransformMatrix(const D3DXMATRIX & parentTransformMatrix)
 	// rotationMatrix * positionMatrix
 	// 최종적으로 위에서 부터 최신화된 부모의 transform행렬을 곱해준다.
 	// 따라서 최종 행렬은
-	transformMatrix = (rotationMatrix * positionMatrix) * parentTransformMatrix;
+	localTransformMatrix = rotationMatrix * positionMatrix;
+	transformMatrix = localTransformMatrix * parentTransformMatrix;
 }
 
 void Transform::calcRotationMatrix()
@@ -224,7 +126,7 @@ void Transform::calcRotationMatrix()
 	//	//D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, D3DXMatrixRotationZ(&temp, rotation.getZ()));
 	//	D3DXMatrixMultiply(&rotationMatrix_DX, &rotationMatrix_DX, &parentRotationMatrix);
 
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, DegreeToRadian( rotation.getY()), DegreeToRadian(rotation.getX()), DegreeToRadian(rotation.getZ()));
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, DegreeToRadian(rotation.getY()), DegreeToRadian(rotation.getX()), DegreeToRadian(rotation.getZ()));
 }
 
 void Transform::calcPositionMatrix()
@@ -273,72 +175,575 @@ void Transform::calcPositionMatrix()
 //	D3DXMatrixMultiply(&positionMatrix_DX, &positionMatrix_DX, &parentPositionMatrix);
 //}
 
-void Transform::setPosition_physics(const Vector3 & other)
+
+
+void Transform::convertLocalPositionIfItIsChild(Vector3 & output, const Vector3 & input)
 {
-	position = other; dirty = true;
+	// 부모객체가 없다면 그냥 바로 초기화
+	if (!gameObject->getParent())
+	{
+		output = input;
+		return;
+	}
+
+	// 부모객체가 있다면 
+	/*
+	1. 부모객체의 TransformMatrix의 역행렬을 곱해서 로컬좌표로 들어간다.
+	2. 로컬좌표를 정해준다.
+	*/
+	D3DXMATRIX parentInverseTransformMatrix;
+	gameObject->getParent()->getTransform()->getInverseTransformMatrix(parentInverseTransformMatrix);
+
+	D3DXVECTOR3 inputLocalPos;
+	Vector3::ToD3DXVECTOR3(inputLocalPos, { input.getX(), input.getY(), input.getZ() });
+
+	D3DXVec3TransformCoord(&inputLocalPos, &inputLocalPos, &parentInverseTransformMatrix);
+	output.setVector3(Vector3{ inputLocalPos.x,inputLocalPos.y, inputLocalPos.z });
+
 }
 
-void Transform::setRotation_physics(const Vector3 & other)
+
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::convertLocalRotationIfItIsChild(Vector3 & output, const Vector3 & input)
 {
+	return;
+}
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+
+void Transform::setWorldPosition_physics(const Vector3 & other)
+{
+	dirty = true;
+	// 내부적으로 부모객체가 없으면 바로 초기화 / 있으면 변환후 초기화해준다.
+	convertLocalPositionIfItIsChild(position, other);
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	// 받아오는 것이기 때문에 다시 System에 최신화시키면 안된다.
+	rootTransformUpdate(false);
+}
+
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::setWorldRotation_physics(const Vector3 & other)
+{
+	dirty = true;
 	rotation.setX(constrainLessThan180(other.getX()));
 	rotation.setY(constrainLessThan180(other.getY()));
 	rotation.setZ(constrainLessThan180(other.getZ()));
 	setDirectionVectorWithRotation_DX();
-	dirty = true;
-}
 
-void Transform::setScale_physics(const Vector3 & other)
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	// 받아오는 것이기 때문에 다시 System에 최신화시키면 안된다.
+	rootTransformUpdate(false);
+
+}
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::setWorldScale_physics(const Vector3 & other)
 {
 	scale = other;
 }
+// 변경예정/////////////////////////////////////////////////////////////// 임시
 
 void Transform::rotate(const Vector3 & other)
 {
-	setRotation(rotation.getX() + other.getX(), rotation.getY() + other.getY(), rotation.getZ() + other.getZ());
+	setLocalRotation(Vector3(rotation.getX() + other.getX(), rotation.getY() + other.getY(), rotation.getZ() + other.getZ()));
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
 }
 
-void Transform::setPosition(const Vector3 & other)
+void Transform::setWorldPosition(const Vector3 & other)
 {
-	position = other; dirty = true;
-		// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
-	if(gameObject->getRigidBody())
-		gameObject->getPhysics().setTransformToSystem(gameObject);
+	dirty = true;
+	// 내부적으로 부모객체가 없으면 바로 초기화 / 있으면 변환후 초기화해준다.
+	convertLocalPositionIfItIsChild(position, other);
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+
+	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	//if(gameObject->getRigidBody())
+	//	gameObject->getPhysics().setTransformToSystem(gameObject);
+
 }
 
-void Transform::setRotation(const Vector3 & other)
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::setWorldRotation(const Vector3 & other)
 {
+	dirty = true;
 	rotation.setX(constrainLessThan180(other.getX()));
 	rotation.setY(constrainLessThan180(other.getY()));
 	rotation.setZ(constrainLessThan180(other.getZ()));
 	setDirectionVectorWithRotation_DX();
+
+	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	//if(gameObject->getRigidBody())
+	//	gameObject->getPhysics().setTransformToSystem(gameObject);
+	rootTransformUpdate();
+}
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+
+void Transform::setWorldPosition(float x, float y, float z)
+{
 	dirty = true;
-	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
-	if(gameObject->getRigidBody())
-		gameObject->getPhysics().setTransformToSystem(gameObject);
+	// 내부적으로 부모객체가 없으면 바로 초기화 / 있으면 변환후 초기화해준다.
+	convertLocalPositionIfItIsChild(position, Vector3{ x,y,z });
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+
+	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	//if (gameObject->getRigidBody())
+	//	gameObject->getPhysics().setTransformToSystem(gameObject);
+
 }
 
-void Transform::setPosition(float x, float y, float z)
 
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::setWorldRotation(float x, float y, float z)
 {
-	position.setX(x);
-	position.setY(y);
-	position.setZ(z);
 	dirty = true;
-	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
-	if (gameObject->getRigidBody())
-		gameObject->getPhysics().setTransformToSystem(gameObject);
-}
-
-void Transform::setRotation(float x, float y, float z)
-{
 	rotation.setX(constrainLessThan180(x));
 	rotation.setY(constrainLessThan180(y));
 	rotation.setZ(constrainLessThan180(z));
 	setDirectionVectorWithRotation_DX();
+
+	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	//if (gameObject->getRigidBody())
+	//	gameObject->getPhysics().setTransformToSystem(gameObject);
+
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+}
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+
+void Transform::setLocalPosition(const Vector3 & other)
+{
 	dirty = true;
-	// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
-	if (gameObject->getRigidBody())
-		gameObject->getPhysics().setTransformToSystem(gameObject);
+	position = other;
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+}
+
+
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::setLocalRotation(const Vector3 & other)
+{
+	dirty = true;
+	rotation.setX(constrainLessThan180(other.getX()));
+	rotation.setY(constrainLessThan180(other.getY()));
+	rotation.setZ(constrainLessThan180(other.getZ()));
+	setDirectionVectorWithRotation_DX();
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+}
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+
+void Transform::setLocalPosition(float x, float y, float z)
+{
+	dirty = true;
+
+	position.setX(x);
+	position.setY(y);
+	position.setZ(z);
+
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+
+	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	//if (gameObject->getRigidBody())
+	//	gameObject->getPhysics().setTransformToSystem(gameObject);
+}
+
+
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+void Transform::setLocalRotation(float x, float y, float z)
+{
+	dirty = true;
+	rotation.setX(constrainLessThan180(x));
+	rotation.setY(constrainLessThan180(y));
+	rotation.setZ(constrainLessThan180(z));
+	setDirectionVectorWithRotation_DX();
+
+	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
+	rootTransformUpdate();
+
+	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
+	//if (gameObject->getRigidBody())
+	//	gameObject->getPhysics().setTransformToSystem(gameObject);
+}
+// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+
+
+
+
+void PlayerScript::update()
+{
+	//if (::GetAsyncKeyState('Q') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
+	//if (::GetAsyncKeyState('E') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
+
+	//if (::GetAsyncKeyState('Z') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
+	//if (::GetAsyncKeyState('C') & 0x8000f)
+	//	transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
+
+	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
+	{
+		//if (gameObject->getRigidBody())
+		//{
+		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+		//}
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+	}
+	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
+	{
+		//if (gameObject->getRigidBody())
+		//{
+		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* -.1f *(transform->getForward()));
+		//}
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
+	}
+
+	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	{
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
+	}
+
+	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
+	{
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
+	}
+
+	if (InputManager::GetKeyUp(VK_SPACE))
+	{
+		Vector3 direction = transform->getForward() + transform->getUp();
+		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
+		bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
+		bullet->getTransform()->setWorldPosition(transform->getWorldPosition()+direction);
+
+		RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
+		bulletRigidBody->setSphereCollider(1);
+		bulletRigidBody->addForce(direction * 20.0f);
+		bullet->addComponent<BulletScript>();
+
+		//car1RigidBody->setGravity(Vector3(0, 0, 0));
+		//car1->addComponent<BoxCollider>();
+	}
+
+	if (::GetAsyncKeyState('N') & 0x8000f)
+			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,-1,0 });
+
+	if (::GetAsyncKeyState('M') & 0x8000f)
+			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,1,0 });
+}
+
+void PlayerScript::start()
+{
+	//animationFSM = gameObject->getComponent<AnimationFSM>();
+	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
+	if (temp)
+	{
+		temp->play(false);
+		temp->setVolume(7.0f);
+	}
+}
+
+void PlayerScript::onCollisionStay(GameObjectWithCollision & other)
+{
+	
+}
+
+void BasicEnemyScript::fixedUpdate()
+{
+	if (target)
+	{
+		Trace::Write("TAG_DEBUG", "current Target", target->getTag());
+	}
+
+}
+void BasicEnemyScript::update()
+{
+	basicEnemyBT->tick();
+
+
+}
+
+void BasicEnemyScript::start()
+{
+	// Unity에서 start함수가 바로 호출되지 않는 이유를 알 것 같다. // 여기서 구현한 start함수는 awake함수랑 같다고 보면 된다.
+	// 만약 자식객체인 경우 현재 좌표가 로컬좌표계가 되어서 부모객체의 Transform 행렬을 추가적으로 곱해서 최종 World좌표를 구해야하는데
+	// 그 최종 계산은 게임루프 한곳에서 실행된다. 그렇게되면 여기서는 World기준 최종 위치를 알 수 없다..
+	// 일단 여기서 TransformUpdate를 한번 돌려서 모든 객체에 대해서 TransformMatrix를 구해주기로한다 // 나중에 start함수 호출시점 변경할 예정
+	transform->rootTransformUpdate();
+
+	// 최종 TransformMatrix에서의 월드좌표를 뽑아내서 반환한 것으로 초기화
+	startPoint = transform->getWorldPosition();
+
+	basicEnemyBT = new BT::Root();
+	basicEnemyBT->openBranch
+	(
+		(new BT::Selector())->openBranch
+		(
+			(new BT::Suquence())->openBranch
+			(
+				// 타겟검사
+				new BT::Condition<BasicEnemyScript, &BasicEnemyScript::isTargeting>(this),
+				(new BT::Selector())->openBranch
+				(
+					// 복귀할 위치라면 // 일정 범위를 벗어났다면
+					// 범위 이상나가면 다시 타겟을 nullptr로 바꿔준다.
+					(new BT::If<BasicEnemyScript, &BasicEnemyScript::isOutOfRange>(this))->openBranch
+					(
+						new BT::Action<BasicEnemyScript, &BasicEnemyScript::resetTarget>(this),
+						BTNodeBranchEnd
+					),
+
+					// Range1일때 // 공격
+					(new BT::If<BasicEnemyScript, &BasicEnemyScript::isInRange1>(this))->openBranch
+					(
+						new BT::Action<BasicEnemyScript, &BasicEnemyScript::attackTarget>(this),
+						BTNodeBranchEnd
+					),
+
+					// Range2일때 // 대쉬
+					(new BT::If<BasicEnemyScript, &BasicEnemyScript::isInRange2>(this))->openBranch
+					(
+						new BT::Action<BasicEnemyScript, &BasicEnemyScript::dashToTarget>(this),
+						BTNodeBranchEnd
+					),
+
+					// Range3일때 // 추격
+					(new BT::If<BasicEnemyScript, &BasicEnemyScript::isInRange3>(this))->openBranch
+					(
+						new BT::Action<BasicEnemyScript, &BasicEnemyScript::chaseTarget>(this),
+						BTNodeBranchEnd
+					),
+
+
+					BTNodeBranchEnd
+				),
+				BTNodeBranchEnd
+			),
+
+			// 복귀검사 // 스타트 포인트와 비슷해질때까지 복귀
+			(new BT::If<BasicEnemyScript, &BasicEnemyScript::haveToReturn>(this))->openBranch
+			(
+				new BT::Action<BasicEnemyScript, &BasicEnemyScript::returnToStartPoint>(this),
+				BTNodeBranchEnd
+			),
+
+			// 대기할때 할일
+			(new BT::If<BasicEnemyScript, &BasicEnemyScript::isNotTargeting>(this))->openBranch
+			(
+				new BT::Action<BasicEnemyScript, &BasicEnemyScript::idle>(this),
+				BTNodeBranchEnd
+			),
+			BTNodeBranchEnd
+		),
+		BTNodeBranchEnd
+	);
+
+}
+
+void BasicEnemyScript::onDestroy()
+{
+	delete basicEnemyBT;
+}
+
+float BasicEnemyScript::getTargetDistance()
+{
+	if (target == nullptr)
+		return INFINITE;
+
+	//// 자식 객체일 수도 있으니 최종 Transformation행렬을 받아서 계산한다. // 위치만 추출한다.
+	//const D3DXMATRIX & transformMatrix = transform->getTransformMatrix();
+	//const D3DXMATRIX & targetTransformMatrix = transform->getTransformMatrix();
+
+	//Vector3 targetPos{ transformMatrix._41,transformMatrix._42,transformMatrix._43 };
+	//Vector3 pos{ targetTransformMatrix._41,  targetTransformMatrix._42,  targetTransformMatrix._43 };
+	Vector3 pos{ transform->getWorldPosition() };
+	Vector3 targetPos{ target->getTransform()->getWorldPosition() };
+	return Vector3::Distance(targetPos, pos);
+}
+
+bool BasicEnemyScript::isOutOfRange()
+{
+	// 타겟과 시작점과의 거리가 300이상이면 
+	return Vector3::Distance(target->getTransform()->getWorldPosition(), startPoint)  > 200.0f;
+}
+
+bool BasicEnemyScript::isInRange()
+{
+	return Vector3::Distance(transform->getWorldPosition(), startPoint) <= 160.0f;
+}
+
+bool BasicEnemyScript::isInRange1()
+{
+	return getTargetDistance() <= 5.0f;
+}
+
+bool BasicEnemyScript::isInRange2()
+{
+	return getTargetDistance() <= 30.0f;
+}
+
+bool BasicEnemyScript::isInRange3()
+{
+	return getTargetDistance() <= 200.0f;
+}
+
+bool BasicEnemyScript::isTargeting()
+{
+	return target != nullptr;
+}
+
+bool BasicEnemyScript::isNotTargeting()
+{
+	return target == nullptr;
+}
+
+bool BasicEnemyScript::haveToReturn()
+{
+	return (Vector3::Distance(transform->getWorldPosition(), startPoint) > 10);
+}
+
+void BasicEnemyScript::returnToStartPoint()
+{
+	Trace::Write("TAG_DEBUG", "return");
+	
+	// 월드 좌표를 받아주고
+	Vector3 & currentWorldPos = transform->getWorldPosition();
+
+	// 방향을 구하고 정규화
+	Vector3 direction = startPoint - currentWorldPos;
+	Vector3::Normalized(direction, direction);
+
+	// 이동한다
+	transform->setWorldPosition(currentWorldPos + FrameTime::GetDeltaTime() * .1f * speed * direction);
+}
+
+void BasicEnemyScript::idle()
+{
+	Trace::Write("TAG_DEBUG", "idle");
+}
+
+void BasicEnemyScript::resetTarget()
+{
+	target = nullptr;
+}
+
+void BasicEnemyScript::attackTarget()
+{
+	Trace::Write("TAG_DEBUG", "attack");
+	if (!target) return;
+}
+
+void BasicEnemyScript::dashToTarget()
+{
+	Trace::Write("TAG_DEBUG", "dash");
+	if (!target) return;
+	// 월드 좌표를 받아주고
+	Vector3 & currentWorldPos = transform->getWorldPosition();
+
+	// 방향을 구하고 정규화
+	Vector3 direction = target->getTransform()->getWorldPosition() -currentWorldPos;
+	Vector3::Normalized(direction, direction);
+
+	// 이동한다
+	transform->setWorldPosition(currentWorldPos + FrameTime::GetDeltaTime() * .1f * dashSpeed * direction);
+}
+
+void BasicEnemyScript::chaseTarget()
+{
+	Trace::Write("TAG_DEBUG", "chase");
+	if (!target) return;
+	// 월드 좌표를 받아주고
+	Vector3 & currentWorldPos = transform->getWorldPosition();
+
+	// 방향을 구하고 정규화
+	Vector3 direction = target->getTransform()->getWorldPosition() - currentWorldPos;
+	Vector3::Normalized(direction, direction);
+
+	// 이동한다
+	transform->setWorldPosition(currentWorldPos + FrameTime::GetDeltaTime() * .1f * speed * direction);
+}
+
+
+
+void BasicEnemySearchRangeScript::start()
+{
+	// 필요한 것들을 초기화시켜준다.
+	GameObject * parent = gameObject->getParent();
+	if (parent != nullptr)
+	{
+		BasicEnemyScript * basicEnemyScript = parent->getComponent<BasicEnemyScript>();
+		if (basicEnemyScript)
+		{
+			this->basicEnemyScript = basicEnemyScript;
+		}
+	}
+}
+
+void BasicEnemySearchRangeScript::onCollisionStay(GameObjectWithCollision & other)
+{
+	if (basicEnemyScript == nullptr) return;
+
+	// 들어온 오브젝트 태그가 플레이어일때
+	if (other.gameObject->getTag() == "Player")
+	{
+		// 타겟이 없을때
+		if (basicEnemyScript->isNotTargeting())
+		{
+			basicEnemyScript->setTarget(other.gameObject);
+		}
+	}
+}
+
+
+void MoveScript_C::start()
+{
+
+}
+
+void MoveScript_C::update()
+{
+	if (::GetAsyncKeyState('K') & 0x8000f)
+	{
+		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,-.05f,0 });
+		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
+		if (temp)
+		{
+			temp->play(false);
+			temp->setVolume(2.0f);
+		}
+	}
+
+	if (::GetAsyncKeyState('L') & 0x8000f)
+	{
+		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,.05f,0 });
+		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
+		if (temp)
+		{
+			temp->play(false);
+			temp->setVolume(2.0f);
+		}
+	}
+
+
+
+	if (::GetAsyncKeyState('P') & 0x8000f)
+		GameObject::Destroy(gameObject);
 }
 
 
@@ -355,31 +760,31 @@ void MainCamera::update()
 	setViewSpace();
 
 	if (::GetAsyncKeyState('E') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,1.05f,0 });
+		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,1.05f,0 });
 	if (::GetAsyncKeyState('Q') & 0x8000f)
-		transform->setRotation(transform->getRotation() + Vector3{ 0,-1.05f,0 });
+		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,-1.05f,0 });
 
 	if (::GetAsyncKeyState('Z') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,.05f });
-		transform->setRotation(transform->getRotation() + Vector3{ 1.05f,0,0 });
+		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 1.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('C') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,-.05f });
-		transform->setRotation(transform->getRotation() + Vector3{ -1.05f,0,0 });
+		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ -1.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('W') & 0x8000f)
-		transform->setPosition(transform->getPosition() + 2*(transform->getForward()));
+		transform->setWorldPosition(transform->getWorldPosition() + 2*(transform->getForward()));
 	if (::GetAsyncKeyState('S') & 0x8000f)
-		transform->setPosition(transform->getPosition() + 2*(-1)*(transform->getForward()));
+		transform->setWorldPosition(transform->getWorldPosition() + 2*(-1)*(transform->getForward()));
 
 	if (::GetAsyncKeyState('D') & 0x8000f)
-		transform->setPosition(transform->getPosition() + 2*(transform->getRight()));
+		transform->setWorldPosition(transform->getWorldPosition() + 2*(transform->getRight()));
 	if (::GetAsyncKeyState('A') & 0x8000f)
-		transform->setPosition(transform->getPosition() + 2*(-1)*(transform->getRight()));
+		transform->setWorldPosition(transform->getWorldPosition() + 2*(-1)*(transform->getRight()));
 
 }
 
@@ -400,9 +805,10 @@ void MainCamera::setViewSpace()
 	D3DXMATRIX temp;
 	D3DXMatrixIdentity(&v);
 
-	v = transform->getTransformMatrix();
-	float t;
-	D3DXMatrixInverse(&v, &t, &v);
+	transform->getInverseTransformMatrix(v);
+	//v = transform->getTransformMatrix();
+	//float t;
+	//D3DXMatrixInverse(&v, &t, &v);
 	/*
 	// 위치 반대로 계산
 	D3DXMatrixMultiply(&v, &v, D3DXMatrixTranslation(&temp, -transform->getPosition().getX(),
@@ -589,10 +995,13 @@ void RigidBody::start()
 
 void RigidBody::fixedUpdate()
 {
-	gameObject->getPhysics().setTransformFromSystem(gameObject);
-	// 물리업데이트가 되었기 때문에 더티플래그를 켜준다.
 	transform->setDirty(true);
+	gameObject->getPhysics().setTransformFromSystem(gameObject);
+	transform->rootTransformUpdate(false);
 
+	// 실시간으로 바로 업데이트하기 때문에 더티를 먼저켜고 업데이트한다.
+	// 물리업데이트가 되었기 때문에 더티플래그를 켜준다.
+	//transform->setDirty(true);
 
 }
 
@@ -600,18 +1009,21 @@ void RigidBody::update()
 {
 	if (colliderInfo.type == ColliderType::NONE) return;
 
+	Vector3 worldPos = transform->getWorldPosition();
 	// 콜라이더를 그려준다.
 	switch (colliderInfo.type)
 	{
 
 	case ColliderType::BOX:
-	
-		Gizmos::DrawBox({ transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ() },
+	/*
+	월드 좌표계기준으로 그려줘야한다
+	*/
+		Gizmos::DrawBox({ worldPos.getX(), worldPos.getY(), worldPos.getZ() },	//({ transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ() },
 		{ colliderInfo.size.getX(),colliderInfo.size.getY(),colliderInfo.size.getZ() });
 		break;
 
 	case ColliderType::SPHERE:
-		Gizmos::DrawBox({ transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ() },
+		Gizmos::DrawBox({ worldPos.getX(), worldPos.getY(), worldPos.getZ() },	//({ transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ() },
 		{ colliderInfo.size.getX(),colliderInfo.size.getY(),colliderInfo.size.getZ() });
 		break;
 
@@ -1926,6 +2338,8 @@ void AnimationFSM::updateAllTrasitions(const string & animationFileName)
 	}
 }
 
+
+
 void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 {
 	if (other.gameObject->getTag() == "Remover")
@@ -2362,11 +2776,12 @@ bool Terrain::getHeight(const Vector3 & position, float * output)
 	D3DXMATRIX terrainInverseTransformMatrix;
 	D3DXVECTOR3 positionInTerrainLocal;
 
-	float determinant = 0.0f;
-	terrainInverseTransformMatrix = transform->getTransformMatrix();
-	D3DXMatrixInverse(&terrainInverseTransformMatrix, &determinant, &terrainInverseTransformMatrix);
-	// 만약 역행렬이 존재하지 않으면 리턴
-	if (determinant == 0.0f) return false;
+	if(transform->getInverseTransformMatrix(terrainInverseTransformMatrix) == false) return false;
+	//float determinant = 0.0f;
+	//terrainInverseTransformMatrix = transform->getTransformMatrix();
+	//D3DXMatrixInverse(&terrainInverseTransformMatrix, &determinant, &terrainInverseTransformMatrix);
+	//// 만약 역행렬이 존재하지 않으면 리턴
+	//if (determinant == 0.0f) return false;
 
 	Vector3::ToD3DXVECTOR3(positionInTerrainLocal, position);
 
@@ -2445,7 +2860,7 @@ bool Terrain::getLocalHeight(const Vector3 & position, float * output)
 	}
 
 	// 여기서 현재 터레인의 높이만큼 더해준다.
-	*output = resultHeight + transform->getPosition().getY();
+	*output = resultHeight + transform->getWorldPosition().getY();
 	return true;
 }
 
@@ -2454,9 +2869,9 @@ void MoveOnTerrainScript::update()
 	if (terrain)
 	{
 		float height = 0.0f;
-		if (terrain->getHeight(transform->getPosition(), &height))
+		if (terrain->getHeight(transform->getWorldPosition(), &height))
 		{
-			transform->setPosition(transform->getPosition().getX(), height, transform->getPosition().getZ());
+			transform->setWorldPosition(transform->getWorldPosition().getX(), height, transform->getWorldPosition().getZ());
 		}
 
 		//float height = 0.0f;
@@ -2506,10 +2921,12 @@ void BillBoard::render()
 void BillBoard::rotateIfMainCameraMoves()
 {
 	// 만약 이전 카메라 포지션과 변함 없다면 리턴
-	D3DXMATRIX mainCameraTransformMatrix = mainCamera->getTransform()->getTransformMatrix();
+	//D3DXMATRIX mainCameraTransformMatrix = mainCamera->getTransform()->getTransformMatrix();
 	// 이런작업을 해주는 이유는 메인카메라가 어느 오브젝트의 하위 오브젝트일 가능성이 있기 때문이다.
 	// 하위오브젝트로 포함되는 경우 position은 로컬좌표이기 때문에 transformMatrix을 받아와서 글로벌 위치를 구해준다.
-	Vector3 mainCameraPosition{ mainCameraTransformMatrix._41,mainCameraTransformMatrix._42,mainCameraTransformMatrix._43 };
+	//Vector3 mainCameraPosition{ mainCameraTransformMatrix._41,mainCameraTransformMatrix._42,mainCameraTransformMatrix._43 };
+
+	Vector3 mainCameraPosition{ mainCamera->getTransform()->getWorldPosition() };
 
 	if (mainCameraPosition == currentMainCameraPosition) return;
 
@@ -2517,7 +2934,7 @@ void BillBoard::rotateIfMainCameraMoves()
 	currentMainCameraPosition = mainCameraPosition;
 
 	// 현재물체에서 카메라방향으로의 벡터를 구해준다.
-	Vector3 direction = currentMainCameraPosition - transform->getPosition();
+	Vector3 direction = currentMainCameraPosition - transform->getWorldPosition();
 
 	// y값은 적용을 안해주기 때문에 빼준다. // y축으로만 로테이션 해야한다.
 	direction.setY(0.0f);
@@ -2557,7 +2974,7 @@ void BillBoard::rotateIfMainCameraMoves()
 	//if (transform->getRotation().getY() > mainCamera->getTransform()->getRotation().getY())
 	//	angle = -angle;
 
-	transform->setRotation({ 0, Transform::RadianToDegree(angle),0 });
+	transform->setWorldRotation({ 0, Transform::RadianToDegree(angle),0 });
 	
 	// 노멀벡터를 새로 계산하기 위해서 버텍스들을 다시 초기화시킨다.
 	// 현재 로테이션이 바뀌었기 때문에 노멀벡터도 바꿔줘야한다. // 항상 카메라에서 봤을때 잘보이게 하기 위해서
@@ -2806,7 +3223,3 @@ void BillBoard::optimizeMesh()
 		nullptr
 	);
 }
-
-
-
-

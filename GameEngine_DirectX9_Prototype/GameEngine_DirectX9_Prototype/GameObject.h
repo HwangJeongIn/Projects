@@ -28,12 +28,9 @@ private:
 		vector<Component *> * components = nullptr)
 		: name(name), tag(tag), transform(new Transform(this, position, rotation, scale)), parent(parent), destroyed(false), rigidBody(nullptr) //, gameObject(this)
 	{
-		//// Transform초기화
-		//// Transform은 필수 컴포넌트 / 파라미터로 잘못들어오면 객체생성에 실패한것이기 때문에 리턴한다.
-		//if (!transform) return;
-
-		// transform은 따로 작업해주고 싶어서 넣어주지 않았다.
-		// 렌더링해야하는 객체는 Transform 컴포넌트에서 월드좌표계 포지션을 받아서 렌더링한다.
+		// transform을 초기화할때 자식객체일 경우 parent를 찾아서 transform업데이트를해서 최종 transform행렬을 계산하기 때문에
+		// parent의 초기화가 transform보다 먼저 보장되어있어야한다.
+		//transform = new Transform(this, position, rotation, scale);
 
 		// this->components.push_back(transform);
 
@@ -96,6 +93,16 @@ public:
 	RigidBody * getRigidBody() { return rigidBody; }
 	bool isRootObj(){ return parent == nullptr; }
 	GameObject * getParent() { return parent; }
+	GameObject * getRoot() 
+	{
+		GameObject * root = this;
+		// 이 과정에서 만약 본인이 루트 객체라면 본인이 반환되게 된다.
+		while (root->getParent() != nullptr)
+		{
+			root = root->getParent();
+		}
+		return root;
+	}
 
 	// Transform은 고정적으로 GameObject와 함께하기 때문에 따로 set해줄필요는없다.
 	void setParent(GameObject * parent);

@@ -178,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio.h" />
+    <ClInclude Include="BehaviorTree.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="d3dUtility.h" />

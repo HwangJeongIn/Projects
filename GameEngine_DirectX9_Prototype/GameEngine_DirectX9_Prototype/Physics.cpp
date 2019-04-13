@@ -151,8 +151,10 @@ void Physics::registerRigidBody(GameObject * other)
 	startTransform.setIdentity();
 
 	Transform * transform = other->getTransform();
+	Vector3 & worldPos = transform->getWorldPosition();
+
 	// 위치 초기화
-	startTransform.setOrigin(btVector3(transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ()));
+	startTransform.setOrigin(btVector3(worldPos.getX(), worldPos.getY(), worldPos.getZ()));
 	// 로테이션 초기화
 	//startTransform.set
 
@@ -199,8 +201,10 @@ void Physics::registerRigidBody(GameObject * other, btCollisionShape * shape, fl
 	startTransform.setIdentity();
 
 	Transform * transform = other->getTransform();
+	Vector3 & worldPos = transform->getWorldPosition();
+
 	// 위치 초기화
-	startTransform.setOrigin(btVector3(transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ()));
+	startTransform.setOrigin(btVector3(worldPos.getX(), worldPos.getY(), worldPos.getZ()));
 	// 로테이션 초기화
 	//startTransform.set
 
@@ -320,7 +324,7 @@ void Physics::setTransformFromSystem(GameObject * other)
 	btVector3 & position = trans.getOrigin();
 
 	Transform * transform = other->getTransform();
-	transform->setPosition_physics(Vector3(position.getX(), position.getY(), position.getZ()));
+	transform->setWorldPosition_physics(Vector3(position.getX(), position.getY(), position.getZ()));
 	
 	/*
 	btQuaternion & quatern = trans.getRotation();
@@ -339,11 +343,11 @@ void Physics::setTransformToSystem(GameObject * other)
 
 
 	Transform * transform = other->getTransform();
-
+	Vector3 worldPos = transform->getWorldPosition();
 	btTransform trans;
 	trans.setIdentity();
 
-	trans.setOrigin(btVector3(transform->getPosition().getX(), transform->getPosition().getY(), transform->getPosition().getZ()));
+	trans.setOrigin(btVector3(worldPos.getX(), worldPos.getY(), worldPos.getZ()));
 	//Trace::Write("TAG_DEBUG","ToSystem X : ", transform->getPosition().getX());
 	//Trace::Write("TAG_DEBUG", "ToSystem Y : ", transform->getPosition().getY());
 	//Trace::Write("TAG_DEBUG", "ToSystem Z : ", transform->getPosition().getZ());
@@ -359,6 +363,7 @@ void Physics::setTransformToSystem(GameObject * other)
 
 	// test
 	return;
+
 	btRigidBody * body = btRigidBody::upcast(temp);
 	btTransform ttt;
 	ttt.setIdentity();

@@ -5,6 +5,7 @@
 #include "Utility.h"
 #include <vector>
 #include "d3dUtility.h"
+#include "BehaviorTree.h"
 
 
 class Transform;
@@ -70,6 +71,7 @@ private:
 	//D3DXMATRIX positionMatrix_DX;
 
 	D3DXMATRIX transformMatrix;
+	D3DXMATRIX localTransformMatrix;
 	D3DXMATRIX rotationMatrix;
 	D3DXMATRIX positionMatrix;
 
@@ -81,11 +83,12 @@ private:
 protected:
 	virtual void start()
 	{ 		
-		// 절댓값 360 * n 날린다 + 이객체의 right up forward 벡터 계산
-		setRotation(rotation);
+		dirty = true;
 		D3DXMatrixIdentity(&transformMatrix);
+		D3DXMatrixIdentity(&localTransformMatrix);
 		D3DXMatrixIdentity(&rotationMatrix);
 		D3DXMatrixIdentity(&positionMatrix);
+
 	}
 
 public:
@@ -126,9 +129,26 @@ public:
 	}
 
 
-	const Vector3 & getPosition() const { return position; }
-	const Vector3 & getRotation() const { return rotation; }
-	const Vector3 & getScale() const { return scale; }
+	// 만약에 월드좌표계의 값이 들어왔을때 부모객체가 있다면 로컬좌표계로 월드좌표계 좌표를 표현해서 초기화 해야한다. 
+	// 즉 월드 -> 로컬로의 변환이 필요하다
+
+	// 그를 위해 월드좌표가 들어오면 부모객체가 존재할때 로컬좌표계 값으로 변경시켜주는 역할을 하는 함수이다.
+
+
+
+
+	//// getPosition과 동일 // getPosition도 로컬좌표 반환
+	//Vector3 getLocalPosition() const { return{ localTransformMatrix._41, localTransformMatrix._42, localTransformMatrix._43 }; }
+
+	Vector3 getWorldPosition() const { return{ transformMatrix._41, transformMatrix._42, transformMatrix._43 }; }
+
+	// 변경예정/////////////////////////////////////////////////////////////// 임시
+	const Vector3 & getWorldRotation() const { return rotation; }
+	// 변경예정/////////////////////////////////////////////////////////////// 임시
+
+	const Vector3 & getLocalPosition() const { return position; }
+	const Vector3 & getLocalRotation() const { return rotation; }
+	const Vector3 & getLocalScale() const { return scale; }
 
 	const Vector3 & getRight() const { return right; }
 	const Vector3 & getForward() const { return forward; }
@@ -142,14 +162,29 @@ public:
 
 	//void transformUpdate(bool dirty, const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix);
 
-	void transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMatrix);
+	void transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMatrix, bool toPhysicsSystem = true);
+	void rootTransformUpdate(bool toPhysicsSystem = true);
 
 	//const D3DXMATRIX & getTransformMatrix_DX() const { return transformMatrix_DX; }
 	//void setTransformMatrix_DX(const D3DXMATRIX & parentPositionMatrix, const D3DXMATRIX & parentRotationMatrix);
 
 	const D3DXMATRIX & getTransformMatrix() const { return transformMatrix; }
+	bool getInverseTransformMatrix(D3DXMATRIX & inverseTransformMatrix) const
+	{
+		float determinant = 0.0f;
+		D3DXMatrixInverse(&inverseTransformMatrix, &determinant, &transformMatrix);
+		// 만약 역행렬이 존재하지 않으면 단위행렬로 초기화
+		if (determinant == 0.0f)
+		{
+			D3DXMatrixIdentity(&inverseTransformMatrix);
+			return false;
+		}
+		return true;
+	}
 	void setTransformMatrix(const D3DXMATRIX & parentTransformMatrix);
 
+	// setTransformMatrix에 의해서 계산된다.
+	const D3DXMATRIX & getLocalTransformMatrix() const { return localTransformMatrix; }
 	
 	//const D3DXMATRIX & getRotationMatrix_DX() const { return rotationMatrix_DX; }
 	//void calcRotationMatrix_DX(const D3DXMATRIX & parentRotationMatrix);
@@ -285,35 +320,48 @@ public:
 		return value;
 	}
 
-	void setPosition_physics(const Vector3 & other);
-	void setRotation_physics(const Vector3 & other);
-	void setScale_physics(const Vector3 & other);
+
+
+	void convertLocalPositionIfItIsChild(Vector3 & output, const Vector3 & input);
+	void convertLocalRotationIfItIsChild(Vector3 & output, const Vector3 & input);
+
+	// 월드 기준
+	void setWorldPosition_physics(const Vector3 & other);
+	void setWorldRotation_physics(const Vector3 & other);
+	void setWorldScale_physics(const Vector3 & other);
 	
 	void rotate(const Vector3 & other);
 
-	void setPosition(const Vector3 & other);
-	void setRotation(const Vector3 & other);
+	void setWorldPosition(const Vector3 & other);
+	void setWorldRotation(const Vector3 & other);
 
-	void setScale(const Vector3 & other) { scale = other; }
+	void setWorldScale(const Vector3 & other) { scale = other; }
 
-	void setPosition(float x, float y, float z);
-	void setRotation(float x, float y, float z);
+	void setWorldPosition(float x, float y, float z);
+	void setWorldRotation(float x, float y, float z);
 
-	void setScale(float x, float y, float z) { scale = { x,y,z }; }
+	void setWorldScale(float x, float y, float z) { scale = { x,y,z }; }
 
-	void setTransform(const Vector3 & position, const Vector3 & rotation, const Vector3 & scale)
+	void setWorldTransform(const Vector3 & position, const Vector3 & rotation, const Vector3 & scale)
 	{
-		setPosition(position);
-		setRotation(rotation);
-		setScale(scale);
+		setWorldPosition(position);
+		setWorldRotation(rotation);
+		setWorldScale(scale);
 	}
 
-	void setTransform(const Transform & other)
+	void setWorldTransform(const Transform & other)
 	{
-		setPosition(other.position);
-		setRotation(other.rotation);
-		setScale(other.scale);
+		setWorldPosition(other.position);
+		setWorldRotation(other.rotation);
+		setWorldScale(other.scale);
 	}
+
+	// 로컬 기준
+	void setLocalPosition(const Vector3 & other);
+	void setLocalRotation(const Vector3 & other);
+
+	void setLocalPosition(float x, float y, float z);
+	void setLocalRotation(float x, float y, float z);
 };
 
 // X파일을 통한 메쉬생성 컴포넌트
@@ -386,6 +434,98 @@ public:
 	}
 
 };
+
+
+class BasicEnemyScript : public Component
+{
+private:
+	const float speed = .2f;
+	const float dashSpeed = .3f;
+
+	GameObject * target;
+	BT::Root * basicEnemyBT;
+	Vector3 startPoint;
+protected:
+	virtual void fixedUpdate();
+	virtual void update();
+	virtual void start();
+	virtual void onDestroy();
+	//virtual void onCollisionStay(GameObjectWithCollision & other);
+
+public:
+	BasicEnemyScript(GameObject * go, Transform * tf)
+		: Component(go, tf), target(nullptr), basicEnemyBT(nullptr)
+	{
+		start();
+	}
+
+	virtual ~BasicEnemyScript()
+	{
+		onDestroy();
+	}
+
+	void setTarget(GameObject * target) { this->target = target; }
+	GameObject * getTarget() { return target; }
+
+
+	float getTargetDistance();
+
+	// 복귀안해도될 거리인지 판단
+	bool isOutOfRange();
+	bool isInRange();
+	bool isInRange1();
+	bool isInRange2();
+	bool isInRange3();
+
+	bool isTargeting();
+	bool isNotTargeting();
+
+	bool haveToReturn();
+
+	void returnToStartPoint();
+	void idle();
+
+	void resetTarget();
+
+	void attackTarget();
+	void dashToTarget();
+	void chaseTarget();
+
+	void setStartPoint(const Vector3 & other)
+	{
+		startPoint = other;
+	}
+
+	const Vector3 & getStartPoint() { return startPoint; }
+
+
+
+};
+
+class BasicEnemySearchRangeScript : public Component
+{
+private:
+	BasicEnemyScript * basicEnemyScript;
+protected:
+	//virtual void update();
+	virtual void start();
+	virtual void onCollisionStay(GameObjectWithCollision & other);
+
+public:
+	BasicEnemySearchRangeScript(GameObject * go, Transform * tf)
+		: Component(go, tf), basicEnemyScript(nullptr)
+	{
+		start();
+	}
+
+	virtual ~BasicEnemySearchRangeScript()
+	{
+		onDestroy();
+	}
+
+};
+
+
 
 // 테스트용
 class MoveScript_C : public Component
@@ -493,12 +633,12 @@ public :
 		start();
 	}
 
-	float calcXMax() const { return transform->getPosition().getX() + width; }
-	float calcXMin() const { return transform->getPosition().getX() - width; }
-	float calcYMax() const { return transform->getPosition().getY() + height; }
-	float calcYMin() const { return transform->getPosition().getY() - height; }
-	float calcZMax() const { return transform->getPosition().getZ() + depth; }
-	float calcZMin() const { return transform->getPosition().getZ() - depth; }
+	float calcXMax() const { return transform->getLocalPosition().getX() + width; }
+	float calcXMin() const { return transform->getLocalPosition().getX() - width; }
+	float calcYMax() const { return transform->getLocalPosition().getY() + height; }
+	float calcYMin() const { return transform->getLocalPosition().getY() - height; }
+	float calcZMax() const { return transform->getLocalPosition().getZ() + depth; }
+	float calcZMin() const { return transform->getLocalPosition().getZ() - depth; }
 
 	const bool checkCollided(const BoxCollider & other) const
 	{
@@ -514,9 +654,9 @@ public :
 	{
 		// 반발하여 1만큼 반대방향으로 튀어나온다.
 		// 나중에 물리현상으로 수정할 예정
-		Vector3 direction = transform->getPosition() - other.transform->getPosition();
+		Vector3 direction = transform->getLocalPosition() - other.transform->getLocalPosition();
 		Vector3::Normalized(direction, direction);
-		transform->setPosition(transform->getPosition() + 1 * direction);
+		transform->setLocalPosition(transform->getLocalPosition() + 1 * direction);
 	}
 
 

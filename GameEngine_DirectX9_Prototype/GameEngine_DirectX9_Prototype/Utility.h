@@ -45,6 +45,76 @@ public:
 		*this = other;
 	}
 
+	Vector3 & operator=(const Vector3 & other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		return *this;
+	}
+
+	bool operator==(const Vector3 & other) const
+	{
+		return (x == other.x && y == other.y && z == other.z);
+	}
+
+	// 뒤에 const가 붙으면 // static Vector3 operator+(const Vector3 & other1 , const Vector3 & other2)
+	// 안붙으면 // static Vector3 operator+(Vector3 & other1 , const Vector3 & other2)
+	Vector3 operator+(const Vector3 & other) const
+	{
+		return{ x + other.x, y + other.y, z + other.z };
+	}
+	Vector3 operator-(const Vector3 & other) const
+	{
+		return{ x - other.x, y - other.y, z - other.z };
+	}
+
+	//friend bool operator==(const Vector3 & other1, const Vector3 & other2)
+	//{
+	//	return (other1.x == other2.x && other1.y == other2.y && other1.z == other2.z);
+	//}
+	//friend Vector3 operator+(const Vector3 & other1, const Vector3 & other2)
+	//{
+	//	return{ other1.x + other2.x, other1.y + other2.y, other1.z + other2.z };
+	//}
+	//friend Vector3 operator-(const Vector3 & other1, const Vector3 & other2)
+	//{
+	//	return{ other1.x - other2.x, other1.y - other2.y, other1.z - other2.z };
+	//}
+
+	Vector3 & operator+=(const Vector3 & other)
+	{
+		this->x += other.x;
+		this->y += other.y;
+		this->z += other.z;
+		return *this;
+	}
+
+	Vector3 & operator-=(const Vector3 & other)
+	{
+		this->x -= other.x;
+		this->y -= other.y;
+		this->z -= other.z;
+		return *this;
+	}
+
+	friend Vector3 operator*(const Vector3 & other, float num)
+	{
+		return{ other.x*num, other.y*num, other.z*num };
+	}
+
+	friend Vector3 operator*(float num, const Vector3 & other)
+	{
+		return{ other.x*num, other.y*num, other.z*num };
+	}
+
+
+	static float Distance(const Vector3 & other1, const Vector3 & other2)
+	{
+		return sqrtf(powf(other1.x-other2.x, 2) + powf(other1.y - other2.y, 2) + powf(other1.z  -  other2.z, 2));
+	}
+
+
 	// 내적외적 정규화는 복사를 안하기 위해서 레퍼런스 변수로 받아서 내부에서 초기화
 	// 내부적으로 변경되는 것이 헷갈릴 수 있어서 포인터로 하려했지만, 빠른 연산을 위해(포인터 검사 안하려고)
 	// 레퍼런스 변수로 지정
@@ -86,54 +156,7 @@ public:
 		output.z = input.z;
 	}
 
-	Vector3 & operator=(const Vector3 & other)
-	{
-		x = other.x;
-		y = other.y;
-		z = other.z;
-		return *this;
-	}
 
-	friend bool operator==(const Vector3 & other1, const Vector3 & other2)
-	{
-		return (other1.x == other2.x && other1.y == other2.y && other1.z == other2.z);
-	}
-
-	friend Vector3 operator+(const Vector3 & other1, const Vector3 & other2)
-	{
-		return{ other1.x + other2.x, other1.y + other2.y, other1.z + other2.z };
-	}
-	friend Vector3 operator-(const Vector3 & other1, const Vector3 & other2)
-	{
-		return{ other1.x - other2.x, other1.y - other2.y, other1.z - other2.z };
-	}
-
-	Vector3 & operator+=(const Vector3 & other)
-	{
-		this->x += other.x;
-		this->y += other.y;
-		this->z += other.z;
-		return *this;
-	}
-
-	Vector3 & operator-=(const Vector3 & other)
-	{
-		this->x -= other.x;
-		this->y -= other.y;
-		this->z -= other.z;
-		return *this;
-	}
-
-	friend Vector3 operator*(const Vector3 & other, float num)
-	{
-		return{ other.x*num, other.y*num, other.z*num };
-	}
-
-	friend Vector3 operator*(float num, const Vector3 & other)
-	{
-		return{ other.x*num, other.y*num, other.z*num };
-	}
-	
 	// static 변수
 	static Vector3 Zero;
 	static Vector3 One;
