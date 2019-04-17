@@ -203,12 +203,30 @@ void Transform::convertLocalPositionIfItIsChild(Vector3 & output, const Vector3 
 }
 
 
-// 변경예정/////////////////////////////////////////////////////////////// 임시
+// 변경예정 /////////////////////////////////////////////////////////////// 임시
 void Transform::convertLocalRotationIfItIsChild(Vector3 & output, const Vector3 & input)
 {
-	return;
+	// 부모객체가 없다면 그냥 바로 초기화
+	if (!gameObject->getParent())
+	{
+		output = input;
+		return;
+	}
+
+	// 부모객체가 있다면 
+	/*
+
+	*/
+	D3DXMATRIX parentInverseTransformMatrix;
+	gameObject->getParent()->getTransform()->getInverseTransformMatrix(parentInverseTransformMatrix);
+
+	D3DXVECTOR3 inputLocalPos;
+	Vector3::ToD3DXVECTOR3(inputLocalPos, { input.getX(), input.getY(), input.getZ() });
+
+	D3DXVec3TransformCoord(&inputLocalPos, &inputLocalPos, &parentInverseTransformMatrix);
+	output.setVector3(Vector3{ inputLocalPos.x,inputLocalPos.y, inputLocalPos.z });
 }
-// 변경예정/////////////////////////////////////////////////////////////// 임시
+// 변경예정 /////////////////////////////////////////////////////////////// 임시
 
 
 void Transform::setWorldPosition_physics(const Vector3 & other)

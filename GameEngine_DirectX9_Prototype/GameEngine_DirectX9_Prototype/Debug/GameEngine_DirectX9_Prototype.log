@@ -1,16 +1,8 @@
 ﻿  Component.cpp
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(567): warning C4305: 'return': 'unsigned int'에서 'float'(으)로 잘립니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1829): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1833): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1839): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
-  코드를 생성하고 있습니다...
-  컴파일하고 있습니다...
-  main.cpp
-  d3dUtility.cpp
-  Scene.cpp
-  Physics.cpp
-  Locator.cpp
-  GameObject.cpp
-  코드를 생성하고 있습니다...
-  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
-  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(585): warning C4305: 'return': 'unsigned int'에서 'float'(으)로 잘립니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1847): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1851): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+c:\users\user\documents\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1857): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+cl : 명령줄 warning D9028: 최소 다시 빌드에 실패했습니다. 정상 빌드로 되돌립니다.
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.exe
+  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)
