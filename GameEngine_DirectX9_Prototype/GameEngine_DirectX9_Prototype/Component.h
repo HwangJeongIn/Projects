@@ -143,7 +143,59 @@ public:
 	Vector3 getWorldPosition() const { return{ transformMatrix._41, transformMatrix._42, transformMatrix._43 }; }
 
 	// 변경예정/////////////////////////////////////////////////////////////// 임시
-	const Vector3 & getWorldRotation() const { return rotation; }
+	Vector3 getWorldRotation() const
+	{
+		// 먼저 transformation matrix를 분리시켜서 Quaternion을 만들어준다.
+		D3DXQUATERNION q;
+		D3DXVECTOR3 scale;
+		D3DXVECTOR3 translation;
+
+		D3DXMatrixDecompose(&scale, &q, &translation, &transformMatrix);
+
+		//x
+		float pitch = 0.0f;
+		//y
+		float yaw = 0.0f;
+		//z
+		float roll = 0.0f;
+
+		float sqw = q.w*q.w;
+		float sqx = q.x*q.x;
+		float sqy = q.y*q.y;
+		float sqz = q.z*q.z;
+
+		pitch = atan2f(2.f * (q.z*q.y + q.x*q.w), 1 - 2 * (sqx + sqy));
+		yaw = asinf(-2.f * (q.x*q.z - q.y*q.w));
+		roll = atan2f(2.f * (q.x*q.y + q.z*q.w), 1 - 2 * (sqy + sqz));
+
+
+		//// atan2 :: -π ~ π
+
+		//// roll (x-axis rotation)
+		//double sinr_cosp = +2.0 * (q.w * q.x + q.y * q.z);
+		//double cosr_cosp = +1.0 - 2.0 * (q.x * q.x + q.y * q.y);
+		//roll = atan2(sinr_cosp, cosr_cosp);
+
+		//// pitch (y-axis rotation)
+		//double sinp = +2.0 * (q.w * q.y - q.z * q.x);
+		//// fabs // 부동 소수점 절댓값
+		//if (fabs(sinp) >= 1)
+		//	pitch = copysign(/*M_PI*/Pi / 2.0f, sinp); // use 90 degrees if out of range
+		//else
+		//	pitch = asin(sinp);
+
+		//// yaw (z-axis rotation)
+		//double siny_cosp = +2.0 * (q.w * q.z + q.x * q.y);
+		//double cosy_cosp = +1.0 - 2.0 * (q.y * q.y + q.z * q.z);
+		//yaw = atan2(siny_cosp, cosy_cosp);
+
+
+		pitch = Transform::RadianToDegree(pitch);
+		yaw = Transform::RadianToDegree(yaw);
+		roll = Transform::RadianToDegree(roll);
+
+		return{ pitch, yaw, roll };
+	}
 	// 변경예정/////////////////////////////////////////////////////////////// 임시
 
 	const Vector3 & getLocalPosition() const { return position; }
@@ -237,7 +289,7 @@ public:
 	}
 
 	
-		void pitch_DX(float angle)
+	void pitch_DX(float angle)
 	{
 		D3DXMATRIX T;
 		D3DXVECTOR3 right_DX;

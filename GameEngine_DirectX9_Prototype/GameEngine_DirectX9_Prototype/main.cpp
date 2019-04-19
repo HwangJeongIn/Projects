@@ -373,6 +373,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
 	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+
 	playerChild1->addComponent<MoveScript_C>();
 
 
@@ -397,14 +399,11 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	enemyRangeColliderRigidBody->turnOnStaticFlag();
 	enemyRangeCollider->addComponent<BasicEnemySearchRangeScript>();
 
-
 	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 	enemyMoveOnTerrainScript->setObjectHeight(3.0f);
 	//enemy->getTransform()->setPosition(0, 0, 0);
 	//enemy->getTransform()->setRotation(0, 0, 0);
-
-
 
 
 	// 2단계
@@ -416,8 +415,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * car1Child1Child2 = car1Child1->addChild("car4", "Car");
 	car1Child1Child2->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child2->getTransform()->setPosition(7, 0, 0);*/
-	
-
 
 
 	// 맵등록 + 맵을 사용할 Script 등록
@@ -431,12 +428,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	const Vector3 & startPoint = enemyBasicEnemyScript->getStartPoint();
 	enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
 	//---------------------------------------------------------------------------------------------------------
-
-
-
 	Scene & scene = mainCamera->getScene();
-
-
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용

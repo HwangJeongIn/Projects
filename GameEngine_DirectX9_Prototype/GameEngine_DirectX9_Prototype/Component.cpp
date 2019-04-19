@@ -406,6 +406,13 @@ void Transform::setLocalRotation(float x, float y, float z)
 
 void PlayerScript::update()
 {
+	Vector3 temp = transform->getWorldRotation();
+	Trace::Write("TAG_DEBUG", "player", "");
+	Trace::Write("TAG_DEBUG", "x", temp.getX());
+	Trace::Write("TAG_DEBUG", "y", temp.getY());
+	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+
+
 	//if (::GetAsyncKeyState('Q') & 0x8000f)
 	//	transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
 	//if (::GetAsyncKeyState('E') & 0x8000f)
@@ -736,6 +743,11 @@ void MoveScript_C::start()
 
 void MoveScript_C::update()
 {
+	Vector3 temp = transform->getWorldRotation();
+	Trace::Write("TAG_DEBUG", "x", temp.getX());
+	Trace::Write("TAG_DEBUG", "y", temp.getY());
+	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+
 	if (::GetAsyncKeyState('K') & 0x8000f)
 	{
 		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,-.05f,0 });

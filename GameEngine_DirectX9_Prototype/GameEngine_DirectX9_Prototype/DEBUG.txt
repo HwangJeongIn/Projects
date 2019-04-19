@@ -1,220 +1,346 @@
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 return
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 idle
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 dash
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
+dash
+current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
 current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
+player :: 
+x :: 180
+y :: 0.000131595
+z :: 180
+x :: 180
+y :: 0.000131595
+z :: 180
 attack
