@@ -368,14 +368,21 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	playerMoveOnTerrainScript->setObjectHeight(3.0f);
 	player->getTransform()->setWorldPosition(-15, 0, 0);
-	player->getTransform()->setWorldRotation(0, 180, 0);
+	player->getTransform()->setWorldRotation(10, 180,20);
 
 	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
 	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1->getTransform()->setLocalRotation(30, 30, 50);
 
 	playerChild1->addComponent<MoveScript_C>();
+
+	GameObject * playerChild1Child1 = playerChild1->addChild("bigShip1", "BigShip");
+	playerChild1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//playerChild1Child1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1Child1->getTransform()->setLocalRotation(30, 30, 50);
+
+	playerChild1Child1->addComponent<MoveScript_C>();
 
 
 	// enemy

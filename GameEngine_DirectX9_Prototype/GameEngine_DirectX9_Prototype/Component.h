@@ -159,15 +159,35 @@ public:
 		//z
 		float roll = 0.0f;
 
+
 		float sqw = q.w*q.w;
 		float sqx = q.x*q.x;
 		float sqy = q.y*q.y;
 		float sqz = q.z*q.z;
 
+		/*
+		pitch = atan2(2.0f * q.x * q.w + 2.0f * q.y * q.z, 1.0f - 2.0f * (sqz + sqw));
+		yaw = asin(2.0f * (q.x * q.z - q.w * q.y));
+		roll = atan2(2.0f * q.x * q.y + 2.0f * q.z * q.w, 1.0f - 2.0f * (sqy + sqz));
+		*/
+
+		/*
+		pitch = atan2(2.0f * (q.y * q.z + q.x * q.w), (-sqx - sqy + sqz + sqw));
+		yaw =  asin(-2.0f * (q.x * q.z - q.y * q.w));
+		roll = atan2(2.0f * (q.x * q.y + q.z * q.w), (sqx - sqy - sqz + sqw));
+		*/
+
+		/*
+		pitch =  asin(2.0f * (q.w * q.x - q.y * q.z));
+		yaw =  atan2(2.0f * (q.x * q.z + q.y * q.w), (-sqx - sqy + sqz + sqw));
+		roll = atan2(2.0f * (q.x * q.y + q.z * q.w), (-sqx + sqy - sqz + sqw));
+		*/
+
+		/*
 		pitch = atan2f(2.f * (q.z*q.y + q.x*q.w), 1 - 2 * (sqx + sqy));
 		yaw = asinf(-2.f * (q.x*q.z - q.y*q.w));
 		roll = atan2f(2.f * (q.x*q.y + q.z*q.w), 1 - 2 * (sqy + sqz));
-
+		*/
 
 		//// atan2 :: -¥ð ~ ¥ð
 
