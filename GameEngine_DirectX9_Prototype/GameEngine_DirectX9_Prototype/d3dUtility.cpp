@@ -144,7 +144,7 @@ bool d3d::InitD3D(
 	return true;
 }
 
-int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void), Scene & scene)
+int d3d::EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject * objToGetScene)
 {
 	MSG msg;
 	::ZeroMemory(&msg, sizeof(MSG));
@@ -153,9 +153,12 @@ int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void), Scene & scene)
 
 
 
-	while(msg.message != WM_QUIT)
+	while (msg.message != WM_QUIT)
 	{
-		if(::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+
+
+
+		if (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 
 			::TranslateMessage(&msg);
@@ -163,21 +166,55 @@ int d3d::EnterMsgLoop( void (Scene::*ptr_display)(void), Scene & scene)
 
 		}
 		else
-        {	
+		{
+
+			// 입력받은 키들을 모두 저장해준다.
+			InputManager::UpdateFrameStart();
+
+			if (objToGetScene)
+			{
+				// 여기서 씬을 바꿔준다.
+				// 1키 : main
+				// 2키 : start
+				// 3키 : end
+				if (InputManager::GetKeyDown(0x30))
+				{
+					Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
+				}
+				else if (InputManager::GetKeyDown(0x38))
+				{
+					Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+				}
+				else if (InputManager::GetKeyDown(0x39))
+				{
+					Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+				}
+
+				scene = &(objToGetScene->getScene());
+			}
+
+
 			//float currTime  = (float)timeGetTime();
 			//float timeDelta = (currTime - lastTime);// *0.001f;
-			
-			(scene.*ptr_display)();
+			if(scene)
+				(scene->*ptr_display)();
 
 			//char t[100]{};
 			////_itoa_s(timeDelta, t, 10);
 			//sprintf(t, "%f", timeDelta);
 			//Trace::Write("TAG_DEBUG", "deltaTime", t);
 			//lastTime = currTime;
-        }
-    }
-    return msg.wParam;
+
+			// 이전프레임의 입력배열을 최신화 시켜준다.
+			InputManager::UpdateFrameEnd();
+
+
+		}
+	}
+	return msg.wParam;
 }
+
+
 
 D3DLIGHT9 d3d::InitDirectionalLight(D3DXVECTOR3* direction, D3DXCOLOR* color)
 {

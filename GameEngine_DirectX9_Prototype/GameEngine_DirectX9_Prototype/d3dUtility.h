@@ -18,6 +18,7 @@
 #include <limits>
 
 class Scene;
+class GameObject;
 
 namespace d3d
 {
@@ -29,9 +30,10 @@ namespace d3d
 		int width, int height,     // [in] Backbuffer dimensions.
 		bool windowed,             // [in] Windowed (true)or full screen (false).
 		D3DDEVTYPE deviceType,     // [in] HAL or REF
-		IDirect3DDevice9** device);// [out]The created device.
+		IDirect3DDevice9** device);
 
-	int EnterMsgLoop(void(Scene::*ptr_display)(void), Scene & scene);
+
+	int EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject * objToGetScene);
 
 	LRESULT CALLBACK WndProc(
 		HWND hwnd,

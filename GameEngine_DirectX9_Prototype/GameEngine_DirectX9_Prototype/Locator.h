@@ -36,10 +36,28 @@ class NullFbxParser;
 
 class Locator
 {
+public:
+
+	enum SystemType
+	{
+		DEBUGTYPE,
+		RELEASETYPE,
+		NULLTYPE
+	};
+
+	enum SceneType
+	{
+		START,
+		END,
+		MAIN
+	};
+
 private :
 	static Scene * scene;
 	static NullScene nullScene;
-	
+	static Scene mainScene;
+	static Scene startScene;
+	static Scene endScene;
 	/*
 	디바이스 같은경우는 간단히 등록한 객체를 바로 받아 올 수 있게 설계
 	디바이스를 가지고 호출 할 수 있는 함수가 매우 많기 때문에 
@@ -59,6 +77,8 @@ private :
 	static FbxParser * fbxParser;
 	static NullFbxParser nullFbxParser;
 
+	static void chagneScene(SceneType type = MAIN);
+
 protected :
 	static Scene& getScene(){ return *scene; }
 	static Audio& getAudio(){ return *audio; }
@@ -75,14 +95,11 @@ protected :
 
 public :
 
-	enum SystemType
-	{
-		DEBUGTYPE,
-		RELEASETYPE,
-		NULLTYPE
-	};
 
-	static void provideScene(SystemType type = SystemType::RELEASETYPE);
+	//static void provideScene(SystemType type = SystemType::RELEASETYPE);
+	static void provideScene(SystemType systemType = SystemType::RELEASETYPE, SceneType sceneType = SceneType::MAIN);
+
+
 	static void provideAudio(SystemType type = SystemType::RELEASETYPE);
 	//static void provideDeviceWrapper(IDirect3DDevice9 * device, SystemType type = SystemType::RELEASETYPE);
 	static void provideDevice(IDirect3DDevice9 * device);

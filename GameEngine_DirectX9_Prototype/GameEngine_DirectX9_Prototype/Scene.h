@@ -30,7 +30,7 @@ public :
 	};
 
 private :
-	string name;
+	string sceneName;
 	vector<GameObject *> rootGameObjects;
 	// 같은 부모객체를 가진 것들은 무조건 중복된 값을 가지지 못한다.
 
@@ -60,10 +60,12 @@ private :
 
 protected :
 
-	Scene();
+	Scene(const string & sceneName);
 	virtual ~Scene(){}
 
 public :
+
+	const string & getSceneName() const { return sceneName; }
 
 	friend class Locator;
 	virtual void gameLoop();
@@ -98,7 +100,7 @@ class NullScene : public Scene
 private:
 
 	NullScene()
-		: Scene() {}
+		: Scene("NullScene") {}
 	virtual ~NullScene() {}
 
 public :
@@ -119,7 +121,7 @@ class DebuggingScene : public Scene
 private :
 	Scene & wrapped;
 	DebuggingScene(Scene & scene)
-		: wrapped(scene) {}
+		: wrapped(scene), Scene(scene.getSceneName()+"DebuggingScene") {}
 	virtual ~DebuggingScene() {}
 
 	void log(const char * message)

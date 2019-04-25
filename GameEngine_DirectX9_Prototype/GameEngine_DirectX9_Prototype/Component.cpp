@@ -203,7 +203,6 @@ void Transform::convertLocalPositionIfItIsChild(Vector3 & output, const Vector3 
 }
 
 
-// 변경예정 /////////////////////////////////////////////////////////////// 임시
 void Transform::convertLocalRotationIfItIsChild(Vector3 & output, const Vector3 & input)
 {
 	// 부모객체가 없다면 그냥 바로 초기화
@@ -215,18 +214,19 @@ void Transform::convertLocalRotationIfItIsChild(Vector3 & output, const Vector3 
 
 	// 부모객체가 있다면 
 	/*
-
+	1. 부모객체의 TransformMatrix의 역행렬을 곱해서 로컬좌표로 들어간다.
+	2. 로컬좌표를 정해준다.
 	*/
 	D3DXMATRIX parentInverseTransformMatrix;
 	gameObject->getParent()->getTransform()->getInverseTransformMatrix(parentInverseTransformMatrix);
 
-	D3DXVECTOR3 inputLocalPos;
-	Vector3::ToD3DXVECTOR3(inputLocalPos, { input.getX(), input.getY(), input.getZ() });
+	D3DXVECTOR3 inputLocalRotation;
+	Vector3::ToD3DXVECTOR3(inputLocalRotation, { input.getX(), input.getY(), input.getZ() });
 
-	D3DXVec3TransformCoord(&inputLocalPos, &inputLocalPos, &parentInverseTransformMatrix);
-	output.setVector3(Vector3{ inputLocalPos.x,inputLocalPos.y, inputLocalPos.z });
+	D3DXVec3TransformCoord(&inputLocalRotation, &inputLocalRotation, &parentInverseTransformMatrix);
+	output.setVector3(Vector3{ inputLocalRotation.x,inputLocalRotation.y, inputLocalRotation.z });
 }
-// 변경예정 /////////////////////////////////////////////////////////////// 임시
+
 
 
 void Transform::setWorldPosition_physics(const Vector3 & other)
@@ -244,9 +244,9 @@ void Transform::setWorldPosition_physics(const Vector3 & other)
 void Transform::setWorldRotation_physics(const Vector3 & other)
 {
 	dirty = true;
-	rotation.setX(constrainLessThan180(other.getX()));
-	rotation.setY(constrainLessThan180(other.getY()));
-	rotation.setZ(constrainLessThan180(other.getZ()));
+	convertLocalRotationIfItIsChild(rotation, other);
+
+
 	setDirectionVectorWithRotation_DX();
 
 	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
@@ -286,21 +286,20 @@ void Transform::setWorldPosition(const Vector3 & other)
 
 }
 
-// 변경예정/////////////////////////////////////////////////////////////// 임시
+
 void Transform::setWorldRotation(const Vector3 & other)
 {
 	dirty = true;
-	rotation.setX(constrainLessThan180(other.getX()));
-	rotation.setY(constrainLessThan180(other.getY()));
-	rotation.setZ(constrainLessThan180(other.getZ()));
-	setDirectionVectorWithRotation_DX();
 
+	convertLocalRotationIfItIsChild(rotation, other);
+
+
+	setDirectionVectorWithRotation_DX();
 	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
 	//if(gameObject->getRigidBody())
 	//	gameObject->getPhysics().setTransformToSystem(gameObject);
 	rootTransformUpdate();
 }
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 
 
 void Transform::setWorldPosition(float x, float y, float z)
@@ -319,13 +318,12 @@ void Transform::setWorldPosition(float x, float y, float z)
 }
 
 
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 void Transform::setWorldRotation(float x, float y, float z)
 {
 	dirty = true;
-	rotation.setX(constrainLessThan180(x));
-	rotation.setY(constrainLessThan180(y));
-	rotation.setZ(constrainLessThan180(z));
+
+	convertLocalRotationIfItIsChild(rotation, Vector3{ x,y,z });
+
 	setDirectionVectorWithRotation_DX();
 
 	//// 값이 변경되었을때 리지드바디가 있다면 물리에서도 처리해준다.
@@ -336,7 +334,6 @@ void Transform::setWorldRotation(float x, float y, float z)
 	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
 	rootTransformUpdate();
 }
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 
 
 void Transform::setLocalPosition(const Vector3 & other)
@@ -349,7 +346,6 @@ void Transform::setLocalPosition(const Vector3 & other)
 }
 
 
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 void Transform::setLocalRotation(const Vector3 & other)
 {
 	dirty = true;
@@ -361,7 +357,6 @@ void Transform::setLocalRotation(const Vector3 & other)
 	// 새롭게 적용된 행렬을 최종 transformMatrix에 적용해준다.
 	rootTransformUpdate();
 }
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 
 
 void Transform::setLocalPosition(float x, float y, float z)
@@ -382,7 +377,6 @@ void Transform::setLocalPosition(float x, float y, float z)
 }
 
 
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 void Transform::setLocalRotation(float x, float y, float z)
 {
 	dirty = true;
@@ -398,7 +392,6 @@ void Transform::setLocalRotation(float x, float y, float z)
 	//if (gameObject->getRigidBody())
 	//	gameObject->getPhysics().setTransformToSystem(gameObject);
 }
-// 변경예정/////////////////////////////////////////////////////////////// 임시
 
 
 
@@ -406,11 +399,11 @@ void Transform::setLocalRotation(float x, float y, float z)
 
 void PlayerScript::update()
 {
-	Vector3 temp = transform->getWorldRotation();
-	Trace::Write("TAG_DEBUG", "player", "");
-	Trace::Write("TAG_DEBUG", "x", temp.getX());
-	Trace::Write("TAG_DEBUG", "y", temp.getY());
-	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	//Vector3 temp = transform->getWorldRotation();
+	//Trace::Write("TAG_DEBUG", "player", "");
+	//Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
 
 	//if (::GetAsyncKeyState('Q') & 0x8000f)
@@ -743,10 +736,10 @@ void MoveScript_C::start()
 
 void MoveScript_C::update()
 {
-	Vector3 temp = transform->getWorldRotation();
-	Trace::Write("TAG_DEBUG", "x", temp.getX());
-	Trace::Write("TAG_DEBUG", "y", temp.getY());
-	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	//Vector3 temp = transform->getWorldRotation();
+	//Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
 	if (::GetAsyncKeyState('K') & 0x8000f)
 	{
@@ -790,31 +783,31 @@ void MainCamera::update()
 	setViewSpace();
 
 	if (::GetAsyncKeyState('E') & 0x8000f)
-		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,1.05f,0 });
+		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 0,1.005f,0 });
 	if (::GetAsyncKeyState('Q') & 0x8000f)
-		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,-1.05f,0 });
+		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 0,-1.005f,0 });
 
 	if (::GetAsyncKeyState('Z') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,.05f });
-		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 1.05f,0,0 });
+		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 1.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('C') & 0x8000f)
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,-.05f });
-		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ -1.05f,0,0 });
+		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ -1.05f,0,0 });
 	}
 
 	if (::GetAsyncKeyState('W') & 0x8000f)
-		transform->setWorldPosition(transform->getWorldPosition() + 2*(transform->getForward()));
+		transform->setLocalPosition(transform->getLocalPosition() + 2*(transform->getForward()));
 	if (::GetAsyncKeyState('S') & 0x8000f)
-		transform->setWorldPosition(transform->getWorldPosition() + 2*(-1)*(transform->getForward()));
+		transform->setLocalPosition(transform->getLocalPosition() + 2*(-1)*(transform->getForward()));
 
 	if (::GetAsyncKeyState('D') & 0x8000f)
-		transform->setWorldPosition(transform->getWorldPosition() + 2*(transform->getRight()));
+		transform->setLocalPosition(transform->getLocalPosition() + 2*(transform->getRight()));
 	if (::GetAsyncKeyState('A') & 0x8000f)
-		transform->setWorldPosition(transform->getWorldPosition() + 2*(-1)*(transform->getRight()));
+		transform->setLocalPosition(transform->getLocalPosition() + 2*(-1)*(transform->getRight()));
 
 }
 
@@ -2073,18 +2066,18 @@ void AnimationFSM::start()
 	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
 	makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
-	makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
-	makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
 	// back > forward / left / right
 
 	// float형으로 등록된 "speed"가 0보다 클때 back > forward
 	makeTransition("standing run back.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
-	makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "speed"가 0보다 클때 back > right
-	makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
 	// left > forward / back / right
 
@@ -2093,16 +2086,16 @@ void AnimationFSM::start()
 	// float형으로 등록된 "speed"가 0보다 클때 left > back
 	makeTransition("standing run left.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
-	makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
 	// right > forward / back / left
 
 	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
-	makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 클때 right > forward
 	makeTransition("standing run right.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "speed"가 0보다 작을때 right > back
-	makeTransition("standing run right.fbx", "standing run back.fbx", "sidepeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	makeTransition("standing run right.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 
 }
 

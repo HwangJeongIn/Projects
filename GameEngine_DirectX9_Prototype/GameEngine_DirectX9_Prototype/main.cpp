@@ -69,76 +69,90 @@ void Cleanup()
 	// pass 0 for the first parameter to instruct cleanup.
 	d3d::DrawBasicScene(0, 0.0f);
 }
-/*
-bool Display(float timeDelta)
+
+void SetStartScene()
 {
-	if( Device )
-	{
-		//
-		// Update: Update the camera.
-		//
 
-		if( ::GetAsyncKeyState('W') & 0x8000f )
-			TheCamera.walk(4.0f * timeDelta);
 
-		if( ::GetAsyncKeyState('S') & 0x8000f )
-			TheCamera.walk(-4.0f * timeDelta);
+	// startScene
+	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
 
-		if( ::GetAsyncKeyState('A') & 0x8000f )
-			TheCamera.strafe(-4.0f * timeDelta);
+	// mainCamera
+	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
+	mainCamera->addComponent<MainCamera>();
+	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
+	mainCamera->getTransform()->setWorldRotation(30, 0, 0);
 
-		if( ::GetAsyncKeyState('D') & 0x8000f )
-			TheCamera.strafe(4.0f * timeDelta);
+	// player
+	GameObject * player = GameObject::Instantiate("player", "Player");
+	player->addChild(mainCamera);
+	//player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	player->addComponent<PlayerScript>();
+	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	playerRigidBody->setSphereCollider(2);
 
-		if( ::GetAsyncKeyState('R') & 0x8000f )
-			TheCamera.fly(4.0f * timeDelta);
+	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
 
-		if( ::GetAsyncKeyState('F') & 0x8000f )
-			TheCamera.fly(-4.0f * timeDelta);
 
-		if( ::GetAsyncKeyState(VK_UP) & 0x8000f )
-			TheCamera.pitch(1.0f * timeDelta);
 
-		if( ::GetAsyncKeyState(VK_DOWN) & 0x8000f )
-			TheCamera.pitch(-1.0f * timeDelta);
+	//MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
+	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
-		if( ::GetAsyncKeyState(VK_LEFT) & 0x8000f )
-			TheCamera.yaw(-1.0f * timeDelta);
-			
-		if( ::GetAsyncKeyState(VK_RIGHT) & 0x8000f )
-			TheCamera.yaw(1.0f * timeDelta);
+	//playerMoveOnTerrainScript->setObjectHeight(4.0f);
+	player->getTransform()->setWorldPosition(-15, 0, 0);
+	player->getTransform()->setWorldRotation(0, 180, 0);
 
-		if( ::GetAsyncKeyState('N') & 0x8000f )
-			TheCamera.roll(1.0f * timeDelta);
+	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
+	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
 
-		if( ::GetAsyncKeyState('M') & 0x8000f )
-			TheCamera.roll(-1.0f * timeDelta);
+	playerChild1->addComponent<MoveScript_C>();
 
-		// Update the view matrix representing the cameras 
-        // new position/orientation.
-		D3DXMATRIX V;
-		TheCamera.getViewMatrix(&V);
-		Device->SetTransform(D3DTS_VIEW, &V);
 
-		//
-		// Render
-		//
-
-		Device->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0);
-		Device->BeginScene();
-
-		d3d::DrawBasicScene(Device, 1.0f);
-
-		Device->EndScene();
-		Device->Present(0, 0, 0, 0);
-	}
-	return true;
 }
-*/
-//
-// WndProc
-//
 
+void SetEndScene()
+{
+	// endScene
+	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+
+	// mainCamera
+	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
+	mainCamera->addComponent<MainCamera>();
+	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
+	mainCamera->getTransform()->setWorldRotation(30, 0, 0);
+
+	// player
+	GameObject * player = GameObject::Instantiate("player", "Player");
+	player->addChild(mainCamera);
+	//player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	player->addComponent<PlayerScript>();
+	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	playerRigidBody->setSphereCollider(2);
+
+	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+
+
+
+	//MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
+	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
+
+	//playerMoveOnTerrainScript->setObjectHeight(4.0f);
+	player->getTransform()->setWorldPosition(-15, 0, 0);
+	player->getTransform()->setWorldRotation(0, 180, 0);
+
+	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
+	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+
+	playerChild1->addComponent<MoveScript_C>();
+}
 
 
 Terrain * GenerateTerrain()
@@ -270,13 +284,15 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
-	
 
 
+	SetStartScene();
+	SetEndScene();
 
-	/*
-	Scene의 카메라와 기본 월드 세팅을 해준다.
-	*/
+
+	// mainScene
+	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
+	//Scene의 카메라와 기본 월드 세팅을 해준다.
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
@@ -358,31 +374,37 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// player
 	GameObject * player = GameObject::Instantiate("player", "Player");
 	player->addChild(mainCamera);
-	player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//player->addComponent<MeshRenderer>()->loadXFile("car.x");
 	player->addComponent<PlayerScript>();
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
+	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+
+
+
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
-	playerMoveOnTerrainScript->setObjectHeight(3.0f);
+	playerMoveOnTerrainScript->setObjectHeight(4.0f);
 	player->getTransform()->setWorldPosition(-15, 0, 0);
-	player->getTransform()->setWorldRotation(10, 180,20);
+	player->getTransform()->setWorldRotation(0, 180, 0);
 
 	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
 	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	playerChild1->getTransform()->setLocalRotation(30, 30, 50);
+	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
 
 	playerChild1->addComponent<MoveScript_C>();
 
-	GameObject * playerChild1Child1 = playerChild1->addChild("bigShip1", "BigShip");
-	playerChild1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//playerChild1Child1->getTransform()->setLocalPosition(5, 3, 0);
-	playerChild1Child1->getTransform()->setLocalRotation(30, 30, 50);
+	//GameObject * playerChild1Child1 = playerChild1->addChild("bigShip1", "BigShip");
+	//playerChild1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	////playerChild1Child1->getTransform()->setLocalPosition(5, 3, 0);
+	//playerChild1Child1->getTransform()->setLocalRotation(30, 30, 50);
 
-	playerChild1Child1->addComponent<MoveScript_C>();
+	//playerChild1Child1->addComponent<MoveScript_C>();
 
 
 	// enemy
@@ -435,11 +457,13 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	const Vector3 & startPoint = enemyBasicEnemyScript->getStartPoint();
 	enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
 	//---------------------------------------------------------------------------------------------------------
+
 	Scene & scene = mainCamera->getScene();
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
-	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/,scene );
+	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, &scene, mainCamera);
+
 
 	// void(*ptr_display)(void)
 	Cleanup();

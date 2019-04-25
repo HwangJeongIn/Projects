@@ -1,825 +1,1050 @@
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 return
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 idle
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+idle
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+dash
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+dash
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+dash
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+dash
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+dash
+dash
 dash
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 dash
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+dash
+dash
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+dash
+current Target :: Player
+dash
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+attack
+attack
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
-attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+attack
+attack
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
 current Target :: Player
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
 attack
-player :: 
-x :: -9.408
-y :: -3.40499
-z :: 160.28
-x :: -46.2135
-y :: -9.37211
-z :: 118.856
-x :: -73.5363
-y :: -36.9717
-z :: 84.4339
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
+attack
+attack
+current Target :: Player
+attack
+attack
+attack
+attack
+current Target :: Player
 attack

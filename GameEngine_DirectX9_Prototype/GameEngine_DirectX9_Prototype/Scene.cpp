@@ -2,8 +2,8 @@
 #include "Audio.h"
 #include "Physics.h"
 
-	Scene::Scene()
-		: name("Scene1"), previousTime(0), currentTime(0), lagTime(0)
+	Scene::Scene(const string & sceneName)
+		: sceneName(sceneName), previousTime(0), currentTime(0), lagTime(0)
 	{
 		// Instantiate함수는 Scene이 완전히 초기화 된 다음에 가능하다.
 		//rootGameObjects.push_back(GameObject::Instantiate("player name", "player"));
@@ -20,6 +20,7 @@
 
 	void Scene::gameLoop()
 	{
+
 		// 카메라는 씬이 시작하기 전에 등록해주었다.
 		// 만약 등록된 카메라가 없으면 게임 루프는 돌지 않는다.
 		if (mainObjectsTable.find(MOT_MAINCAMERA) == mainObjectsTable.end()) return;
@@ -27,8 +28,7 @@
 		GameObject * mainCamera = mainObjectsTable[MOT_MAINCAMERA];
 		IDirect3DDevice9 & device_s = mainCamera->getDevice();
 
-		// 입력받은 키들을 모두 저장해준다.
-		InputManager::UpdateFrameStart();
+
 
 		// 여기서 하드코딩으로 해결하는 방법외에는 없을까?
 		if (previousTime == 0)
@@ -98,8 +98,7 @@
 		
 		//Trace::Write("TAG_DEBUG", FrameTime::getDeltaTime());
 
-		// 이전프레임의 입력배열을 최신화 시켜준다.
-		InputManager::UpdateFrameEnd();
+
 
 
 		if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)

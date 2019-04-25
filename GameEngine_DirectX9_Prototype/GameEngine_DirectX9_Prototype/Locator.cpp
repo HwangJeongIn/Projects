@@ -10,6 +10,9 @@
 */
 NullScene Locator::nullScene{};
 Scene * Locator::scene = &nullScene;
+Scene Locator::mainScene("MainScene");
+Scene Locator::startScene("StartScene");
+Scene Locator::endScene("EndScene");
 
 NullAudio Locator::nullAudio{};
 Audio * Locator::audio = &nullAudio;
@@ -61,10 +64,20 @@ void Locator::provideAudio(SystemType type)
 	}
 }
 
-void Locator::provideScene(SystemType type)
+void Locator::provideScene(SystemType systemType, SceneType sceneType)
 {
+	// 새롭게 할당해야 디버깅모드일 경우 새롭게 할당될 가능성이 있기 때문에
+	// 널과 세팅해둔 씬이 아닌 것들이 들어가 있거나 래핑되어 있는 경우에 삭제해준다
+	if (scene != &nullScene && scene != nullptr && scene != &startScene && scene != &endScene &&  scene != &mainScene)
+		delete scene;
+
+	// 씬타입으로 설정해준다.
+	chagneScene(sceneType);
+
+	
+
 	// 가장 처리 방식이 다른 경우는 Debug모드일때 이다. 먼저처리해준다.
-	if (type == SystemType::DEBUGTYPE)
+	if (systemType == SystemType::DEBUGTYPE)
 	{
 
 		// 여기서 현재 디버깅 모드로 동적하고 있다면 그냥 리턴한다. // 여러번 래핑되는 것을 막기 위해서
@@ -73,31 +86,52 @@ void Locator::provideScene(SystemType type)
 			return;
 
 		// 현재 가지고 있는 Scene이 NullScene이거나 nullptr이면 바로적용시켜준다.
-		if (scene == &nullScene || scene == nullptr)
+		if (scene == nullptr)
 		{
 			scene = new DebuggingScene(nullScene);
 			return;
 		}
 
-		// 만약에 동적할당한 것을 다시 래핑했을때 해제를 2번에해주어야한다. // 릴리즈에서 처리해준다.
 		scene = new DebuggingScene(*scene);
 		return;
 	}
 
-	// 새롭게 할당해야 되기 때문에 널이 아닌 것들이 들어가 있으면 삭제한다.
-	if (scene != &nullScene && scene != nullptr)
-		delete scene;
 
-	switch (type)
+	switch (systemType)
 	{
 	case SystemType::RELEASETYPE:
-		scene = new Scene();
+		// 위에서 씬타입으로 설정해주었기 때문에 아무것도 해주지않는다.
 		break;
 
 	case SystemType::NULLTYPE: default:
+		// 위에서 씬타입으로 설정해주었지만 systemType가 nullType이면 널씬을 갖게된다.
 		scene = &nullScene;
 		break;
 	}
+}
+void Locator::chagneScene(SceneType type)
+{
+	switch (type)
+	{
+	case SceneType::MAIN:
+		scene = &mainScene;
+		break;
+
+	case SceneType::START:
+		scene = &startScene;
+		break;
+
+	case SceneType::END:
+		scene = &endScene;
+		break;
+
+	default:
+		scene = &nullScene;
+		break;
+
+	}
+
+
 }
 void Locator::provideDevice(IDirect3DDevice9 * device)
 {
@@ -213,22 +247,12 @@ void Locator::release()
 
 	}
 
-	if (!scene && scene != &nullScene)
-	{
-		DebuggingScene * tScene = dynamic_cast<DebuggingScene *>(scene);
-		if (tScene)
-		{
-			// 널포인터 널시스템은 아니지만 디버깅 시스템인경우
-			// 만약 래핑되어있는 객체가 널시스템이아니고 동적할당된 것이라면 따로 삭제해준다.
-			Scene * wrappedScene = tScene->getWrappedScene();
-			if (!wrappedScene && wrappedScene != &nullScene)
-				delete wrappedScene;
-		}
-
-		// 디버깅시스템 널포인터 널시스템이 아닌 상황 + 디버깅스템이지만 동적할당된 wrapped을 처리한 상황
+	// 씬의 경우 감싸고 있는 경우만 지워주면 된다. DebuggingScene 의 경우에만 동적할당이 일어난다.
+	// 널과 세팅해둔 씬이 아닌 것들이 들어가 있거나 래핑되어 있는 경우에 삭제해준다
+	if (scene != &nullScene && scene != nullptr&& scene != &mainScene && scene != &startScene && scene != &endScene)
 		delete scene;
-		
-	}
+
+
 
 	if (!physics && physics != &nullPhysics)
 	{
