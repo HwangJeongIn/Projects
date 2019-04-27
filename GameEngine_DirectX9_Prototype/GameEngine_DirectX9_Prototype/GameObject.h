@@ -57,6 +57,9 @@ private:
 		}
 	}
 
+
+
+
 	virtual ~GameObject();
 
 
@@ -146,6 +149,7 @@ public:
 		vector<GameObject *> *children = nullptr, vector<Component *> * components = nullptr);
 
 	static GameObject * Instantiate(GameObject * other);
+	//static GameObject * Instantiate_copy(GameObject * other);
 	static GameObject * Instantiate(const string & name = "default GO name", const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
 		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr,

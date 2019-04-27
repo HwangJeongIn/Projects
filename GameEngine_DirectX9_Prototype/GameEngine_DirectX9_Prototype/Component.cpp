@@ -443,20 +443,36 @@ void PlayerScript::update()
 		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
 	}
 
+
 	if (InputManager::GetKeyUp(VK_SPACE))
 	{
-		Vector3 direction = transform->getForward() + transform->getUp();
+		Vector3 direction = transform->getForward() + Vector3(0, 0.01, 0);
 		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
-		bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
-		bullet->getTransform()->setWorldPosition(transform->getWorldPosition()+direction);
+		//bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
+		//FbxModelRenderer * bulletFbxModelRenderer = bullet->addComponent<FbxModelRenderer>();
+		//bulletFbxModelRenderer->loadFbxFile("Arrow_Regular.fbx");
+		//bulletFbxModelRenderer->setScale(Vector3(10, 10, 10));
+		//bullet->getTransform()->setWorldRotation(Vector3(0, 180, 0));
 
+		bullet->getTransform()->setWorldPosition(transform->getWorldPosition()+direction + Vector3(0,3.0f,0));
+
+		bullet->addComponent<BulletScript>();
 		RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
 		bulletRigidBody->setSphereCollider(1);
-		bulletRigidBody->addForce(direction * 20.0f);
-		bullet->addComponent<BulletScript>();
+		bulletRigidBody->addForce(direction * shootingPower);
+
+		shootingPower = 100.0f;
+
 
 		//car1RigidBody->setGravity(Vector3(0, 0, 0));
 		//car1->addComponent<BoxCollider>();
+	}
+	else if (InputManager::GetKeyStay(VK_SPACE))
+	{
+		if (shootingPower < 200.0f)
+		{
+			shootingPower += FrameTime::GetDeltaTime()*.1f * chargingSpeed;
+		}
 	}
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
@@ -2042,11 +2058,14 @@ void AnimationFSM::start()
 		fbxModelAnimations = fbxModelRenderer->getAnimations();
 	}
 
+
 	registerAnimation("standing run forward.fbx");
 	registerAnimation("standing run back.fbx");
 	registerAnimation("standing run right.fbx");
 	registerAnimation("standing run left.fbx");
-	setDefaultState("standing run forward.fbx");
+	registerAnimation("standing idle 01.fbx");
+	registerAnimation("Standing Draw Arrow.fbx");
+	setDefaultState("standing idle 01.fbx");
 
 	// 플레이어 기준
 
@@ -2058,44 +2077,72 @@ void AnimationFSM::start()
 	// 변수 등록
 	registerFloat("speed");
 	setFloat("speed", 1.0f);
+
 	registerFloat("sideSpeed");
 	setFloat("sideSpeed", 1.0f);
 
-	// forward > back / left / right
+	registerBool("isIdle");
+	setBool("isIdle",true);
 
+	registerBool("isShooting");
+	setBool("isShooting", false);
+
+	// forward > back / left / right / idle
 	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
 	makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
 	makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
 	makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run forward.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
 
-	// back > forward / left / right
-
+	// back > forward / left / right / idle
 	// float형으로 등록된 "speed"가 0보다 클때 back > forward
 	makeTransition("standing run back.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
 	makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "speed"가 0보다 클때 back > right
 	makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run back.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
 
-	// left > forward / back / right
-
+	// left > forward / back / right / idle
 	// float형으로 등록된 "speed"가 0보다 작을때 left > forward
 	makeTransition("standing run left.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "speed"가 0보다 클때 left > back
 	makeTransition("standing run left.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
 	makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run left.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
 
-	// right > forward / back / left
 
+	// right > forward / back / left / idle
 	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
 	makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "sideSpeed"가 0보다 클때 right > forward
 	makeTransition("standing run right.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
 	// float형으로 등록된 "speed"가 0보다 작을때 right > back
 	makeTransition("standing run right.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run right.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// idle > forward / back / left / right / arrow
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 idle > left
+	makeTransition("standing idle 01.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
+	makeTransition("standing idle 01.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 idle > forward
+	makeTransition("standing idle 01.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 작을때 idle > back
+	makeTransition("standing idle 01.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isShooting"가 0보다 작을때 idle > arrow
+	makeTransition("standing idle 01.fbx", "Standing Draw Arrow.fbx", "isShooting", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// arrow > idel
+	// float형으로 등록된 "speed"가 0보다 작을때 arrow > idle
+	makeTransition("Standing Draw Arrow.fbx", "standing idle 01.fbx", "isShooting", 0, AnimationFSM::ValueType::BOOLTYPE, false);
 
 }
 
@@ -2109,33 +2156,47 @@ void AnimationFSM::update()
 		currentState = defaultState;
 
 
-
-	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
+	
+	if (InputManager::GetKeyStay(VK_UP))
 	{
 		setFloat("speed", 1);
 		setFloat("sideSpeed", 0);
+		setBool("isIdle", false);
 	}
-	else if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
+	else if (InputManager::GetKeyStay(VK_DOWN))
 	{
 		setFloat("speed", -1);
 		setFloat("sideSpeed", 0);
+		setBool("isIdle", false);
 	}
-	else if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	else if (InputManager::GetKeyStay(VK_RIGHT))
 	{
 		setFloat("sideSpeed", 1);
 		setFloat("speed", 0);
+		setBool("isIdle", false);
 	}
-	else if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
+	else if (InputManager::GetKeyStay(VK_LEFT))
 	{
 		setFloat("sideSpeed", -1);
 		setFloat("speed", 0);
+		setBool("isIdle", false);
 	}
 	else
 	{
 		setFloat("sideSpeed", 0);
 		setFloat("speed", 0);
+		setBool("isIdle", true);
 	}
 
+
+	if (InputManager::GetKeyDown(VK_SPACE))
+	{
+		setBool("isShooting", true);
+	}
+	else if (InputManager::GetKeyUp(VK_SPACE))
+	{
+		setBool("isShooting", false);
+	}
 
 
 	// 애니메이션을 플레이해주고 // 현재플레이중이면 계속플레이
@@ -2363,6 +2424,67 @@ void AnimationFSM::updateAllTrasitions(const string & animationFileName)
 
 
 
+void BulletScript::start()
+{
+	device = &(gameObject->getDevice());
+
+	D3DXCreateSphere(device, 1.0f, 10, 10, &bulletMesh, 0);
+
+	//HRESULT hr = 0;
+
+	//// 파일을 로드시켜서 텍스처를 불러오는 방식 
+	//hr = D3DXCreateTextureFromFile
+	//(
+	//	device,
+	//	"../Fbx/Textures/fire4.jpg",
+	//	&texture
+	//);
+
+	//if (FAILED(hr))
+	//	texture = nullptr;
+
+	// material 기본 설정
+	// Set the RGBA for diffuse reflection.
+	mtrl.Diffuse.r = 1.0f;
+	mtrl.Diffuse.g = 0.0f;
+	mtrl.Diffuse.b = 0.0f;
+	mtrl.Diffuse.a = 1.0f;
+
+	// Set the RGBA for ambient reflection.
+	mtrl.Ambient.r = 1.0f;
+	mtrl.Ambient.g = 0.0f;
+	mtrl.Ambient.b = 0.0f;
+	mtrl.Ambient.a = 1.0f;
+
+	// Set the color and sharpness of specular highlights.
+	mtrl.Specular.r = 100.0f;
+	mtrl.Specular.g = .0f;
+	mtrl.Specular.b = .0f;
+	mtrl.Specular.a = 1.0f;
+	mtrl.Power = 2000.0f;
+
+	// Set the RGBA for emissive color.
+	mtrl.Emissive.r = 1.0f;
+	mtrl.Emissive.g = 0.0f;
+	mtrl.Emissive.b = 0.0f;
+	mtrl.Emissive.a = 1.0f;
+}
+
+void BulletScript::update()
+{
+	if (!bulletMesh) return;
+
+	// 현재 transform행렬로 적용시킨다.
+	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
+
+	//if (texture)
+	//	device->SetTexture(0, texture);
+
+	device->SetMaterial(&mtrl);
+
+	bulletMesh->DrawSubset(0);
+}
+
 void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 {
 	if (other.gameObject->getTag() == "Remover")
@@ -2370,6 +2492,8 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 		GameObject::Destroy(gameObject);
 	}
 }
+
+
 
 const string Terrain::filePathToLoadTerrainFiles = "../Terrain/";
 const string Terrain::filePathToLoadTerrainTextureFiles = "../Terrain/Texture/";
@@ -2894,7 +3018,7 @@ void MoveOnTerrainScript::update()
 		float height = 0.0f;
 		if (terrain->getHeight(transform->getWorldPosition(), &height))
 		{
-			transform->setWorldPosition(transform->getWorldPosition().getX(), height, transform->getWorldPosition().getZ());
+			transform->setWorldPosition(transform->getWorldPosition().getX(), height + objectHeight, transform->getWorldPosition().getZ());
 		}
 
 		//float height = 0.0f;

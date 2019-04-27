@@ -19,7 +19,11 @@
 #include "Locator.h"
 #include "Scene.h"
 
-#include "Physics.h"
+#include "DXQWidget.h"
+#include "gameui.h"
+#include <QtWidgets/qapplication.h>
+
+
 //
 // Globals
 //
@@ -28,7 +32,7 @@
 const int Width  = 1280;
 const int Height = 720;
 
-Camera TheCamera(Camera::LANDOBJECT);
+//Camera TheCamera(Camera::LANDOBJECT);
 
 //
 // Framework functions
@@ -64,11 +68,11 @@ Camera TheCamera(Camera::LANDOBJECT);
 	return true;
 }*/
 
-void Cleanup()
-{
-	// pass 0 for the first parameter to instruct cleanup.
-	d3d::DrawBasicScene(0, 0.0f);
-}
+//void Cleanup()
+//{
+//	// pass 0 for the first parameter to instruct cleanup.
+//	d3d::DrawBasicScene(0, 0.0f);
+//}
 
 void SetStartScene()
 {
@@ -80,8 +84,8 @@ void SetStartScene()
 	// mainCamera
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
-	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
-	mainCamera->getTransform()->setWorldRotation(30, 0, 0);
+	mainCamera->getTransform()->setWorldPosition(0, 40, -100);
+	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 
 	// player
 	GameObject * player = GameObject::Instantiate("player", "Player");
@@ -122,8 +126,8 @@ void SetEndScene()
 	// mainCamera
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
-	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
-	mainCamera->getTransform()->setWorldRotation(30, 0, 0);
+	mainCamera->getTransform()->setWorldPosition(0, 40, -100);
+	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 
 	// player
 	GameObject * player = GameObject::Instantiate("player", "Player");
@@ -223,20 +227,42 @@ LRESULT CALLBACK d3d::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // WinMain
 //
 int WINAPI WinMain(HINSTANCE hinstance,
-				   HINSTANCE prevInstance, 
-				   PSTR cmdLine,
-				   int showCmd)
+	HINSTANCE prevInstance,
+	PSTR cmdLine,
+	int showCmd)
 {
 	IDirect3DDevice9* device = 0;
 
 
-	if(!d3d::InitD3D(hinstance,
-		Width, Height, true, D3DDEVTYPE_HAL, &device))
-	{
-		::MessageBox(0, "InitD3D() - FAILED", 0, 0);
-		return 0;
-	}
-		
+	//if(!d3d::InitD3D(hinstance,
+	//	Width, Height, true, D3DDEVTYPE_HAL, &device))
+	//{
+	//	::MessageBox(0, "InitD3D() - FAILED", 0, 0);
+	//	return 0;
+	//}
+
+	int tempA = 0;
+	QApplication a(tempA, 0);
+
+	GameUI gameUI;
+
+	//////////////////////////////////////////////////////////////////////////
+	gameUI.initD3D(Width, Height, true, D3DDEVTYPE_HAL, &device);
+
+
+	gameUI.show();
+	//layout->addWidget(pDxWidget);
+	//w.centralWidget()->setLayout(layout);
+	////w.setLayout(layout);
+
+	//pDxWidget->initD3D();
+	//pDxWidget->StartRenderFunc(30);
+	//pDxWidget->show();
+
+	//////////////////////////////////////////////////////////////////////////
+
+
+
 	D3DXMATRIX proj;
 	D3DXMatrixPerspectiveFovLH(
 		&proj,
@@ -272,7 +298,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// 디버깅용 txt파일을 로드
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
-	
+
 	// Gizmos클래스 초기화
 	Gizmos::InitGizmos(device);
 
@@ -295,8 +321,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//Scene의 카메라와 기본 월드 세팅을 해준다.
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
-	mainCamera->getTransform()->setWorldPosition(0, 100, -150);
-	mainCamera->getTransform()->setWorldRotation(30, 0, 0);
+	mainCamera->getTransform()->setWorldPosition(0, 50, -100);
+	mainCamera->getTransform()->setWorldRotation(25, 0, 0);
 
 
 
@@ -364,7 +390,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//playerRigidBody->setSphereCollider(2);
 
 
-	
+
 	// 0단계
 	//GameObject * car0 = GameObject::Instantiate("car0", "Car");
 	//car0->addComponent<MeshRenderer>()->loadXFile("car.x");
@@ -379,16 +405,16 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
-	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+	FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
 
 
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
-	playerMoveOnTerrainScript->setObjectHeight(4.0f);
+	playerMoveOnTerrainScript->setObjectHeight(3.0f);
 	player->getTransform()->setWorldPosition(-15, 0, 0);
 	player->getTransform()->setWorldRotation(0, 180, 0);
 
@@ -436,7 +462,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 	// 2단계
-	
+
 	/*GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
 	car1Child1Child1->addComponent<MeshRenderer>()->loadXFile("car.x");
 	car1Child1Child1->getTransform()->setPosition(0, 5, 0);
@@ -462,14 +488,17 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
-	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, &scene, mainCamera);
+	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, &scene, *mainCamera, gameUI);
 
 
 	// void(*ptr_display)(void)
-	Cleanup();
 
+	a.exit();
 	Locator::release();
 	device->Release();
+
+
+
 
 	return 0;
 }

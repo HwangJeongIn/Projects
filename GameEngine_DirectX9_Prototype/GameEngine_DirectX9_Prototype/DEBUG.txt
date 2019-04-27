@@ -1,1050 +1,946 @@
 return
 idle
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+attack
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+current Target :: Player
+dash
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+chase
+current Target :: Player
+current Target :: Player
+current Target :: Player
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
+return
 idle
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-dash
-current Target :: Player
-dash
-dash
-dash
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-dash
-dash
-current Target :: Player
-dash
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-dash
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-dash
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
-attack
-current Target :: Player
-attack
-attack
-attack
-attack
-current Target :: Player
-attack
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+return
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle
+idle

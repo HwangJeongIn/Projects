@@ -506,6 +506,8 @@ public:
 class PlayerScript : public Component
 {
 private:
+	float shootingPower;
+	const float chargingSpeed;
 protected:
 	virtual void update();
 	virtual void start();
@@ -513,7 +515,7 @@ protected:
 
 public:
 	PlayerScript(GameObject * go, Transform * tf)
-		: Component(go, tf)
+		: Component(go, tf), shootingPower(0.0f), chargingSpeed(6.0f)
 	{
 		start();
 	}
@@ -645,24 +647,28 @@ public:
 class BulletScript : public Component
 {
 private:
+	IDirect3DDevice9 * device;
+	ID3DXMesh* bulletMesh;
+	IDirect3DTexture9 * texture;
+	D3DMATERIAL9 mtrl;
 
 protected:
-	virtual void start() {};
-	virtual void update() {};
+	virtual void start();
+	virtual void update();
 	virtual void onCollisionStay(GameObjectWithCollision & other);
 
 public:
 	BulletScript(GameObject * go, Transform * tf)
-		: Component(go, tf)
+		: Component(go, tf), bulletMesh(nullptr), texture(nullptr)
 	{
 		start();
+		
 	}
 
 	virtual ~BulletScript()
 	{
 		onDestroy();
 	}
-
 };
 
 

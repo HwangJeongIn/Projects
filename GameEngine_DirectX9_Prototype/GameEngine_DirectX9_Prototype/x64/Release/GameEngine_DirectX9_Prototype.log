@@ -1,7 +1,9 @@
-﻿  코드를 생성하고 있습니다.
-  137 of 1643 functions ( 8.3%) were compiled, the rest were copied from previous compilation.
+﻿  moc_gameui.cpp
+  gameui.cpp
+  코드를 생성하고 있습니다.
+  268 of 3865 functions ( 6.9%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    6 functions had inline decision re-evaluated but remain unchanged
+    28 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
-  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Release\GameEngine_DirectX9_Prototype.exe
-  GameEngine_DirectX9_Prototype.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Release\GameEngine_DirectX9_Prototype.pdb (Full PDB)
+  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Release\GameEngine_DirectX9_Prototype.exe
+  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Release\GameEngine_DirectX9_Prototype.pdb (Full PDB)

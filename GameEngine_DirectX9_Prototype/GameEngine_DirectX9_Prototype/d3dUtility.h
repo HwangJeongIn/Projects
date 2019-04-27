@@ -19,6 +19,7 @@
 
 class Scene;
 class GameObject;
+class GameUI;
 
 namespace d3d
 {
@@ -32,8 +33,8 @@ namespace d3d
 		D3DDEVTYPE deviceType,     // [in] HAL or REF
 		IDirect3DDevice9** device);
 
+	int EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject & objToGetScene, GameUI & gameUI);
 
-	int EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject * objToGetScene);
 
 	LRESULT CALLBACK WndProc(
 		HWND hwnd,

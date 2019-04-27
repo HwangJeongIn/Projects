@@ -280,6 +280,7 @@ GameObject * GameObject::addChild(const string & name, const string & tag,
 	return tempGameObject;
 }
 
+
 GameObject * GameObject::Instantiate(GameObject * other)
 {
 	if (!other) return nullptr;
@@ -289,6 +290,8 @@ GameObject * GameObject::Instantiate(GameObject * other)
 
 	return other;
 }
+
+
 
 GameObject * GameObject::Instantiate
 (const string & name, const string & tag,

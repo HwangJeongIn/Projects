@@ -12,6 +12,7 @@
 
 #include "d3dUtility.h"
 #include "Scene.h"
+#include "gameui.h"
 
 // vertex formats
 const DWORD d3d::Vertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
@@ -144,7 +145,9 @@ bool d3d::InitD3D(
 	return true;
 }
 
-int d3d::EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject * objToGetScene)
+
+
+int d3d::EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject & objToGetScene, GameUI & gameUI)
 {
 	MSG msg;
 	::ZeroMemory(&msg, sizeof(MSG));
@@ -167,38 +170,49 @@ int d3d::EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObjec
 		}
 		else
 		{
-
 			// 입력받은 키들을 모두 저장해준다.
 			InputManager::UpdateFrameStart();
 
-			if (objToGetScene)
+			// 탈출 // 임시
+			// VK_ESCAPE
+			if (InputManager::GetKeyDown(VK_ESCAPE))
 			{
-				// 여기서 씬을 바꿔준다.
-				// 1키 : main
-				// 2키 : start
-				// 3키 : end
-				if (InputManager::GetKeyDown(0x30))
-				{
-					Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
-				}
-				else if (InputManager::GetKeyDown(0x38))
-				{
-					Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
-				}
-				else if (InputManager::GetKeyDown(0x39))
-				{
-					Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
-				}
-
-				scene = &(objToGetScene->getScene());
+				return 0;
 			}
+
+
+			// 여기서 씬을 바꿔준다.
+			// 1키 : main
+			// 2키 : start
+			// 3키 : end
+			if (InputManager::GetKeyDown(0x30))
+			{
+				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
+				gameUI.setMainSceneUI();
+				scene = &(objToGetScene.getScene());
+			}
+			else if (InputManager::GetKeyDown(0x38))
+			{
+				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+				gameUI.setStartSceneUI();
+				scene = &(objToGetScene.getScene());
+			}
+			else if (InputManager::GetKeyDown(0x39))
+			{
+				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+				gameUI.setEndSceneUI();
+				scene = &(objToGetScene.getScene());
+			}
+
+
 
 
 			//float currTime  = (float)timeGetTime();
 			//float timeDelta = (currTime - lastTime);// *0.001f;
-			if(scene)
+			if (scene)
 				(scene->*ptr_display)();
 
+			gameUI.showUI();
 			//char t[100]{};
 			////_itoa_s(timeDelta, t, 10);
 			//sprintf(t, "%f", timeDelta);

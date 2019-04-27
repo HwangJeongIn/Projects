@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="QT">
+      <UniqueIdentifier>{77632d1f-ca9b-4a84-8cc0-0a356e6630e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QT\Release">
+      <UniqueIdentifier>{008ff36e-57b1-4c5b-b608-783406584fb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QT\Debug">
+      <UniqueIdentifier>{fba3721d-033f-4e8d-855b-10d4f2f36013}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Component.cpp">
@@ -56,6 +65,18 @@
     </ClCompile>
     <ClCompile Include="WeightOfBones.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="gameui.cpp">
+      <Filter>QT</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_gameui.cpp">
+      <Filter>QT</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_gameui.cpp">
+      <Filter>QT\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_gameui.cpp">
+      <Filter>QT\Debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +140,12 @@
     <ClInclude Include="BehaviorTree.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_gameui.h">
+      <Filter>QT</Filter>
+    </ClInclude>
+    <ClInclude Include="DXQWidget.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="DEBUG.txt">
@@ -133,5 +160,17 @@
     <Text Include="TextFileNamesList.txt">
       <Filter>소스 파일</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="gameui.qrc">
+      <Filter>QT</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gameui.h">
+      <Filter>QT</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gameui.ui" />
+    <CustomBuild Include="C:\Users\Administrator\Desktop\qt_test_final\qt_test_final\gameui.ui">
+      <Filter>QT</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

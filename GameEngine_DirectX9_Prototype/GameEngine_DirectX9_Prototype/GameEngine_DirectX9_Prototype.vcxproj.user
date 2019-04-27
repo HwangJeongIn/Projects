@@ -9,11 +9,11 @@
     <LocalDebuggerEnvironment>PATH=$(SolutionDir)\Audio\lib\x86;%PATH% $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=$(SolutionDir)\Audio\lib\x64;%PATH% </LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(SolutionDir)\Audio\lib\x64;%PATH%;PATH=%PATH%;C:\Qt\5.12.3\msvc2015_64\bin</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerEnvironment>PATH=$(SolutionDir)\Audio\lib\x64;%PATH% </LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(SolutionDir)\Audio\lib\x64;%PATH%;PATH=%PATH%;C:\Qt\5.12.3\msvc2015_64\bin</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
