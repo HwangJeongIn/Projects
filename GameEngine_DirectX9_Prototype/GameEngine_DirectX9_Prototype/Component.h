@@ -1199,6 +1199,11 @@ private:
 protected:
 	virtual void start();
 	virtual void update() { render(); }
+	virtual void onDestroy() 
+	{ 
+		if (mesh) mesh->Release();
+		if (texture) texture->Release();
+	}
 
 public:
 	Terrain(GameObject * go, Transform * tf)
@@ -1359,6 +1364,14 @@ public:
 	{
 		this->height = height;
 		// 새롭게 버텍스를 설정해준다.
+		processVertices();
+	}
+
+	void setSize(float width, float height)
+	{
+		this->width = width;
+		this->height = height;
+
 		processVertices();
 	}
 	void loadTextureFromFile(const string & fileName);

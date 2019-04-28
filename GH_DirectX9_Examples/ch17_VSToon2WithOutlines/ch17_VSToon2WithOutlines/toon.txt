@@ -15,6 +15,9 @@
 // Globals
 //
 
+static vector defaultNormal = {1.0f, 0.0f, 0.0f, 0.0f};
+static vector Black = {1.0f, 1.0f, 1.0f, 1.0f};
+
 extern matrix WorldViewMatrix;
 extern matrix WorldViewProjMatrix;
 
@@ -36,7 +39,8 @@ struct VS_OUTPUT
 {
     vector position : POSITION;
     float2 uvCoords : TEXCOORD;
-    vector diffuse  : COLOR;
+    vector diffuse  : COLOR0;
+    vector specular   : COLOR1;
 };
 
 
@@ -109,7 +113,9 @@ VS_OUTPUT Main(VS_INPUT input)
 	// 여기서는 그냥 색은 일정하게 지정해두고 빛과 법선벡터의 사이각에 따라서 UV좌표값만 조정해준다.
 	// 이 UV좌표에 따라서 음영이 3가지로 결정된다. // 정확히는 U의 좌표
     output.diffuse = Color;
-    
+	output.specular = Black;
+   // output.normal = defaultNormal;
+
     return output;
 }
 

@@ -73,7 +73,7 @@ bool Setup()
 		"vs_1_1",
 
 		// 오래된 버전과 호환가능하게 하는 플래그 + 디버그 정보 생성
-		D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY|D3DXSHADER_DEBUG,
+		/*D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY|*/D3DXSHADER_DEBUG,
 
 		// 컴파일 된 셰이더 코드를 포함하는 ID3DXBuffer로의 포인터 리턴
 		// 픽셀 / 버텍스 셰이더를 만드는 인자로 사용된다.

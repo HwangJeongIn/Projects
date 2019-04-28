@@ -294,6 +294,7 @@ bool Display(float timeDelta)
 
 		// Draw Cartoon
 		Device->SetVertexShader(ToonShader);
+		//Device->SetVertexShader(NULL);
 		Device->SetTexture(0, ShadeTex);
 
 		D3DXMATRIX worldView;
@@ -332,6 +333,7 @@ bool Display(float timeDelta)
 		// 외곽선 셰이더를 설정해준다.
 		// 텍스처도 바꿔준다.
 		Device->SetVertexShader(OutlineShader);
+
 		Device->SetTexture(0, 0);
 
 		Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -425,6 +427,8 @@ bool Display(float timeDelta)
 
 
 			** 셰이더 코드에서 반환되는 자료형은 어떻게 활용되는 것일까?
+
+			// OutPut 형식에 맞게 그려준다
 
 			// 아직 정보를 덜찾았음 확인중
 			반환될때 있는 타입에 따라서 알아서 결정해줄것이다

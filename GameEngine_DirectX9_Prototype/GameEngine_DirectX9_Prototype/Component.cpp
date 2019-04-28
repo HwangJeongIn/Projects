@@ -399,11 +399,11 @@ void Transform::setLocalRotation(float x, float y, float z)
 
 void PlayerScript::update()
 {
-	//Vector3 temp = transform->getWorldRotation();
-	//Trace::Write("TAG_DEBUG", "player", "");
-	//Trace::Write("TAG_DEBUG", "x", temp.getX());
-	//Trace::Write("TAG_DEBUG", "y", temp.getY());
-	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	Vector3 temp = transform->getWorldRotation();
+	Trace::Write("TAG_DEBUG", "player", "");
+	Trace::Write("TAG_DEBUG", "x", temp.getX());
+	Trace::Write("TAG_DEBUG", "y", temp.getY());
+	Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
 
 	//if (::GetAsyncKeyState('Q') & 0x8000f)
@@ -2627,6 +2627,7 @@ bool Terrain::generateMeshBuffer()
 {
 	HRESULT hr = 0;
 
+
 	hr = D3DXCreateMeshFVF(
 		// 메쉬가 가질 면의 개수 // 총사각형 갯수 * 2
 		// 삼각형의 개수/3 = 인덱스의 수
@@ -2637,7 +2638,8 @@ bool Terrain::generateMeshBuffer()
 
 		// 메쉬를 만드는데 이용될 하나 이상의 플래그
 		// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
-		D3DXMESH_MANAGED,
+		D3DXMESH_MANAGED,// | 
+//		D3DXMESH_32BIT,
 
 		// 복제된 메쉬를 만드는데 이용될 포맷
 		Terrain::TerrainVertex::DefaultFVF,
@@ -2760,6 +2762,9 @@ void Terrain::processVertices()
 			Vector3::Cross(normal, vector1, vector2);
 
 
+			Trace::Write("TAG_INFO1", "x", x);
+			Trace::Write("TAG_INFO1", "y", heightMap[i * verticesPerRow + j]);
+			Trace::Write("TAG_INFO1", "z", z);
 
 			// 인덱스를 제대로 설정해주지 않아서 제대로 렌더링이되지 않는 버그가 발생했다.
 			// 주의해서 인덱스를 넣어주자

@@ -168,12 +168,16 @@ Terrain * GenerateTerrain()
 	//groundRigidBody->turnOnStaticFlag();
 	Terrain * groundTerrain = ground->addComponent<Terrain>();
 	// adsfasfdSsabgaw.raw / coastMountain64.raw / Ash.raw / adsfsaf.raw
-	groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 20, .5f);
+
+
+	//groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 25, .5f);
+	groundTerrain->loadRawFile("terrain.raw", 129, 129, 7.0, .5f);
+	
 	groundTerrain->loadTextureFromFile("grass.bmp");
 
 	srand(time(0));
 
-	for (int i = 0; i < 15; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		// 터레인의 로컬좌표계 기준으로 나무를 심어준다. // 즉 중심이 원점이고 xz평면으로 뻗어있는 터레인기준으로 생각해준다.
 
@@ -195,10 +199,50 @@ Terrain * GenerateTerrain()
 		}
 		pos.setY(y + 40);
 
+		char randomChar = rand() % 3 + '0';
+
+		string tempName = "tree";
+		tempName += randomChar;
+		tempName += ".jpg";
 		GameObject * groundChild1 = ground->addChild("billBoard", "BillBoard");
 		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
 		billBoard1->generateBillBoard();
-		billBoard1->loadTextureFromFile("tree0.dds");
+		billBoard1->loadTextureFromFile(tempName);
+		groundChild1->getTransform()->setWorldPosition(pos);
+	}
+
+	for (int i = 0; i < 30; ++i)
+	{
+		// 터레인의 로컬좌표계 기준으로 나무를 심어준다. // 즉 중심이 원점이고 xz평면으로 뻗어있는 터레인기준으로 생각해준다.
+
+		Vector3 pos = { 0,0,0 };
+		float depth = groundTerrain->getDepth();
+		float width = groundTerrain->getWidth();
+
+		float y = 0.0f;
+
+		pos.setX((rand() % (int)width) - width / 2);
+		pos.setZ((rand() % (int)depth) - depth / 2);
+		while (!groundTerrain->getLocalHeight(pos, &y))
+		{
+			// 범위안에 들어올때까지 뽑아준다. 
+			// 범위 맞춰서 랜덤값 적용해서 무조건 통과하긴하겠지만 그냥 예외처리하였다.
+			pos.setX((rand() % (int)width) - width / 2);
+			pos.setZ((rand() % (int)depth) - depth / 2);
+
+		}
+		pos.setY(y + 5);
+
+		char randomChar = rand() % 2 + '0';
+
+		string tempName = "grass";
+		tempName += randomChar;
+		tempName += ".jpg";
+		GameObject * groundChild1 = ground->addChild("billBoard", "BillBoard");
+		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
+		billBoard1->setSize(20, 20);
+		billBoard1->generateBillBoard();
+		billBoard1->loadTextureFromFile(tempName);
 		groundChild1->getTransform()->setWorldPosition(pos);
 	}
 	return groundTerrain;
@@ -405,9 +449,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
-	FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
 
 
 
@@ -416,7 +460,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	playerMoveOnTerrainScript->setObjectHeight(3.0f);
 	player->getTransform()->setWorldPosition(-15, 0, 0);
-	player->getTransform()->setWorldRotation(0, 180, 0);
+	player->getTransform()->setWorldRotation(0, 0, 0);
 
 	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
 	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
