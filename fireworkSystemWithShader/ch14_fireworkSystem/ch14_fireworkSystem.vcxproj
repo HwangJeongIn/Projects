@@ -145,15 +145,15 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="d3dUtility.cpp" />
     <ClCompile Include="firework.cpp" />
-    <ClCompile Include="pSystem.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="d3dUtility.h" />
-    <ClInclude Include="pSystem.h" />
+    <ClInclude Include="ParticleSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="toon.txt" />
+    <Text Include="FireExplosion.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

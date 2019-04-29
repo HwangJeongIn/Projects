@@ -10,6 +10,8 @@
 #include "FbxModelSkeletonBones.h"
 #include "FbxModelAnimations.h"
 
+#include "ParticleSystem.h"
+
 #include "Utility.h"
 #include "Trace.h"
 
@@ -2487,12 +2489,59 @@ void BulletScript::update()
 
 void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 {
-	if (other.gameObject->getTag() == "Remover")
+	if (other.gameObject->getTag() == "Enemy")
 	{
 		GameObject::Destroy(gameObject);
+		GameObject * bulletParticle = GameObject::Instantiate("bulletParticle", "BulletParticle");
+		BulletParticle * particleSystem = bulletParticle->addComponent<BulletParticle>();
+
+		D3DXVECTOR3 origin{};
+		Vector3::ToD3DXVECTOR3(origin, other.contactPoint);
+		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare.bmp", 2000, .9f, origin);
 	}
 }
 
+void BulletParticle::update()
+{
+	if (!fireExplosion)
+	{
+		GameObject::Destroy(this->gameObject);
+		return;
+	}
+
+	if (lagTime >= fireExplosion->getDuration())
+	{
+		GameObject::Destroy(this->gameObject);
+		return;
+	}
+
+	fireExplosion->update((float)(FrameTime::GetDeltaTime())/1000.0f);
+	fireExplosion->render();
+	lagTime += (float)(FrameTime::GetDeltaTime()) / 1000.0f;
+}
+
+void BulletParticle::onDestroy()
+{
+	if(fireExplosion)
+		delete fireExplosion;
+}
+
+void BulletParticle::generateParticle(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin)
+{
+	fireExplosion = new FireExplosion(device, textureFileName, numOfParticles, particleSize, origin);
+}
+
+void BulletParticle::setAmountFactor(float factor)
+{
+	if (fireExplosion)
+		fireExplosion->setAmountFactor(factor);
+}
+
+void BulletParticle::setDuration(float duration)
+{
+	if (fireExplosion)
+		fireExplosion->setDuration(duration);
+}
 
 
 const string Terrain::filePathToLoadTerrainFiles = "../Terrain/";
@@ -3375,3 +3424,4 @@ void BillBoard::optimizeMesh()
 		nullptr
 	);
 }
+

@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "d3dUtility.h"
-#include "psystem.h"
+#include "ParticleSystem.h"
 #include "camera.h"
 #include <cstdlib>
 #include <ctime>
@@ -25,7 +25,7 @@ IDirect3DDevice9* Device = 0;
 const int Width  = 640;
 const int Height = 480;
 
-psys::PSystem* Exp = 0;
+ParticleSystem * Exp = 0;
 
 Camera TheCamera(Camera::AIRCRAFT);
 
@@ -40,9 +40,8 @@ bool Setup()
 	//
 	// Create the Firework system.
 	//
-	D3DXVECTOR3 origin(0.0f, 10.0f, 50.0f);
-	Exp = new psys::Firework(&origin, 6000);
-	Exp->init(Device, "flare.bmp");
+
+	//Exp->init(Device, "flare.bmp");
 
 	//
 	// Setup a basic scene.
@@ -64,15 +63,19 @@ bool Setup()
 
 	Device->SetTransform(D3DTS_PROJECTION, &proj);
 
+	D3DXVECTOR3 origin(0.0f, 10.0f, 50.0f);
+
+	Exp = new FireExPlosion(Device, "flare.bmp", 20000, .9f, origin);
+
 	return true;
 }
 
 void Cleanup()
 {
-	d3d::Delete<psys::PSystem*>( Exp );
+	delete Exp;
 	d3d::DrawBasicScene(0, 0.0f);
 }
-
+static float factor = 0.0f;
 bool Display(float timeDelta)
 {
 	if( Device )
@@ -93,11 +96,26 @@ bool Display(float timeDelta)
 		if( ::GetAsyncKeyState(VK_RIGHT) & 0x8000f )
 			TheCamera.yaw(1.0f * timeDelta);
 
-		if( ::GetAsyncKeyState('N') & 0x8000f )
-			TheCamera.strafe(-4.0f * timeDelta);
+		if (::GetAsyncKeyState('N') & 0x8000f)
+		{
+			//Exp->resetAllParticles();
+			factor -= 0.01f;
+			Exp->setAmountFactor(factor);
+			//TheCamera.strafe(-4.0f * timeDelta);
+		}
 
-		if( ::GetAsyncKeyState('M') & 0x8000f )
-			TheCamera.strafe(4.0f * timeDelta);
+		if (::GetAsyncKeyState('M') & 0x8000f)
+		{
+			factor += 0.01f;
+			Exp->setAmountFactor(factor);
+			//TheCamera.strafe(4.0f * timeDelta);
+		}
+
+		if (::GetAsyncKeyState(VK_SPACE) & 0x8000f)
+		{
+			Exp->resetAllParticles();
+		}
+
 
 		if( ::GetAsyncKeyState('W') & 0x8000f )
 			TheCamera.pitch(1.0f * timeDelta);
@@ -111,8 +129,6 @@ bool Display(float timeDelta)
 
 		Exp->update(timeDelta);
 
-		if( Exp->isDead() )
-			Exp->reset();
 
 		//
 		// Draw the scene:

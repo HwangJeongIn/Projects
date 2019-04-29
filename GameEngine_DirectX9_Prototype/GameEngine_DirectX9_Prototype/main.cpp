@@ -1,25 +1,10 @@
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// 
-// File: cameraApp.cpp
-// 
-// Author: Frank Luna (C) All Rights Reserved
-//
-// System: AMD Athlon 1800+ XP, 512 DDR, Geforce 3, Windows XP, MSVC++ 7.0 
-//
-// Desc: Demonstrates using the Camera class.
-//         
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 에러코드 무시
-//#pragma warning(disable:4244) // '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-//#pragma warning(disable:4018) // '<': signed 또는 unsigned가 일치하지 않습니다.
 #include <conio.h>
 #include "d3dUtility.h"
 #include "camera.h"
 #include "Locator.h"
 #include "Scene.h"
 
-#include "DXQWidget.h"
 #include "gameui.h"
 #include <QtWidgets/qapplication.h>
 

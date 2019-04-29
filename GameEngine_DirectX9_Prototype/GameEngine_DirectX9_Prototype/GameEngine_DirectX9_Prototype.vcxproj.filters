@@ -22,6 +22,18 @@
     <Filter Include="QT\Debug">
       <UniqueIdentifier>{fba3721d-033f-4e8d-855b-10d4f2f36013}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI">
+      <UniqueIdentifier>{7db11883-909b-43f9-a3d0-00d13b587a1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fbx">
+      <UniqueIdentifier>{93e9f551-a069-4f26-91b9-2281ffea777d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FMOD">
+      <UniqueIdentifier>{02b2551a-f0db-4823-80d9-aa6a3222006d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BulletPhysics">
+      <UniqueIdentifier>{9ddba38c-a49f-499f-9c6e-b88e7f0e39e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Component.cpp">
@@ -51,21 +63,6 @@
     <ClCompile Include="Locator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Audio.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="FbxParser.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="FbxModelMesh.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="WeightOfBones.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="gameui.cpp">
       <Filter>QT</Filter>
     </ClCompile>
@@ -77,6 +74,24 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_gameui.cpp">
       <Filter>QT\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>FMOD</Filter>
+    </ClCompile>
+    <ClCompile Include="FbxParser.cpp">
+      <Filter>Fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="WeightOfBones.cpp">
+      <Filter>Fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="FbxModelMesh.cpp">
+      <Filter>Fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>BulletPhysics</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,46 +119,46 @@
     <ClInclude Include="Locator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Audio.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxParser.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModelMesh.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModelSkeletonBone.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModelSkeletonBones.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModelAnimation.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModelAnimations.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="WeightOfBones.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="FbxModelAnimationKeyFrames.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="BehaviorTree.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_gameui.h">
       <Filter>QT</Filter>
     </ClInclude>
-    <ClInclude Include="DXQWidget.h">
+    <ClInclude Include="FbxModelSkeletonBones.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelAnimation.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelAnimationKeyFrames.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelAnimations.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelMesh.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxModelSkeletonBone.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="FbxParser.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>BulletPhysics</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightOfBones.h">
+      <Filter>Fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTree.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -168,9 +183,13 @@
     <CustomBuild Include="gameui.h">
       <Filter>QT</Filter>
     </CustomBuild>
-    <CustomBuild Include="gameui.ui" />
     <CustomBuild Include="C:\Users\Administrator\Desktop\qt_test_final\qt_test_final\gameui.ui">
       <Filter>QT</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FireExplosion.vs">
+      <Filter>헤더 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

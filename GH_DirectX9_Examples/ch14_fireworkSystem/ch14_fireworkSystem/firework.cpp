@@ -41,7 +41,7 @@ bool Setup()
 	// Create the Firework system.
 	//
 	D3DXVECTOR3 origin(0.0f, 10.0f, 50.0f);
-	Exp = new psys::Firework(&origin, 6000);
+	Exp = new psys::Firework(&origin, 50000);
 	Exp->init(Device, "flare.bmp");
 
 	//

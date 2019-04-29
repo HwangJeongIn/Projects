@@ -670,7 +670,32 @@ public:
 		onDestroy();
 	}
 };
+class FireExplosion;
+class BulletParticle : public Component
+{
+private :
+	FireExplosion * fireExplosion;
+	float lagTime;
+protected :
+	//virtual void start();
+	virtual void update();
+	virtual void onDestroy();
+public:
+	BulletParticle(GameObject * go, Transform * tf)
+		: Component(go, tf), fireExplosion(nullptr), lagTime(0.0f)
+	{
+		start();
+	}
 
+	virtual ~BulletParticle()
+	{
+		onDestroy();
+	}
+
+	void generateParticle(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
+	void setAmountFactor(float factor);
+	void setDuration(float duration);
+};
 
 
 //class Scene;
