@@ -137,6 +137,10 @@ public:
 		channel->setVolume(value);
 
 	}
+	void getMode(FMOD_MODE * mode)
+	{
+		sound->getMode(mode);
+	}
 
 
 };
@@ -149,15 +153,18 @@ private :
 	map<string, AudioSource * > audioSources;
 	static const string filePathToLoadSoundFiles;
 	const string fileNameToLoadSoundFiles = "Sound";
-
+	AudioSource * currentBackGroundSound;
 	void init();
 	void initFilePathToLoadSoundFiles();
 	void initAudioSourcesWithBaseSoundFiles();
 	void release();
 
+
+	virtual AudioSource * getAudioSource(const string & audioFileName);
 protected :
 
 	Audio()
+		: currentBackGroundSound(nullptr)
 	{
 		init();
 	}
@@ -171,9 +178,9 @@ public :
 	friend class Locator;
 
 	virtual void registerAudio(const string & audioFileName, bool effectSound = false);
-	virtual AudioSource * getAudioSource(const string & audioFileName);
 	virtual void update() { system->update(); }
-
+	virtual void playBackGroundSound(const string & audioFileName);
+	virtual void playEffectSound(const string & audioFileName, bool ignore = false);
 
 };
 
@@ -186,11 +193,13 @@ private:
 		: Audio() {}
 	virtual ~NullAudio(){}
 
+	virtual AudioSource * getAudioSource(const string & audioFileName) { return nullptr; }
 public :
 	friend class Locator;
 	virtual void registerAudio(const string & audioFileName, bool effectSound = false) {}
-	virtual AudioSource * getAudioSource(const string & audioFileName) { return nullptr; }
 	virtual void update() {}
+	virtual void playBackGroundSound(const string & audioFileName) {}
+	virtual void playEffectSound(const string & audioFileName, bool ignore = false) {}
 };
 
 class DebuggingAudio : public Audio

@@ -68,10 +68,47 @@ void Audio::initAudioSourcesWithBaseSoundFiles()
 {
 	// 미리 몇개는 등록해두자
 	// 이함수는 경로가 초기화 된 이후에 호출해야 한다.
-	registerAudio("BS_BackGround_1.mp3", false);
-	registerAudio("BS_BackGround_2.mp3", false);
-	registerAudio("BS_Effect_1.mp3", true);
+	registerAudio("BS_BackGround_BossMonster.mp3", false);
+	registerAudio("BS_BackGround_EndScene.mp3", false);
+	registerAudio("BS_BackGround_MainScene.mp3", false);
+	registerAudio("BS_BackGround_Monster.mp3", false);
+	registerAudio("BS_BackGround_StartScene.mp3", false);
 
+	registerAudio("BS_Effect_Arrow.mp3", true);
+	registerAudio("BS_Effect_Bird1.mp3", true);
+	registerAudio("BS_Effect_Bird2.mp3", true);
+	registerAudio("BS_Effect_Bird3.mp3", true);
+	registerAudio("BS_Effect_Bird4.mp3", true);
+	registerAudio("BS_Effect_BossMonsterAttack.mp3", true);
+	registerAudio("BS_Effect_BossMonsterDamaged.mp3", true);
+	registerAudio("BS_Effect_Button.mp3", true);
+	registerAudio("BS_Effect_FootStep.mp3", true);
+	registerAudio("BS_Effect_FootStepSingle.mp3", true);
+	registerAudio("BS_Effect_MainButton.mp3", true);
+	registerAudio("BS_Effect_MonsterAttack.mp3", true);
+	registerAudio("BS_Effect_MonsterDamaged.mp3", true);
+	registerAudio("BS_Effect_Wind.mp3", true);
+	/*
+	BS_BackGround_BossMonster.mp3
+	BS_BackGround_EndScene.mp3
+	BS_BackGround_MainScene.mp3
+	BS_BackGround_Monster.mp3
+	BS_BackGround_StartScene.mp3
+	BS_Effect_Arrow.mp3
+	BS_Effect_Bird1.mp3
+	BS_Effect_Bird2.mp3
+	BS_Effect_Bird3.mp3
+	BS_Effect_Bird4.mp3
+	BS_Effect_BossMonsterAttack.mp3
+	BS_Effect_BossMonsterDamaged.mp3
+	BS_Effect_Button.mp3
+	BS_Effect_FootStep.mp3
+	BS_Effect_FootStepSingle.mp3
+	BS_Effect_MainButton.mp3
+	BS_Effect_MonsterAttack.mp3
+	BS_Effect_MonsterDamaged.mp3
+	BS_Effect_Wind.mp3
+	*/
 }
 
 void Audio::release()
@@ -106,7 +143,7 @@ void Audio::registerAudio(const string & audioFileName, bool effectSound)
 		system->createSound((filePathToLoadSoundFiles + audioFileName).c_str(), FMOD_DEFAULT, 0, &sound);
 	else
 		system->createSound((filePathToLoadSoundFiles + audioFileName).c_str(), FMOD_LOOP_NORMAL, 0, &sound);
-
+	
 	// 만약에 생성이 안되었다면 리턴 // 등록하지 않는다.
 	if (!sound) return;
 
@@ -122,3 +159,29 @@ AudioSource * Audio::getAudioSource(const string & audioFileName)
 
 	return audioSources[audioFileName];
 }
+
+void Audio::playBackGroundSound(const string & audioFileName)
+{
+	if (currentBackGroundSound)
+		currentBackGroundSound->stop();
+
+	auto it = audioSources.find(audioFileName);
+	if (it == audioSources.end()) return;
+	currentBackGroundSound = it->second;
+	it->second->play();
+	it->second->setVolume(6.0f);
+}
+
+void Audio::playEffectSound(const string & audioFileName, bool ignore)
+{
+	auto it = audioSources.find(audioFileName);
+	if (it == audioSources.end()) return;
+	FMOD_MODE mode = 0;
+	it->second->getMode(&mode);
+	// 기본형식이아니면 무한히 재생될수있다.
+	if (mode == FMOD_LOOP_NORMAL) return;
+	it->second->play(ignore);
+	it->second->setVolume(2.0f);
+}
+
+

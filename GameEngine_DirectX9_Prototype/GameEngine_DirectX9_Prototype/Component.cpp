@@ -5,6 +5,7 @@
 #include "Audio.h"
 #include "Physics.h"
 #include "FbxParser.h"
+#include "gameui.h"
 
 #include "FbxModelMesh.h"
 #include "FbxModelSkeletonBones.h"
@@ -418,36 +419,34 @@ void PlayerScript::update()
 	//if (::GetAsyncKeyState('C') & 0x8000f)
 	//	transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
 
-	if (::GetAsyncKeyState(VK_UP) & 0x8000f)
+	if (InputManager::GetKeyStay(0x57))
 	{
-		//if (gameObject->getRigidBody())
-		//{
-		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
-		//}
+		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
 		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+
 	}
-	if (::GetAsyncKeyState(VK_DOWN) & 0x8000f)
+	if (InputManager::GetKeyStay(0x53))
 	{
-		//if (gameObject->getRigidBody())
-		//{
-		//	gameObject->getRigidBody()->addForce(FrameTime::GetDeltaTime()* -.1f *(transform->getForward()));
-		//}
+		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
 		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
 	}
-
-	if (::GetAsyncKeyState(VK_RIGHT) & 0x8000f)
+	
+	if (InputManager::GetKeyStay(0x44))
 	{
+		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
 		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
 	}
 
-	if (::GetAsyncKeyState(VK_LEFT) & 0x8000f)
+	if (InputManager::GetKeyStay(0x41))
 	{
+		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
 		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
 	}
 
 
-	if (InputManager::GetKeyUp(VK_SPACE))
+	if (InputManager::GetKeyUp(0x31))
 	{
+		gameObject->getAudio().playEffectSound("BS_Effect_Arrow.mp3", true);
 		Vector3 direction = transform->getForward() + Vector3(0, 0.01, 0);
 		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
 		//bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
@@ -469,7 +468,7 @@ void PlayerScript::update()
 		//car1RigidBody->setGravity(Vector3(0, 0, 0));
 		//car1->addComponent<BoxCollider>();
 	}
-	else if (InputManager::GetKeyStay(VK_SPACE))
+	else if (InputManager::GetKeyStay(0x31))
 	{
 		if (shootingPower < 200.0f)
 		{
@@ -487,12 +486,12 @@ void PlayerScript::update()
 void PlayerScript::start()
 {
 	//animationFSM = gameObject->getComponent<AnimationFSM>();
-	AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
-	if (temp)
-	{
-		temp->play(false);
-		temp->setVolume(7.0f);
-	}
+	//AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
+	//if (temp)
+	//{
+	//	temp->play(false);
+	//	temp->setVolume(7.0f);
+	//}
 }
 
 void PlayerScript::onCollisionStay(GameObjectWithCollision & other)
@@ -525,6 +524,9 @@ void BasicEnemyScript::start()
 
 	// 최종 TransformMatrix에서의 월드좌표를 뽑아내서 반환한 것으로 초기화
 	startPoint = transform->getWorldPosition();
+
+	basicEnemyAnimationFSM = gameObject->getComponent<BasicEnemyAnimationFSM>();
+
 
 	basicEnemyBT = new BT::Root();
 	basicEnemyBT->openBranch
@@ -597,6 +599,17 @@ void BasicEnemyScript::onDestroy()
 	delete basicEnemyBT;
 }
 
+void BasicEnemyScript::onCollisionStay(GameObjectWithCollision & other)
+{
+	if (other.gameObject->getTag() == "Player")
+	{
+		DamageableScript * damageableScript = other.gameObject->getComponent<DamageableScript>();
+		if (damageableScript)
+			damageableScript->getDamaged(power);
+	}
+
+}
+
 float BasicEnemyScript::getTargetDistance()
 {
 	if (target == nullptr)
@@ -615,6 +628,7 @@ float BasicEnemyScript::getTargetDistance()
 
 bool BasicEnemyScript::isOutOfRange()
 {
+
 	// 타겟과 시작점과의 거리가 300이상이면 
 	return Vector3::Distance(target->getTransform()->getWorldPosition(), startPoint)  > 200.0f;
 }
@@ -658,6 +672,13 @@ void BasicEnemyScript::returnToStartPoint()
 {
 	Trace::Write("TAG_DEBUG", "return");
 	
+	if (basicEnemyAnimationFSM)
+	{
+		basicEnemyAnimationFSM->setBool("isIdle", false);
+		basicEnemyAnimationFSM->setBool("isRunning", true);
+		basicEnemyAnimationFSM->setBool("isAttacking", false);
+	}
+
 	// 월드 좌표를 받아주고
 	Vector3 & currentWorldPos = transform->getWorldPosition();
 
@@ -672,10 +693,17 @@ void BasicEnemyScript::returnToStartPoint()
 void BasicEnemyScript::idle()
 {
 	Trace::Write("TAG_DEBUG", "idle");
+	if (basicEnemyAnimationFSM)
+	{
+		basicEnemyAnimationFSM->setBool("isIdle", true);
+		basicEnemyAnimationFSM->setBool("isRunning", false);
+		basicEnemyAnimationFSM->setBool("isAttacking", false);
+	}
 }
 
 void BasicEnemyScript::resetTarget()
 {
+	gameObject->getAudio().playBackGroundSound("BS_BackGround_MainScene.mp3");
 	target = nullptr;
 }
 
@@ -683,12 +711,27 @@ void BasicEnemyScript::attackTarget()
 {
 	Trace::Write("TAG_DEBUG", "attack");
 	if (!target) return;
+
+	if (basicEnemyAnimationFSM)
+	{
+		basicEnemyAnimationFSM->setBool("isIdle", false);
+		basicEnemyAnimationFSM->setBool("isRunning", false);
+		basicEnemyAnimationFSM->setBool("isAttacking", true);
+	}
 }
 
 void BasicEnemyScript::dashToTarget()
 {
 	Trace::Write("TAG_DEBUG", "dash");
+
 	if (!target) return;
+
+	if (basicEnemyAnimationFSM)
+	{
+		basicEnemyAnimationFSM->setBool("isIdle", false);
+		basicEnemyAnimationFSM->setBool("isRunning", true);
+		basicEnemyAnimationFSM->setBool("isAttacking", false);
+	}
 	// 월드 좌표를 받아주고
 	Vector3 & currentWorldPos = transform->getWorldPosition();
 
@@ -704,6 +747,13 @@ void BasicEnemyScript::chaseTarget()
 {
 	Trace::Write("TAG_DEBUG", "chase");
 	if (!target) return;
+
+	if (basicEnemyAnimationFSM)
+	{
+		basicEnemyAnimationFSM->setBool("isIdle", false);
+		basicEnemyAnimationFSM->setBool("isRunning", true);
+		basicEnemyAnimationFSM->setBool("isAttacking", false);
+	}
 	// 월드 좌표를 받아주고
 	Vector3 & currentWorldPos = transform->getWorldPosition();
 
@@ -741,12 +791,67 @@ void BasicEnemySearchRangeScript::onCollisionStay(GameObjectWithCollision & othe
 		// 타겟이 없을때
 		if (basicEnemyScript->isNotTargeting())
 		{
+			if (gameObject->getParent()->getTag() == "Enemy")
+			{
+				gameObject->getAudio().playBackGroundSound("BS_BackGround_Monster.mp3");
+			}
+			else // if(gameObject->getTag() == "EnemyBoss")
+			{
+				gameObject->getAudio().playBackGroundSound("BS_BackGround_BossMonster.mp3");
+			}
 			basicEnemyScript->setTarget(other.gameObject);
 		}
 	}
 }
 
+void DamageableScript::start()
+{
+	currentHp = maxHp;
+}
+void DamageableScript::setMaxHp(float maxHp)
+{
+	if (maxHp < 0)
+		maxHp = 10.0f;
+	this->maxHp = maxHp;
+	currentHp = maxHp;
 
+	if (gameObject->getTag() == "Player")
+	{
+		gameObject->getGameUI().setCurrentPlayerHpFactor(currentHp / maxHp);
+	}
+}
+void DamageableScript::setCurrentHp(float hp)
+{
+	if (hp < 0)
+		hp = 0;
+	if (hp > maxHp)
+		hp = maxHp;
+
+	currentHp = hp;
+
+	if (gameObject->getTag() == "Player")
+	{
+		gameObject->getGameUI().setCurrentPlayerHpFactor(currentHp / maxHp);
+	}
+}
+
+void DamageableScript::getDamaged(float power)
+{
+	if (power < 0)
+		power = 0;
+
+	currentHp -= power;
+	if (currentHp <= 0)
+	{
+		currentHp = 0.0f;
+		GameObject::Destroy(gameObject);
+	}
+
+	if (gameObject->getTag() == "Player")
+	{
+		gameObject->getGameUI().setCurrentPlayerHpFactor(currentHp / maxHp);
+	}
+}
 void MoveScript_C::start()
 {
 
@@ -762,23 +867,23 @@ void MoveScript_C::update()
 	if (::GetAsyncKeyState('K') & 0x8000f)
 	{
 		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,-.05f,0 });
-		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
-		if (temp)
-		{
-			temp->play(false);
-			temp->setVolume(2.0f);
-		}
+		//AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
+		//if (temp)
+		//{
+		//	//temp->play(false);
+		//	//temp->setVolume(2.0f);
+		//}
 	}
 
 	if (::GetAsyncKeyState('L') & 0x8000f)
 	{
 		transform->setWorldRotation(transform->getWorldRotation() + Vector3{ 0,.05f,0 });
-		AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
-		if (temp)
-		{
-			temp->play(false);
-			temp->setVolume(2.0f);
-		}
+		//AudioSource * temp = gameObject->getAudio().getAudioSource("BS_Effect_1.mp3");
+		//if (temp)
+		//{
+		//	temp->play(false);
+		//	temp->setVolume(2.0f);
+		//}
 	}
 
 
@@ -817,15 +922,15 @@ void MainCamera::update()
 		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ -1.05f,0,0 });
 	}
 
-	if (::GetAsyncKeyState('W') & 0x8000f)
-		transform->setLocalPosition(transform->getLocalPosition() + 2*(transform->getForward()));
-	if (::GetAsyncKeyState('S') & 0x8000f)
-		transform->setLocalPosition(transform->getLocalPosition() + 2*(-1)*(transform->getForward()));
+	//if (::GetAsyncKeyState('W') & 0x8000f)
+	//	transform->setLocalPosition(transform->getLocalPosition() + 2*(transform->getForward()));
+	//if (::GetAsyncKeyState('S') & 0x8000f)
+	//	transform->setLocalPosition(transform->getLocalPosition() + 2*(-1)*(transform->getForward()));
 
-	if (::GetAsyncKeyState('D') & 0x8000f)
-		transform->setLocalPosition(transform->getLocalPosition() + 2*(transform->getRight()));
-	if (::GetAsyncKeyState('A') & 0x8000f)
-		transform->setLocalPosition(transform->getLocalPosition() + 2*(-1)*(transform->getRight()));
+	//if (::GetAsyncKeyState('D') & 0x8000f)
+	//	transform->setLocalPosition(transform->getLocalPosition() + 2*(transform->getRight()));
+	//if (::GetAsyncKeyState('A') & 0x8000f)
+	//	transform->setLocalPosition(transform->getLocalPosition() + 2*(-1)*(transform->getRight()));
 
 }
 
@@ -950,12 +1055,15 @@ void MeshRenderer::loadXFile(const string & fileName)
 	setMtrlsAndTextures(mtrlBuffer, numMtrls);
 
 	// 사용되었던 재질버퍼를 비워준다.
-	d3d::Release<ID3DXBuffer*>(mtrlBuffer);
+	if (mtrlBuffer)
+		mtrlBuffer->Release();
+
 
 	optimizeMesh(adjBuffer);
 
 	// 사용완료한 인접버퍼 릴리즈
-	d3d::Release<ID3DXBuffer*>(adjBuffer); // done w/ buffer
+	if (adjBuffer)
+		adjBuffer->Release();
 }
 
 void MeshRenderer::render()
@@ -2060,151 +2168,10 @@ void AnimationFSM::start()
 		fbxModelAnimations = fbxModelRenderer->getAnimations();
 	}
 
-
-	registerAnimation("standing run forward.fbx");
-	registerAnimation("standing run back.fbx");
-	registerAnimation("standing run right.fbx");
-	registerAnimation("standing run left.fbx");
-	registerAnimation("standing idle 01.fbx");
-	registerAnimation("Standing Draw Arrow.fbx");
-	setDefaultState("standing idle 01.fbx");
-
-	// 플레이어 기준
-
-	/*
-	전이될 상황 등록
-	*/
-	string floatSpeed = "speed";
-	string floatSideSpeed = "sideSpeed";
-	// 변수 등록
-	registerFloat("speed");
-	setFloat("speed", 1.0f);
-
-	registerFloat("sideSpeed");
-	setFloat("sideSpeed", 1.0f);
-
-	registerBool("isIdle");
-	setBool("isIdle",true);
-
-	registerBool("isShooting");
-	setBool("isShooting", false);
-
-	// forward > back / left / right / idle
-	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
-	makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
-	makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
-	makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// bool형으로 등록된 "isIdle"이 true 일때
-	makeTransition("standing run forward.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-
-	// back > forward / left / right / idle
-	// float형으로 등록된 "speed"가 0보다 클때 back > forward
-	makeTransition("standing run back.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
-	makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 클때 back > right
-	makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// bool형으로 등록된 "isIdle"이 true 일때
-	makeTransition("standing run back.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-
-	// left > forward / back / right / idle
-	// float형으로 등록된 "speed"가 0보다 작을때 left > forward
-	makeTransition("standing run left.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 클때 left > back
-	makeTransition("standing run left.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
-	makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// bool형으로 등록된 "isIdle"이 true 일때
-	makeTransition("standing run left.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-
-
-	// right > forward / back / left / idle
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
-	makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 right > forward
-	makeTransition("standing run right.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 작을때 right > back
-	makeTransition("standing run right.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// bool형으로 등록된 "isIdle"이 true 일때
-	makeTransition("standing run right.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-
-	// idle > forward / back / left / right / arrow
-	// float형으로 등록된 "sideSpeed"가 0보다 작을때 idle > left
-	makeTransition("standing idle 01.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
-	makeTransition("standing idle 01.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "sideSpeed"가 0보다 클때 idle > forward
-	makeTransition("standing idle 01.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// float형으로 등록된 "speed"가 0보다 작을때 idle > back
-	makeTransition("standing idle 01.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
-	// bool형으로 등록된 "isShooting"가 0보다 작을때 idle > arrow
-	makeTransition("standing idle 01.fbx", "Standing Draw Arrow.fbx", "isShooting", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-
-	// arrow > idel
-	// float형으로 등록된 "speed"가 0보다 작을때 arrow > idle
-	makeTransition("Standing Draw Arrow.fbx", "standing idle 01.fbx", "isShooting", 0, AnimationFSM::ValueType::BOOLTYPE, false);
-
 }
 
 void AnimationFSM::update()
 {
-	if (!fbxModelAnimations) return;
-
-	auto it = stateTable.find(currentState);
-	// 만약에 현재 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
-	if (it == stateTable.end())
-		currentState = defaultState;
-
-
-	
-	if (InputManager::GetKeyStay(VK_UP))
-	{
-		setFloat("speed", 1);
-		setFloat("sideSpeed", 0);
-		setBool("isIdle", false);
-	}
-	else if (InputManager::GetKeyStay(VK_DOWN))
-	{
-		setFloat("speed", -1);
-		setFloat("sideSpeed", 0);
-		setBool("isIdle", false);
-	}
-	else if (InputManager::GetKeyStay(VK_RIGHT))
-	{
-		setFloat("sideSpeed", 1);
-		setFloat("speed", 0);
-		setBool("isIdle", false);
-	}
-	else if (InputManager::GetKeyStay(VK_LEFT))
-	{
-		setFloat("sideSpeed", -1);
-		setFloat("speed", 0);
-		setBool("isIdle", false);
-	}
-	else
-	{
-		setFloat("sideSpeed", 0);
-		setFloat("speed", 0);
-		setBool("isIdle", true);
-	}
-
-
-	if (InputManager::GetKeyDown(VK_SPACE))
-	{
-		setBool("isShooting", true);
-	}
-	else if (InputManager::GetKeyUp(VK_SPACE))
-	{
-		setBool("isShooting", false);
-	}
-
-
-	// 애니메이션을 플레이해주고 // 현재플레이중이면 계속플레이
-	fbxModelAnimations->playWithFileName(currentState);
-
-	updateAllTrasitions(currentState);
 }
 
 bool AnimationFSM::Transition::evaluate()
@@ -2424,7 +2391,213 @@ void AnimationFSM::updateAllTrasitions(const string & animationFileName)
 	}
 }
 
+void PlayerAnimationFSM::start()
+{
+	AnimationFSM::start();
 
+	if (!fbxModelRenderer || !fbxModelAnimations) return;
+
+	registerAnimation("standing run forward.fbx");
+	registerAnimation("standing run back.fbx");
+	registerAnimation("standing run right.fbx");
+	registerAnimation("standing run left.fbx");
+	registerAnimation("standing idle 01.fbx");
+	registerAnimation("Standing Draw Arrow.fbx");
+	setDefaultState("standing idle 01.fbx");
+
+	// 플레이어 기준
+
+	/*
+	전이될 상황 등록
+	*/
+	string floatSpeed = "speed";
+	string floatSideSpeed = "sideSpeed";
+	// 변수 등록
+	registerFloat("speed");
+	setFloat("speed", 1.0f);
+
+	registerFloat("sideSpeed");
+	setFloat("sideSpeed", 1.0f);
+
+	registerBool("isIdle");
+	setBool("isIdle", true);
+
+	registerBool("isShooting");
+	setBool("isShooting", false);
+
+	// forward > back / left / right / idle
+	// float형으로 등록된 "speed"가 0보다 작을때 forward > back
+	makeTransition("standing run forward.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 forward > left
+	makeTransition("standing run forward.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 forward > right
+	makeTransition("standing run forward.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run forward.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// back > forward / left / right / idle
+	// float형으로 등록된 "speed"가 0보다 클때 back > forward
+	makeTransition("standing run back.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 back > left
+	makeTransition("standing run back.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 클때 back > right
+	makeTransition("standing run back.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run back.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// left > forward / back / right / idle
+	// float형으로 등록된 "speed"가 0보다 작을때 left > forward
+	makeTransition("standing run left.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 클때 left > back
+	makeTransition("standing run left.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
+	makeTransition("standing run left.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run left.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+
+	// right > forward / back / left / idle
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 right > left
+	makeTransition("standing run right.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 right > forward
+	makeTransition("standing run right.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 작을때 right > back
+	makeTransition("standing run right.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isIdle"이 true 일때
+	makeTransition("standing run right.fbx", "standing idle 01.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// idle > forward / back / left / right / arrow
+	// float형으로 등록된 "sideSpeed"가 0보다 작을때 idle > left
+	makeTransition("standing idle 01.fbx", "standing run left.fbx", "sideSpeed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 left > right
+	makeTransition("standing idle 01.fbx", "standing run right.fbx", "sideSpeed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "sideSpeed"가 0보다 클때 idle > forward
+	makeTransition("standing idle 01.fbx", "standing run forward.fbx", "speed", 1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// float형으로 등록된 "speed"가 0보다 작을때 idle > back
+	makeTransition("standing idle 01.fbx", "standing run back.fbx", "speed", -1, AnimationFSM::ValueType::FLOATTYPE, 0);
+	// bool형으로 등록된 "isShooting"가 0보다 작을때 idle > arrow
+	makeTransition("standing idle 01.fbx", "Standing Draw Arrow.fbx", "isShooting", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// arrow > idel
+	// float형으로 등록된 "speed"가 0보다 작을때 arrow > idle
+	makeTransition("Standing Draw Arrow.fbx", "standing idle 01.fbx", "isShooting", 0, AnimationFSM::ValueType::BOOLTYPE, false);
+
+}
+
+void PlayerAnimationFSM::update()
+{
+	if (!fbxModelAnimations) return;
+
+	auto it = stateTable.find(currentState);
+	// 만약에 현재 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
+	if (it == stateTable.end())
+		currentState = defaultState;
+
+	if (InputManager::GetKeyStay(0x57))
+	{
+		setFloat("speed", 1);
+		setFloat("sideSpeed", 0);
+		setBool("isIdle", false);
+	}
+	else if (InputManager::GetKeyStay(0x53))
+	{
+		setFloat("speed", -1);
+		setFloat("sideSpeed", 0);
+		setBool("isIdle", false);
+	}
+	else if (InputManager::GetKeyStay(0x44))
+	{
+		setFloat("sideSpeed", 1);
+		setFloat("speed", 0);
+		setBool("isIdle", false);
+	}
+	else if (InputManager::GetKeyStay(0x41))
+	{
+		setFloat("sideSpeed", -1);
+		setFloat("speed", 0);
+		setBool("isIdle", false);
+	}
+	else
+	{
+		setFloat("sideSpeed", 0);
+		setFloat("speed", 0);
+		setBool("isIdle", true);
+	}
+
+
+	if (InputManager::GetKeyDown(0x31))
+	{
+		setBool("isShooting", true);
+	}
+	else if (InputManager::GetKeyUp(0x31))
+	{
+		setBool("isShooting", false);
+	}
+
+
+	// 애니메이션을 플레이해주고 // 현재플레이중이면 계속플레이
+	fbxModelAnimations->playWithFileName(currentState);
+
+	updateAllTrasitions(currentState);
+}
+
+void BasicEnemyAnimationFSM::start()
+{
+	AnimationFSM::start();
+
+	if (!fbxModelRenderer || !fbxModelAnimations) return;
+
+	registerAnimation("Mutant Idle.fbx");
+	registerAnimation("Mutant Swiping.fbx");
+	registerAnimation("Mutant Run.fbx");
+	setDefaultState("Mutant Idle.fbx");
+
+	// 플레이어 기준
+
+	/*
+	전이될 상황 등록
+	*/
+
+	// 변수 등록
+	registerBool("isIdle");
+	setBool("isIdle", true);
+
+	registerBool("isRunning");
+	setBool("isRunning", false);
+
+	registerBool("isAttacking");
+	setBool("isAttacking", false);
+
+	// idle > run / attack
+	makeTransition("Mutant Idle.fbx", "Mutant Run.fbx", "isRunning", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Idle.fbx", "Mutant Swiping.fbx", "isAttacking", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// run > idle / attack
+	makeTransition("Mutant Run.fbx", "Mutant Idle.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Run.fbx", "Mutant Swiping.fbx", "isAttacking", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+	// attack > idle / run
+	makeTransition("Mutant Swiping.fbx", "Mutant Run.fbx", "isRunning", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Swiping.fbx", "Mutant Idle.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+
+
+}
+
+void BasicEnemyAnimationFSM::update()
+{
+	if (!fbxModelAnimations) return;
+
+	auto it = stateTable.find(currentState);
+	// 만약에 현재 상태를 테이블에서 찾지 못한다면 디폴트로 해준다.
+	if (it == stateTable.end())
+		currentState = defaultState;
+
+	// 애니메이션을 플레이해주고 // 현재플레이중이면 계속플레이
+	fbxModelAnimations->playWithFileName(currentState);
+
+	updateAllTrasitions(currentState);
+
+}
 
 void BulletScript::start()
 {
@@ -2489,15 +2662,32 @@ void BulletScript::update()
 
 void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 {
-	if (other.gameObject->getTag() == "Enemy")
+	if (other.gameObject->getTag() == "Enemy" || other.gameObject->getTag() == "EnemyBoss")
 	{
-		GameObject::Destroy(gameObject);
+		// 몬스터에 따라 사운드 출력
+		if (other.gameObject->getTag() == "Enemy")
+		{
+			gameObject->getAudio().playEffectSound("BS_Effect_MonsterDamaged.mp3", true);
+		}
+		else // if(other.gameObject->getTag() == "EnemyBoss")
+		{
+			gameObject->getAudio().playEffectSound("BS_Effect_BossMonsterDamaged.mp3", true);
+		}
+
+
+		// 데미지를 입힌다.
+		DamageableScript * damageableScript = other.gameObject->getComponent<DamageableScript>();
+		if (damageableScript)
+			damageableScript->getDamaged(power);
+		
 		GameObject * bulletParticle = GameObject::Instantiate("bulletParticle", "BulletParticle");
 		BulletParticle * particleSystem = bulletParticle->addComponent<BulletParticle>();
 
 		D3DXVECTOR3 origin{};
-		Vector3::ToD3DXVECTOR3(origin, other.contactPoint);
+		Vector3::ToD3DXVECTOR3(origin, transform->getWorldPosition());
+		bulletParticle->getTransform()->setWorldPosition(transform->getWorldPosition());
 		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare.bmp", 2000, .9f, origin);
+		GameObject::Destroy(gameObject);
 	}
 }
 
@@ -3093,7 +3283,7 @@ void BillBoard::render()
 	if (!mesh) return;
 
 	device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-
+	//device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 
 	// Color = TexelColor x SourceBlend + CurrentPixelColor x DestBlend
 	// 여기서 소스알파값이 0이면 뒷배경이 1이 적용되어서 뒷배경이 반영되고
@@ -3117,6 +3307,7 @@ void BillBoard::render()
 
 
 	device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	//device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 }
 
 void BillBoard::rotateIfMainCameraMoves()

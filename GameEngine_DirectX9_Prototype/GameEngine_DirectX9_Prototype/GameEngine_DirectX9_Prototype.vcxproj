@@ -167,7 +167,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="camera.cpp" />
     <ClCompile Include="FbxModelMesh.cpp" />
     <ClCompile Include="FbxParser.cpp" />
     <ClCompile Include="gameui.cpp" />
@@ -181,7 +180,6 @@
     <ClCompile Include="Locator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Component.cpp" />
-    <ClCompile Include="d3dUtility.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Physics.cpp" />
@@ -193,9 +191,7 @@
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="BehaviorTree.h" />
-    <ClInclude Include="camera.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="d3dUtility.h" />
     <ClInclude Include="FbxModelAnimation.h" />
     <ClInclude Include="FbxModelAnimationKeyFrames.h" />
     <ClInclude Include="FbxModelAnimations.h" />

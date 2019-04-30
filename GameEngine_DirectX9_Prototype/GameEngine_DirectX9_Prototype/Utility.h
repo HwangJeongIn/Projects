@@ -259,6 +259,7 @@ class Gizmos
 private :
 	static IDirect3DDevice9 * Device;
 	static ID3DXLine * Line;
+	static bool Active;
 public:
 
 
@@ -271,6 +272,8 @@ public:
 		Line->SetWidth(2);
 	}
 
+	static void TrunOnGizmos() { Active = true; }
+	static void TrunOffGizmos() { Active = false; }
 
 	//struct LineVertex
 	//{
@@ -291,6 +294,7 @@ public:
 
 	static void DrawLine(const D3DXVECTOR3 & from, const D3DXVECTOR3 & to, D3DCOLOR color = 0xffff)
 	{
+		if (!Active) return;
 		if (!Device || !Line) return;
 
 		D3DXVECTOR3 lineVertices[2] = { from, to };//{ {0,0,0}, {10,10,10} };//{ from, to };
@@ -332,6 +336,7 @@ public:
 
 	static void DrawBox(const D3DXVECTOR3 & position, const D3DXVECTOR3 & xyz, D3DCOLOR color = 0xffff)
 	{
+		if (!Active) return;
 		// À­¸é
 		D3DXVECTOR3 upLeftTop = position + D3DXVECTOR3(-xyz.x, xyz.y, xyz.z);
 		D3DXVECTOR3 upLeftBottom = position + D3DXVECTOR3(-xyz.x, xyz.y, -xyz.z);

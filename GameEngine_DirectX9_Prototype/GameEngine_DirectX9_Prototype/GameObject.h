@@ -72,6 +72,7 @@ public:
 	Audio & getAudio();
 	Physics & getPhysics();
 	FbxParser & getFbxParser();
+	GameUI & getGameUI();
 
 	const bool isDestroyed() const { return destroyed; }
  

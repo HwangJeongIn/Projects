@@ -58,6 +58,11 @@ FbxParser & GameObject::getFbxParser()
 	return Locator::getFbxParser();
 }
 
+GameUI & GameObject::getGameUI()
+{
+	return Locator::getGameUI();
+}
+
 
 void GameObject::setParent(GameObject * parent)
 {

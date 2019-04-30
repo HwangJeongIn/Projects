@@ -4,6 +4,7 @@
 #include "Audio.h"
 #include "Physics.h"
 #include "FbxParser.h"
+#include "gameui.h"
 
 /*
 기본적인 static변수 초기화
@@ -26,6 +27,8 @@ FbxParser * Locator::fbxParser = &nullFbxParser;
 //NullDeviceWrapper Locator::nullDeviceWrapper{};
 //DeviceWrapper * Locator::deviceWrapper = &nullDeviceWrapper;
 IDirect3DDevice9 * Locator::device = nullptr;
+
+GameUI * Locator::gameUI = nullptr;
 
 void Locator::provideAudio(SystemType type)
 {
@@ -227,6 +230,20 @@ void Locator::provideFbxParser(SystemType type)
 	}
 }
 
+void Locator::provideGameUI(IDirect3DDevice9 ** device, GameObject * objToAccessSystem)
+{
+	if (gameUI) return;
+	gameUI = new GameUI();
+
+	gameUI->initD3D(1920, 1080, true, D3DDEVTYPE_HAL, device);
+
+	if(objToAccessSystem)
+		gameUI->objToAccessSystem = objToAccessSystem;
+
+	gameUI->show();
+}
+
+
 void Locator::release()
 {
 	// device를 제외한 나머지 시스템은 직접 만든 시스템이므로 여기서 릴리즈 시켜줘야한다.
@@ -287,6 +304,9 @@ void Locator::release()
 		delete fbxParser;
 
 	}
+
+	if (gameUI)
+		delete gameUI;
 
 }
 

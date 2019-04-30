@@ -1,7 +1,5 @@
 
 #include <conio.h>
-#include "d3dUtility.h"
-#include "camera.h"
 #include "Locator.h"
 #include "Scene.h"
 
@@ -14,8 +12,8 @@
 //
 
 
-const int Width  = 1280;
-const int Height = 720;
+const int Width  = 1920;
+const int Height = 1080;
 
 //Camera TheCamera(Camera::LANDOBJECT);
 
@@ -58,6 +56,145 @@ const int Height = 720;
 //	// pass 0 for the first parameter to instruct cleanup.
 //	d3d::DrawBasicScene(0, 0.0f);
 //}
+
+int EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject & objToAccessSystem)
+{
+	MSG msg;
+	::ZeroMemory(&msg, sizeof(MSG));
+
+	//static float lastTime = (float)timeGetTime(); 
+
+
+
+	while (msg.message != WM_QUIT)
+	{
+
+
+
+		if (::PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+
+			::TranslateMessage(&msg);
+			::DispatchMessage(&msg);
+
+		}
+		else
+		{
+			// 입력받은 키들을 모두 저장해준다.
+			InputManager::UpdateFrameStart();
+
+			// 탈출 // 임시
+			// VK_ESCAPE
+			if (InputManager::GetKeyDown(VK_ESCAPE))
+			{
+				return 0;
+			}
+
+
+			// 여기서 씬을 바꿔준다.
+			// 1키 : main
+			// 2키 : start
+			// 3키 : end
+			if (InputManager::GetKeyDown(0x30))
+			{
+				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
+				objToAccessSystem.getGameUI().setMainSceneUI();
+
+			}
+			else if (InputManager::GetKeyDown(0x38))
+			{
+				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+				objToAccessSystem.getGameUI().setStartSceneUI();
+
+			}
+			else if (InputManager::GetKeyDown(0x39))
+			{
+				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+				objToAccessSystem.getGameUI().setEndSceneUI();
+
+			}
+
+
+			scene = &(objToAccessSystem.getScene());
+
+			//float currTime  = (float)timeGetTime();
+			//float timeDelta = (currTime - lastTime);// *0.001f;
+			if (scene)
+				(scene->*ptr_display)();
+
+			//gameUI.showUI();
+			//char t[100]{};
+			////_itoa_s(timeDelta, t, 10);
+			//sprintf(t, "%f", timeDelta);
+			//Trace::Write("TAG_DEBUG", "deltaTime", t);
+			//lastTime = currTime;
+
+			// 이전프레임의 입력배열을 최신화 시켜준다.
+			InputManager::UpdateFrameEnd();
+
+
+		}
+	}
+	return msg.wParam;
+}
+
+
+D3DLIGHT9 InitDirectionalLight(D3DXVECTOR3* direction, D3DXCOLOR* color)
+{
+	D3DLIGHT9 light;
+	::ZeroMemory(&light, sizeof(light));
+
+	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Ambient = *color * 0.4f;
+	light.Diffuse = *color;
+	light.Specular = *color * 0.6f;
+	light.Direction = *direction;
+
+	return light;
+}
+
+D3DLIGHT9 InitPointLight(D3DXVECTOR3* position, D3DXCOLOR* color)
+{
+	D3DLIGHT9 light;
+	::ZeroMemory(&light, sizeof(light));
+
+	light.Type = D3DLIGHT_POINT;
+	light.Ambient = *color * 0.4f;
+	light.Diffuse = *color;
+	light.Specular = *color * 0.6f;
+	light.Position = *position;
+	light.Range = 1000.0f;
+	light.Falloff = 1.0f;
+	light.Attenuation0 = 1.0f;
+	light.Attenuation1 = 0.0f;
+	light.Attenuation2 = 0.0f;
+
+	return light;
+}
+
+D3DLIGHT9 InitSpotLight(D3DXVECTOR3* position, D3DXVECTOR3* direction, D3DXCOLOR* color)
+{
+	D3DLIGHT9 light;
+	::ZeroMemory(&light, sizeof(light));
+
+	light.Type = D3DLIGHT_SPOT;
+	light.Ambient = *color * 0.4f;
+	light.Diffuse = *color;
+	light.Specular = *color * 0.6f;
+	light.Position = *position;
+	light.Direction = *direction;
+	light.Range = 1000.0f;
+	light.Falloff = 1.0f;
+	light.Attenuation0 = 1.0f;
+	light.Attenuation1 = 0.0f;
+	light.Attenuation2 = 0.0f;
+	light.Theta = 0.5f;
+	light.Phi = 0.7f;
+
+	return light;
+}
+
+
 
 void SetStartScene()
 {
@@ -152,14 +289,16 @@ Terrain * GenerateTerrain()
 	//groundRigidBody->setBoxCollider(Vector3{ 200,10,200 });
 	//groundRigidBody->turnOnStaticFlag();
 	Terrain * groundTerrain = ground->addComponent<Terrain>();
+
 	// adsfasfdSsabgaw.raw / coastMountain64.raw / Ash.raw / adsfsaf.raw
 
 
 	//groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 25, .5f);
-	groundTerrain->loadRawFile("terrain.raw", 129, 129, 7.0, .5f);
+	//groundTerrain->loadRawFile("terrain.raw", 129, 129, 10.0, .5f);
+	groundTerrain->loadRawFile("terrain.raw", 12, 12, 10.0, .5f);
 	
 	groundTerrain->loadTextureFromFile("grass.bmp");
-
+	return groundTerrain;
 	srand(time(0));
 
 	for (int i = 0; i < 10; ++i)
@@ -235,7 +374,7 @@ Terrain * GenerateTerrain()
 
 
 
-LRESULT CALLBACK d3d::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch( msg )
 	{
@@ -273,13 +412,13 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	int tempA = 0;
 	QApplication a(tempA, 0);
 
-	GameUI gameUI;
+	//GameUI gameUI;
 
 	//////////////////////////////////////////////////////////////////////////
-	gameUI.initD3D(Width, Height, true, D3DDEVTYPE_HAL, &device);
+	//gameUI.initD3D(Width, Height, true, D3DDEVTYPE_HAL, &device);
 
 
-	gameUI.show();
+	//gameUI.show();
 	//layout->addWidget(pDxWidget);
 	//w.centralWidget()->setLayout(layout);
 	////w.setLayout(layout);
@@ -289,6 +428,26 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//pDxWidget->show();
 
 	//////////////////////////////////////////////////////////////////////////
+
+	/*
+	서비스 등록
+	*/
+	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+	// 디바이스를 여기서 초기화시켜줘야한다 // 더미객체 하나가 startScene에 남아있다.
+	GameObject * dummy = GameObject::Instantiate("dummy", "Dummy");
+	Locator::provideGameUI(&device, dummy);
+
+	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
+	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
+	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
+	Locator::provideDevice(device);
+
+	// Gizmos클래스 초기화
+	Gizmos::InitGizmos(device);
+
+	// 디버깅용 txt파일을 로드
+	Trace::LoadFileNames();
+	Trace::Clear("TAG_DEBUG");
 
 
 
@@ -313,7 +472,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	D3DXVECTOR3 dir(1.0f, -1.0f, 1.0f);
 	D3DXCOLOR col(1.0f, 1.0f, 1.0f, 1.0f);
-	D3DLIGHT9 light = d3d::InitDirectionalLight(&dir, &col);
+	D3DLIGHT9 light = InitDirectionalLight(&dir, &col);
 
 	device->SetLight(0, &light);
 	device->LightEnable(0, true);
@@ -322,23 +481,6 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	device->SetRenderState(D3DRS_SPECULARENABLE, true);
 
 	//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
-
-	// 디버깅용 txt파일을 로드
-	Trace::LoadFileNames();
-	Trace::Clear("TAG_DEBUG");
-
-	// Gizmos클래스 초기화
-	Gizmos::InitGizmos(device);
-
-	/*
-	서비스 등록
-	*/
-	Locator::provideScene(Locator::SystemType::RELEASETYPE);
-	//Locator::provideAudio(Locator::SystemType::RELEASETYPE);
-	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
-	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
-	Locator::provideDevice(device);
 
 
 	SetStartScene();
@@ -434,11 +576,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
-	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
-
-
+	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
@@ -447,12 +587,14 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	player->getTransform()->setWorldPosition(-15, 0, 0);
 	player->getTransform()->setWorldRotation(0, 0, 0);
 
-	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
-	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
 
-	playerChild1->addComponent<MoveScript_C>();
+	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
+	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	//playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+
+	//playerChild1->addComponent<MoveScript_C>();
 
 	//GameObject * playerChild1Child1 = playerChild1->addChild("bigShip1", "BigShip");
 	//playerChild1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
@@ -465,7 +607,13 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// enemy
 	GameObject * enemy = GameObject::Instantiate("enemy", "Enemy");
 	//enemy->addChild(mainCamera);
-	enemy->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//enemy->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+
+	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
+	fbxModelRendererEnemy->loadFbxFile("mutant.fbx");
+	BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+
+
 	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
 	//enemy->addComponent<PlayerScript>();
 	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
@@ -473,7 +621,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
 	//enemyRangeCollider->getTransform()->setLocalPosition(0, 0, 0);
-	enemyRangeCollider->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//enemyRangeCollider->addComponent<MeshRenderer>()->loadXFile("car.x");
 
 	RigidBody * enemyRangeColliderRigidBody = enemyRangeCollider->addComponent<RigidBody>();
 	// 탐색 범위 10 // 안움직여야 하기 때문에 static객체 설정 + 뚫어야 하기 때문에 trigger객체 설정
@@ -489,6 +637,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//enemy->getTransform()->setPosition(0, 0, 0);
 	//enemy->getTransform()->setRotation(0, 0, 0);
 
+	enemy->addComponent<DamageableScript>()->setMaxHp(50.0f);
 
 	// 2단계
 
@@ -517,7 +666,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
-	d3d::EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, &scene, *mainCamera, gameUI);
+	EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, &scene, *dummy);
 
 
 	// void(*ptr_display)(void)

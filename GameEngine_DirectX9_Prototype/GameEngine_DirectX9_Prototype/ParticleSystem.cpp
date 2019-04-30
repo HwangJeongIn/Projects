@@ -219,7 +219,7 @@ bool FireExplosion::init()
 	if (errorBuffer)
 	{
 		::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
-		d3d::Release<ID3DXBuffer*>(errorBuffer);
+		errorBuffer->Release();
 	}
 
 	if (FAILED(hr))
@@ -379,7 +379,7 @@ void FireExplosion::preRender()
     device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
 	// read, but don't write particles to z-buffer
-	device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	//device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 	device->SetVertexShader(fireExplosionShader);
 	device->SetVertexDeclaration(declaration);
 }
@@ -388,7 +388,7 @@ void FireExplosion::postRender()
 {
 	ParticleSystem::postRender();
 
-	device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	//device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 	device->SetVertexShader(NULL);
 	device->SetVertexDeclaration(NULL);
 }

@@ -91,3 +91,4 @@ long FrameTime::DeltaTime = 0;
 
 IDirect3DDevice9 * Gizmos::Device = nullptr;
 ID3DXLine * Gizmos::Line = nullptr;
+bool Gizmos::Active = true;

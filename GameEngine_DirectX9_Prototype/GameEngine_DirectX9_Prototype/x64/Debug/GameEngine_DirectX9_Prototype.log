@@ -1,0 +1,15 @@
+﻿  main.cpp
+  gameui.cpp
+  Scene.cpp
+  Physics.cpp
+  Locator.cpp
+  GameObject.cpp
+  Component.cpp
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(450): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(616): warning C4305: 'return': 'unsigned int'에서 'float'(으)로 잘립니다.
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1978): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1982): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+d:\github\projects\gameengine_directx9_prototype\gameengine_directx9_prototype\component.cpp(1988): warning C4838: 'fbxsdk::FbxDouble'에서 'float'(으)로의 변환에는 축소 변환이 필요합니다.
+  코드를 생성하고 있습니다...
+  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Debug\GameEngine_DirectX9_Prototype.exe
+  GameEngine_DirectX9_Prototype.vcxproj -> D:\GitHub\Projects\GameEngine_DirectX9_Prototype\x64\Debug\GameEngine_DirectX9_Prototype.pdb (Full PDB)

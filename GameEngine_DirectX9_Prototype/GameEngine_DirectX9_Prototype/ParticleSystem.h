@@ -1,9 +1,8 @@
 #ifndef PARTICLESYSTEM_H
 #define PARTICLESYSTEM_H
 
-#include "d3dUtility.h"
-#include "camera.h"
 #include <vector>
+#include "Utility.h"
 
 using namespace std;
 

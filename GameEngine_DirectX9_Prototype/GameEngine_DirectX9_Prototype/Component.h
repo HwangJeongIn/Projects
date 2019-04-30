@@ -4,7 +4,6 @@
 #include <cassert>
 #include "Utility.h"
 #include <vector>
-#include "d3dUtility.h"
 #include "BehaviorTree.h"
 
 
@@ -480,11 +479,14 @@ protected:
 	}
 	virtual void onDestroy()
 	{
-		d3d::Release<ID3DXMesh*>(mesh);
-
+		if (mesh)
+			mesh->Release();
 		// 텍스처만 할당된 값이고 재질은 복사된 값이다.
 		for (int i = 0; i < textures.size(); i++)
-			d3d::Release<IDirect3DTexture9*>(textures[i]);
+		{
+			if (textures[i])
+				textures[i]->Release();
+		}
 	}
 
 
@@ -527,26 +529,27 @@ public:
 
 };
 
-
+class BasicEnemyAnimationFSM;
 class BasicEnemyScript : public Component
 {
 private:
 	const float speed = .2f;
 	const float dashSpeed = .3f;
-
+	BasicEnemyAnimationFSM * basicEnemyAnimationFSM;
 	GameObject * target;
 	BT::Root * basicEnemyBT;
 	Vector3 startPoint;
+	float power;
 protected:
 	virtual void fixedUpdate();
 	virtual void update();
 	virtual void start();
 	virtual void onDestroy();
-	//virtual void onCollisionStay(GameObjectWithCollision & other);
+	virtual void onCollisionStay(GameObjectWithCollision & other);
 
 public:
 	BasicEnemyScript(GameObject * go, Transform * tf)
-		: Component(go, tf), target(nullptr), basicEnemyBT(nullptr)
+		: Component(go, tf), target(nullptr), basicEnemyBT(nullptr), power(10.0f), basicEnemyAnimationFSM(nullptr)
 	{
 		start();
 	}
@@ -561,7 +564,8 @@ public:
 
 
 	float getTargetDistance();
-
+	float getPower() const { return power; }
+	void setPower(float power) { this->power = power; }
 	// 복귀안해도될 거리인지 판단
 	bool isOutOfRange();
 	bool isInRange();
@@ -617,6 +621,33 @@ public:
 
 };
 
+class DamageableScript : public Component
+{
+private :
+	float maxHp;
+	float currentHp;
+protected :
+	virtual void start();
+public :
+	DamageableScript(GameObject * go, Transform * tf)
+		: Component(go, tf), maxHp(100)
+	{
+		start();
+	}
+
+	virtual ~DamageableScript()
+	{
+		onDestroy();
+	}
+
+	void setMaxHp(float maxHp);
+
+	void setCurrentHp(float hp);
+
+	void getDamaged(float power);
+
+};
+
 
 
 // 테스트용
@@ -652,6 +683,8 @@ private:
 	IDirect3DTexture9 * texture;
 	D3DMATERIAL9 mtrl;
 
+	float power;
+
 protected:
 	virtual void start();
 	virtual void update();
@@ -659,7 +692,7 @@ protected:
 
 public:
 	BulletScript(GameObject * go, Transform * tf)
-		: Component(go, tf), bulletMesh(nullptr), texture(nullptr)
+		: Component(go, tf), bulletMesh(nullptr), texture(nullptr), power(1.0f)
 	{
 		start();
 		
@@ -669,6 +702,9 @@ public:
 	{
 		onDestroy();
 	}
+
+	void setPower(float power) { this->power = power; }
+	float getPower() const { return power; }
 };
 class FireExplosion;
 class BulletParticle : public Component
@@ -1042,7 +1078,7 @@ public:
 		bool evaluate();
 
 	};
-private:
+protected:
 	//class Transition;
 	FbxModelRenderer * fbxModelRenderer;
 	FbxModelAnimations * fbxModelAnimations;
@@ -1085,7 +1121,7 @@ public:
 		start();
 	}
 
-	~AnimationFSM();
+	virtual ~AnimationFSM();
 
 	friend class Transition;
 
@@ -1136,6 +1172,44 @@ public:
 
 };
 
+class PlayerAnimationFSM : public AnimationFSM
+{
+protected :
+	virtual void start();
+	virtual void update();
+	virtual void onDestroy(){}
+public:
+	PlayerAnimationFSM(GameObject * go, Transform * tf)
+		: AnimationFSM(go, tf)
+	{
+		start();
+	}
+
+	virtual ~PlayerAnimationFSM()
+	{
+		onDestroy();
+	}
+};
+
+
+class BasicEnemyAnimationFSM : public AnimationFSM
+{
+protected:
+	virtual void start();
+	virtual void update();
+	virtual void onDestroy() { AnimationFSM::onDestroy(); }
+public:
+	BasicEnemyAnimationFSM(GameObject * go, Transform * tf)
+		: AnimationFSM(go, tf)
+	{
+		start();
+	}
+
+	virtual ~BasicEnemyAnimationFSM()
+	{
+		onDestroy();
+	}
+};
 
 class Terrain : public Component
 {

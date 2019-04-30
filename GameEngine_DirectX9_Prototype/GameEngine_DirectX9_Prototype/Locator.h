@@ -33,6 +33,8 @@ class NullPhysics;
 class FbxParser;
 class NullFbxParser;
 
+class GameUI;
+class GameObject;
 
 class Locator
 {
@@ -58,6 +60,8 @@ private :
 	static Scene mainScene;
 	static Scene startScene;
 	static Scene endScene;
+
+	static void chagneScene(SceneType type = MAIN);
 	/*
 	디바이스 같은경우는 간단히 등록한 객체를 바로 받아 올 수 있게 설계
 	디바이스를 가지고 호출 할 수 있는 함수가 매우 많기 때문에 
@@ -77,7 +81,7 @@ private :
 	static FbxParser * fbxParser;
 	static NullFbxParser nullFbxParser;
 
-	static void chagneScene(SceneType type = MAIN);
+	static GameUI * gameUI;
 
 protected :
 	static Scene& getScene(){ return *scene; }
@@ -93,6 +97,8 @@ protected :
 		return *device;
 	}
 
+	static GameUI& getGameUI(){	return *gameUI;}
+
 public :
 
 
@@ -105,6 +111,10 @@ public :
 	static void provideDevice(IDirect3DDevice9 * device);
 	static void providePhysics(SystemType type = SystemType::RELEASETYPE);
 	static void provideFbxParser(SystemType type = SystemType::RELEASETYPE);
+
+	static void provideGameUI(IDirect3DDevice9 ** device, GameObject * objToAccessSystem);
+
+
 	static void release();
 
 };
