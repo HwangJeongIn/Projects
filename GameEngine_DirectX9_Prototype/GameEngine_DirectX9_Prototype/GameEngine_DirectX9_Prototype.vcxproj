@@ -253,6 +253,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="FbxModelRendererWithAnimation.vs" />
     <None Include="FireExplosion.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

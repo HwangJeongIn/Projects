@@ -587,6 +587,8 @@ public:
 	void dashToTarget();
 	void chaseTarget();
 
+	void lookAtTarget(const Vector3 & targetDirection);
+
 	void setStartPoint(const Vector3 & other)
 	{
 		startPoint = other;
@@ -884,6 +886,13 @@ class FbxModelMesh;
 class FbxModelRenderer : public Component
 {
 private:
+	// 쉐이더 관련 변수들
+	IDirect3DVertexDeclaration9* declaration;
+	IDirect3DVertexShader9* fbxModelRendererWithAnimationShader;
+	ID3DXConstantTable* constTable;
+	D3DXHANDLE worldViewProjectionMatrixHandle;
+
+
 	// 여러가지 메쉬정보를 담고 있음
 	vector<FbxModelMesh *> fbxMeshes;
 
@@ -937,19 +946,28 @@ private:
 		float position[3];
 		float normal[3];
 		float uv[2];
-
+		//float animationMatrix[4][4];
 		FbxModelVertex()
-			: position{}, normal{}, uv{}
+			: position{}, normal{}, uv{}//, animationMatrix{}
 		{
 		
 		}
 
 		FbxModelVertex(float x, float y, float z,
-			float nx, float ny, float nz, float u, float v)
+			float nx, float ny, float nz, float u, float v
+			//float m11, float m12, float m13, float m14,
+			//float m21, float m22, float m23, float m24,
+			//float m31, float m32, float m33, float m34,
+			//float m41, float m42, float m43, float m44
+		)
 		{
 			position[0] = x; position[1] = y; position[2] = z;
 			normal[0] = nx; normal[1] = ny; normal[2] = nz;
 			uv[0] = u; uv[1] = v;
+			//animationMatrix[0][0] = m11; animationMatrix[0][1] = m12; animationMatrix[0][2] = m13; animationMatrix[0][3] = m14;
+			//animationMatrix[1][0] = m21; animationMatrix[1][1] = m22; animationMatrix[1][2] = m23; animationMatrix[1][3] = m24;
+			//animationMatrix[2][0] = m31; animationMatrix[2][1] = m32; animationMatrix[2][2] = m33; animationMatrix[2][3] = m34;
+			//animationMatrix[3][0] = m41; animationMatrix[3][1] = m42; animationMatrix[3][2] = m43; animationMatrix[3][3] = m44;
 		}
 
 		float& operator[] (unsigned int index) 
@@ -972,6 +990,7 @@ protected:
 	virtual void start();
 	virtual void update()
 	{
+
 		render();
 		//if (::GetAsyncKeyState('F') & 0x8000f)
 		//	setScale(Vector3(1, 1, 1));

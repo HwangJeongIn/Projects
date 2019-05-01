@@ -3,25 +3,19 @@ x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 0
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 idle
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
 y :: 0
 z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -30,352 +24,11 @@ x :: 0
 y :: 0
 z :: 0
 dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: -90.0001
 z :: 0
-dash
 current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -385,230 +38,12 @@ x :: 0
 y :: 0
 z :: 0
 dash
-current Target :: Player
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: -90.0001
 z :: 0
-dash
 current Target :: Player
 current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -618,188 +53,12 @@ x :: 0
 y :: 0
 z :: 0
 dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: -90.0001
 z :: 0
-dash
 current Target :: Player
 current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-attack
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -809,6 +68,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -817,6 +83,12 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -825,6 +97,101 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -834,6 +201,13 @@ x :: 0
 y :: 0
 z :: 0
 dash
+enemy rotation :: 
+x :: 0
+y :: -90.0001
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -842,14 +216,11 @@ x :: 0
 y :: 0
 z :: 0
 dash
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 164.434
 z :: 0
-chase
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -859,101 +230,13 @@ x :: 0
 y :: 0
 z :: 0
 chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 174.702
 z :: 0
-chase
 current Target :: Player
 current Target :: Player
 current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -962,23 +245,12 @@ player ::
 x :: 0
 y :: 0
 z :: 0
-chase
-current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
+dash
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 171.16
 z :: 0
-chase
 current Target :: Player
-current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -987,7 +259,14 @@ player ::
 x :: 0
 y :: 0
 z :: 0
-chase
+dash
+enemy rotation :: 
+x :: 0
+y :: 162.81
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -995,7 +274,15 @@ player ::
 x :: 0
 y :: 0
 z :: 0
-chase
+dash
+enemy rotation :: 
+x :: 0
+y :: 159.776
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1003,22 +290,14 @@ player ::
 x :: 0
 y :: 0
 z :: 0
-chase
-current Target :: Player
-current Target :: Player
-player :: 
+dash
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 151.758
 z :: 0
-chase
 current Target :: Player
 current Target :: Player
 current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-chase
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1026,781 +305,2584 @@ player ::
 x :: 0
 y :: 0
 z :: 0
-chase
+dash
+enemy rotation :: 
+x :: 0
+y :: 142.254
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
 player :: 
 x :: 0
 y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 120.503
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 124.886
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 123.292
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 120.544
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 121.885
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 171.37
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 164.535
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.758
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 166.046
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.918
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 169.006
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.878
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.83
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 164.399
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 168.103
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 171.474
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.878
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.801
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.63
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.672
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 171.171
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.592
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 171.116
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.541
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 163.678
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 159.812
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.5
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 171.051
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.481
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 163.629
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.47
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.526
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 163.615
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.523
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 171.02
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 131.539
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 115.316
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 129.563
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 108.857
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 127.491
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 108.258
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 140.726
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 104.418
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 112.79
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 110.22
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 106.33
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 105.274
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 106.329
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 104.622
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 106.113
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 104.391
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 113.132
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 109.015
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 117.28
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 107.688
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 114.588
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 102.792
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 121.979
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 112.23
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 109.308
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 120.918
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 109.227
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 111.997
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 167.855
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 120.014
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 120.787
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 121.914
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 123.902
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 131.511
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 137.409
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 143.86
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 150.825
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 158.223
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 165.948
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 173.766
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 178.439
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 170.791
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 163.529
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 160.885
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 154.366
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 148.484
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 143.246
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -67.8028
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -70.4997
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -72.5897
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 108.601
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 106.255
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 104.444
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -87.3706
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -82.7541
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -91.3805
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -91.2055
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -91.0717
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -90.2844
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -85.1481
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 100.392
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 99.0923
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 98.5596
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -97.683
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -94.0115
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -93.5278
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -90.8368
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 86.8394
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 86.3349
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 85.7555
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 85.0845
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 167.089
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 166.999
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 171.249
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 167.52
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 160.185
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+enemy rotation :: 
+x :: 0
+y :: 153.498
 z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
+enemy rotation :: 
+x :: 0
+y :: 153.498
+z :: 0
 player :: 
 x :: 0
 y :: 0
 z :: 0
 return
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
-x :: 0
-y :: 0
-z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 player :: 
 x :: 0
 y :: 0
 z :: 0
-idle
-player :: 
+return
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: 153.498
 z :: 0
-idle
 current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1809,6 +2891,13 @@ x :: 0
 y :: 0
 z :: 0
 dash
+enemy rotation :: 
+x :: 0
+y :: -81.3281
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1817,21 +2906,12 @@ x :: 0
 y :: 0
 z :: 0
 dash
-current Target :: Player
-current Target :: Player
-player :: 
+enemy rotation :: 
 x :: 0
-y :: 0
+y :: -82.5869
 z :: 0
-dash
 current Target :: Player
 current Target :: Player
-current Target :: Player
-player :: 
-x :: 0
-y :: 0
-z :: 0
-dash
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1840,6 +2920,171 @@ x :: 0
 y :: 0
 z :: 0
 dash
+enemy rotation :: 
+x :: 0
+y :: -83.7602
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.4575
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.5203
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.5202
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.791
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.5197
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.7909
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.5196
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.8095
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.8419
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -84.5232
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -84.5246
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1848,6 +3093,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -106.021
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1856,6 +3108,27 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -104.935
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -102.846
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1864,6 +3137,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -111.351
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1872,6 +3152,12 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -113.611
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1880,6 +3166,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -106.655
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1888,6 +3181,26 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -113.06
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -102.932
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1896,6 +3209,56 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -110.945
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -103.994
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 84.0247
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 84.2649
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1904,6 +3267,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: 132.076
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1912,6 +3282,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: 119.503
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1920,6 +3297,12 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: 114.751
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1928,6 +3311,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: 111.245
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1936,6 +3326,72 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: 105.815
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 104.094
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -84.0773
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.9766
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -83.7137
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1944,6 +3400,14 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -104.195
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1952,6 +3416,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: -0
+y :: -130.243
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1960,6 +3431,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -113.815
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1968,6 +3446,12 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -117.708
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1976,6 +3460,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -108.025
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1984,6 +3475,12 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -106.673
+z :: 0
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -1992,6 +3489,13 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -103.734
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
 current Target :: Player
 current Target :: Player
 current Target :: Player
@@ -2000,3 +3504,375 @@ x :: 0
 y :: 0
 z :: 0
 attack
+enemy rotation :: 
+x :: 0
+y :: -106.646
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -105.54
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -106.627
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -105.794
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -108.306
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -99.8123
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -97.6548
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -92.2411
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 90.0458
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 90.0818
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 90.0948
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -89.979
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -89.9974
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -90.0098
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 90.0129
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 90.0203
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 90.0233
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 90.0164
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 84.9003
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 88.2692
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: 83.4292
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -94.3913
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: -93.8398
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -91.0588
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+attack
+enemy rotation :: 
+x :: 0
+y :: 90.3166
+z :: 0
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+current Target :: Player
+player :: 
+x :: 0
+y :: 0
+z :: 0
+dash
+enemy rotation :: 
+x :: 0
+y :: -85.1487
+z :: 0

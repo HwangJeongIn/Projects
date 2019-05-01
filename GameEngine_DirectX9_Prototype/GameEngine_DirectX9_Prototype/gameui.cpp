@@ -268,7 +268,7 @@ void GameUI::start_pushButton_start()
 {
 	objToAccessSystem->getAudio().playEffectSound("BS_Effect_MainButton.mp3",true);
 
-	objToAccessSystem->getAudio().playBackGroundSound("BS_BackGround_MainScene.mp3");
+
 	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
 	setMainSceneUI();
 	// 씬을 초기상태로 되돌린다.
@@ -283,7 +283,6 @@ void GameUI::start_pushButton_load()
 {
 	objToAccessSystem->getAudio().playEffectSound("BS_Effect_MainButton.mp3", true);
 
-	objToAccessSystem->getAudio().playBackGroundSound("BS_BackGround_MainScene.mp3");
 	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
 	setMainSceneUI();
 	// 씬을 저장상태로 되돌린다.
@@ -296,7 +295,6 @@ void GameUI::end_pushButton_restart()
 {
 	objToAccessSystem->getAudio().playEffectSound("BS_Effect_MainButton.mp3", true);
 
-	objToAccessSystem->getAudio().playBackGroundSound("BS_BackGround_StartScene.mp3");
 	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
 	setStartSceneUI();
 	//ui.main_label_score->setText("end_pushButton_restart");

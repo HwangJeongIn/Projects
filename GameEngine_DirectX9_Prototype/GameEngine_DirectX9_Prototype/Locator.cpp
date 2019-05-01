@@ -117,14 +117,20 @@ void Locator::chagneScene(SceneType type)
 	switch (type)
 	{
 	case SceneType::MAIN:
+		if(audio !=nullptr)
+			audio->playBackGroundSound("BS_BackGround_MainScene.mp3");
 		scene = &mainScene;
 		break;
 
 	case SceneType::START:
+		if (audio != nullptr)
+			audio->playBackGroundSound("BS_BackGround_StartScene.mp3");
 		scene = &startScene;
 		break;
 
 	case SceneType::END:
+		if (audio != nullptr)
+			audio->playBackGroundSound("BS_BackGround_EndScene.mp3");
 		scene = &endScene;
 		break;
 

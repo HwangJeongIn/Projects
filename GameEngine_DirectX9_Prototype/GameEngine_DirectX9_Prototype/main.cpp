@@ -576,9 +576,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
-	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
@@ -587,7 +587,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	player->getTransform()->setWorldPosition(-15, 0, 0);
 	player->getTransform()->setWorldRotation(0, 0, 0);
 
-	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
+	player->addComponent<DamageableScript>()->setMaxHp(300000000.0f);
 
 	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
 	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
@@ -605,7 +605,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 	// enemy
-	GameObject * enemy = GameObject::Instantiate("enemy", "Enemy");
+	GameObject * enemy = GameObject::Instantiate("enemy", "EnemyBoss");
 	//enemy->addChild(mainCamera);
 	//enemy->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 
@@ -615,7 +615,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
-	//enemy->addComponent<PlayerScript>();
+
 	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
 	enemyRigidBody->setSphereCollider(2);
 

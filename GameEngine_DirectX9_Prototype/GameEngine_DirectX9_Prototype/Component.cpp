@@ -276,6 +276,14 @@ void Transform::rotate(const Vector3 & other)
 
 void Transform::setWorldPosition(const Vector3 & other)
 {
+	//if (gameObject->getTag() == "Enemy")
+	//{
+	//		Vector3 temp = transform->getWorldPosition();
+	//		Trace::Write("TAG_DEBUG", "enemy position world", "");
+	//		Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//		Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//		Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	//}
 	dirty = true;
 	// 내부적으로 부모객체가 없으면 바로 초기화 / 있으면 변환후 초기화해준다.
 	convertLocalPositionIfItIsChild(position, other);
@@ -511,6 +519,17 @@ void BasicEnemyScript::update()
 {
 	basicEnemyBT->tick();
 
+	Vector3 temp = transform->getWorldRotation();
+	Trace::Write("TAG_DEBUG", "enemy rotation", "");
+	Trace::Write("TAG_DEBUG", "x", temp.getX());
+	Trace::Write("TAG_DEBUG", "y", temp.getY());
+	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+
+	//temp = transform->getWorldPosition();
+	//Trace::Write("TAG_DEBUG", "enemy position", "");
+	//Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
 }
 
@@ -687,7 +706,9 @@ void BasicEnemyScript::returnToStartPoint()
 	Vector3::Normalized(direction, direction);
 
 	// 이동한다
-	transform->setWorldPosition(currentWorldPos + FrameTime::GetDeltaTime() * .1f * speed * direction);
+	transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime() * .1f * speed * direction);
+
+	//lookAtTarget(direction);
 }
 
 void BasicEnemyScript::idle()
@@ -718,6 +739,15 @@ void BasicEnemyScript::attackTarget()
 		basicEnemyAnimationFSM->setBool("isRunning", false);
 		basicEnemyAnimationFSM->setBool("isAttacking", true);
 	}
+
+	// 월드 좌표를 받아주고
+	Vector3 & currentWorldPos = transform->getWorldPosition();
+
+	// 방향을 구하고 정규화
+	Vector3 direction = target->getTransform()->getWorldPosition() - currentWorldPos;
+	Vector3::Normalized(direction, direction);
+
+	lookAtTarget(direction);
 }
 
 void BasicEnemyScript::dashToTarget()
@@ -740,7 +770,9 @@ void BasicEnemyScript::dashToTarget()
 	Vector3::Normalized(direction, direction);
 
 	// 이동한다
-	transform->setWorldPosition(currentWorldPos + FrameTime::GetDeltaTime() * .1f * dashSpeed * direction);
+	transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime() * .1f * dashSpeed * direction);
+
+	lookAtTarget(direction);
 }
 
 void BasicEnemyScript::chaseTarget()
@@ -762,8 +794,49 @@ void BasicEnemyScript::chaseTarget()
 	Vector3::Normalized(direction, direction);
 
 	// 이동한다
-	transform->setWorldPosition(currentWorldPos + FrameTime::GetDeltaTime() * .1f * speed * direction);
+	transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime() * .1f * speed * direction);
+
+	lookAtTarget(direction);
 }
+
+
+
+void BasicEnemyScript::lookAtTarget(const Vector3 & targetDirection)
+{
+	// 타겟방향쪽을 기준으로 enemy의 로컬좌표계로 들어간다.
+	// 구하고자 하는 점을 Terrain의 로컬좌표계로 변환한다.
+	// 로컬좌표계로 변환하기 위해서는 Terrain의 transform행렬의 역행렬을 곱해주면 된다.
+	D3DXMATRIX inverseTransformMatrix;
+	D3DXVECTOR3 targetDirectionInEnemyLocal;
+
+	if (gameObject->getParent() == nullptr)
+	{
+		D3DXMatrixIdentity(&inverseTransformMatrix);
+	}
+	else
+	{
+		if (gameObject->getParent()->getTransform()->getInverseTransformMatrix(inverseTransformMatrix) == false) return;
+	}
+	//if (transform->getInverseTransformMatrix(inverseTransformMatrix) == false) return;
+
+	Vector3::ToD3DXVECTOR3(targetDirectionInEnemyLocal, targetDirection);
+	//D3DXVec3Normalize(&targetDirectionInEnemyLocal, &targetDirectionInEnemyLocal);
+
+	D3DXVec3TransformNormal(&targetDirectionInEnemyLocal, &targetDirectionInEnemyLocal, &inverseTransformMatrix);
+	D3DXVec3Normalize(&targetDirectionInEnemyLocal, &targetDirectionInEnemyLocal);
+	//Vector3::ToVector3(targetDirection, targetDirectionInEnemyLocal);
+	// 현재 로컬좌표계로들어왔다.
+	// 포워드(0,0,1)와 계산해서 로테이션을 정해준다.
+	targetDirectionInEnemyLocal.y = 0;
+	float angle = (float)acos(D3DXVec3Dot(&D3DXVECTOR3{ 0,0,1 }, &targetDirectionInEnemyLocal) / (1.0f * 1.0f));
+	if (targetDirectionInEnemyLocal.x < 0)
+		angle = -angle;
+
+	transform->setWorldRotation(Vector3(transform->getLocalRotation().getX(), Transform::RadianToDegree(angle), transform->getLocalRotation().getZ()));
+
+}
+
+
 
 
 
@@ -1284,6 +1357,11 @@ void FbxModelRenderer::render()
 			// FbxModelMesh(mesh와 인덱스 1:1 매칭)에 접근해서(vectorMyVertex)
 			// 렌더링할 mesh의 버텍스 버퍼를 열어서 최종적인 위치 값들을 다시 넣어준다.
 			processVerticesWithAnimation(meshes[i], fbxMeshes[i]);
+			
+
+			// 애니메이션이 있을때 애니메이션 메트릭스가 계속 변하기 때문에 최신화시켜준다.
+			//processVertices(meshes[i], fbxMeshes[i]);
+
 
 			// FbxModelMesh의 각 버텍스에서 MyFbxVertex->getPositionWithAnimation해서 초기화 
 			//  position * animationmatrix // 	
@@ -1327,6 +1405,25 @@ void FbxModelRenderer::render()
 			}
 		}
 
+		device->SetVertexShader(fbxModelRendererWithAnimationShader);
+		device->SetVertexDeclaration(declaration);
+
+		D3DXMATRIX viewMatrix;
+		D3DXMATRIX projectionMatrix;
+
+		// 먼저 카메라 부터 최신화
+		device->GetTransform(D3DTS_VIEW, &viewMatrix);
+		device->GetTransform(D3DTS_PROJECTION, &projectionMatrix);
+
+		// worldViewProjection 초기화
+		constTable->SetMatrix
+		(
+			device,
+			worldViewProjectionMatrixHandle,
+			&D3DXMATRIX(transform->getTransformMatrix() * viewMatrix * projectionMatrix)
+		);
+
+
 		// rendering-----------------------------------------------------
 		if(material)
 			device->SetMaterial(material);
@@ -1334,6 +1431,9 @@ void FbxModelRenderer::render()
 			device->SetTexture(0, texture);
 		
 		meshes[i]->DrawSubset(0);
+
+		device->SetVertexShader(NULL);
+		device->SetVertexDeclaration(NULL);
 	}
 
 }
@@ -1341,6 +1441,92 @@ void FbxModelRenderer::render()
 void FbxModelRenderer::start()
 {
 	device = &(gameObject->getDevice());
+
+	HRESULT hr = 0;
+
+	D3DVERTEXELEMENT9 decl[] =
+	{
+		/*
+		나중에 셰이더 코드의 구조체
+		struct VS_INPUT
+		{
+		vector positi : POSITION // POSITION0
+		: NORMAL0
+		: NORMAL1
+		: NORMAL2
+		}
+		과 매핑된다.
+
+		*/
+		// offsets in bytes
+		{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0 },
+		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,   0 },
+
+		// 나머지 매트릭스
+		//{ 0, 32, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   1 },
+		//{ 0, 44, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2 },
+		//{ 0, 56, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   3 },
+		//{ 0, 68, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   4 },
+
+		//{ 0, 36, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2 },
+		D3DDECL_END()
+	};
+
+
+	hr = device->CreateVertexDeclaration(decl, &declaration);
+	if (FAILED(hr))
+	{
+		::MessageBox(0, "CreateVertexDeclaration() - FAILED", 0, 0);
+		return;
+	}
+
+
+	// 쉐이더 컴파일 / 핸들 받아오기
+	//------------------------------------------------------------------
+	ID3DXBuffer* compiledCode = 0;
+	ID3DXBuffer* errorBuffer = 0;
+
+	hr = D3DXCompileShaderFromFile(
+		"FbxModelRendererWithAnimation.vs",
+		0,
+		0,
+		"Main", // entry point function name
+		"vs_2_0",   //"vs_2_sw",//"vs_2_0",//"vs_1_1",
+
+		D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY | D3DXSHADER_DEBUG,
+		&compiledCode,
+		&errorBuffer,
+		&constTable);
+
+	// output any error messages
+	if (errorBuffer)
+	{
+		::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
+		errorBuffer->Release();
+	}
+
+	if (FAILED(hr))
+	{
+		::MessageBox(0, "D3DXCompileShaderFromFile() - FAILED", 0, 0);
+		return;
+	}
+
+	hr = device->CreateVertexShader(
+		(DWORD*)compiledCode->GetBufferPointer(),
+		&fbxModelRendererWithAnimationShader);
+
+	if (FAILED(hr))
+	{
+		::MessageBox(0, "CreateVertexShader - FAILED", 0, 0);
+		return;
+	}
+
+	if (compiledCode)
+		compiledCode->Release();
+
+	worldViewProjectionMatrixHandle = constTable->GetConstantByName(0, "WorldViewProjectionMatrix");
+
 }
 
 void FbxModelRenderer::onDestroy()
@@ -1403,7 +1589,9 @@ void FbxModelRenderer::onDestroy()
 }
 
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
-	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr)
+	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr),
+	// 쉐이더
+	declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr), worldViewProjectionMatrixHandle(0)
 {
 	start();
 }
@@ -1764,7 +1952,7 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
 	FbxModelVertex * fbxV = nullptr;
 	MyFbxVertex * tVertex = nullptr;
-
+	
 	//int t1 = mesh->GetNumVertices();
 	//int t2 = fbxModelMesh->getVertexCount();
 
@@ -1774,18 +1962,25 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
 	{
 		tVertex = fbxModelMesh->getVertex(i);
+		
 		// 값이 있을때
 		if (tVertex)
 		{
+			const D3DXMATRIX & tempAnimationMatrix = tVertex->getAnimationMatrix();
 			// 각각의 정보를 초기화 시켜준다.
 			fbxV[i] = 
 			{
 				// Position
 				(float)tVertex->getPosition().mData[0]/10,(float)tVertex->getPosition().mData[1]/10, (float)tVertex->getPosition().mData[2]/10,
 				// Normal
-				(float)tVertex->getNormal().mData[0]/10,(float)tVertex->getNormal().mData[1]/10, (float)tVertex->getNormal().mData[2]/10,
+				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
 				// UV
 				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
+				//// AnimationMatrix
+				//tempAnimationMatrix._11,tempAnimationMatrix._12,tempAnimationMatrix._13,tempAnimationMatrix._14,
+				//tempAnimationMatrix._21,tempAnimationMatrix._22,tempAnimationMatrix._23,tempAnimationMatrix._24,
+				//tempAnimationMatrix._31,tempAnimationMatrix._32,tempAnimationMatrix._33,tempAnimationMatrix._34,
+				//tempAnimationMatrix._41,tempAnimationMatrix._42,tempAnimationMatrix._43,tempAnimationMatrix._44
 			};
 			continue;
 		}
@@ -1798,6 +1993,12 @@ void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 			0,0,0,
 			// UV
 			0,0
+
+			//// AnimationMatrix
+			//1,0,0,0,
+			//0,1,0,0,
+			//0,0,1,0,
+			//0,0,0,1
 		};
 	}
 
@@ -1813,6 +2014,7 @@ void FbxModelRenderer::processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMe
 
 	FbxModelVertex * fbxV = nullptr;
 	MyFbxVertex * tVertex = nullptr;
+	D3DXVECTOR3 temp{};
 
 	mesh->LockVertexBuffer(0, (void**)&fbxV);
 	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
@@ -1821,6 +2023,7 @@ void FbxModelRenderer::processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMe
 		// 값이 있을때
 		if (tVertex)
 		{
+			temp = tVertex->getPositionWithAnimation();
 			// 내부적으로 애니메이션 행렬을 곱한 것들을 처리해준다.
 			// 애니메이션 행렬을 곱하기 전에 본들의 가중치에 따른 애니메이션 행렬을 내부적으로 계산해준다.
 			//fbxV[i][0] = (float)tVertex->getPositionWithAnimation().x / 10;
@@ -1830,9 +2033,9 @@ void FbxModelRenderer::processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMe
 			fbxV[i] =
 			{
 				// Position
-				(float)tVertex->getPositionWithAnimation().x / 10, (float)tVertex->getPositionWithAnimation().y / 10, (float)tVertex->getPositionWithAnimation().z / 10,
+				temp.x / 10, temp.y/ 10, temp.z / 10,
 				// Normal
-				(float)tVertex->getNormal().mData[0] / 10,(float)tVertex->getNormal().mData[1] / 10, (float)tVertex->getNormal().mData[2] / 10,
+				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
 				// UV
 				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
 			};
@@ -2706,6 +2909,8 @@ void BulletParticle::update()
 	}
 
 	fireExplosion->update((float)(FrameTime::GetDeltaTime())/1000.0f);
+	// 여기서는 따로 월드 지정을 안해줘도 쉐이더에서 알아서 포지션에 맞게 렌더링하기 때문에 괜찮다.
+	// 그 이유는 처음 시작할때 시작점을 잘 지정했기 때문이다.
 	fireExplosion->render();
 	lagTime += (float)(FrameTime::GetDeltaTime()) / 1000.0f;
 }
@@ -3167,7 +3372,16 @@ bool Terrain::getHeight(const Vector3 & position, float * output)
 	D3DXMATRIX terrainInverseTransformMatrix;
 	D3DXVECTOR3 positionInTerrainLocal;
 
-	if(transform->getInverseTransformMatrix(terrainInverseTransformMatrix) == false) return false;
+
+	if (gameObject->getParent() == nullptr)
+	{
+		D3DXMatrixIdentity(&terrainInverseTransformMatrix);
+	}
+	else
+	{
+		if (gameObject->getParent()->getTransform()->getInverseTransformMatrix(terrainInverseTransformMatrix) == false) return false;
+	}
+	//if(transform->getInverseTransformMatrix(terrainInverseTransformMatrix) == false) return false;
 	//float determinant = 0.0f;
 	//terrainInverseTransformMatrix = transform->getTransformMatrix();
 	//D3DXMatrixInverse(&terrainInverseTransformMatrix, &determinant, &terrainInverseTransformMatrix);
@@ -3259,11 +3473,31 @@ void MoveOnTerrainScript::update()
 {
 	if (terrain)
 	{
+		//if (gameObject->getTag() == "Enemy")
+		//{
+		//	Vector3 temp = transform->getWorldPosition();
+		//	Trace::Write("TAG_DEBUG", "enemy position move on", "");
+		//	Trace::Write("TAG_DEBUG", "x", temp.getX());
+		//	Trace::Write("TAG_DEBUG", "y", temp.getY());
+		//	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+		//}
+
+
+
 		float height = 0.0f;
 		if (terrain->getHeight(transform->getWorldPosition(), &height))
 		{
 			transform->setWorldPosition(transform->getWorldPosition().getX(), height + objectHeight, transform->getWorldPosition().getZ());
 		}
+
+		//if (gameObject->getTag() == "Enemy")
+		//{
+		//	Vector3 temp = transform->getWorldPosition();
+		//	Trace::Write("TAG_DEBUG", "enemy position move on", "");
+		//	Trace::Write("TAG_DEBUG", "x", temp.getX());
+		//	Trace::Write("TAG_DEBUG", "y", temp.getY());
+		//	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+		//}
 
 		//float height = 0.0f;
 		//if (terrain->getHeight(transform->getPosition(), &height))

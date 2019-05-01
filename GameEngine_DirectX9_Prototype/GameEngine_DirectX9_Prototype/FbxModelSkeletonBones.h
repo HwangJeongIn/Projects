@@ -136,7 +136,6 @@ public :
 
 
 
-
 			bones[i]->setAnimationMatrix( animationMatrix * parentAnimationMatrix);
 			bones[i]->setFinalAnimationMatrix(inverseMatrix * bones[i]->getAnimationMatrix());
 		}
