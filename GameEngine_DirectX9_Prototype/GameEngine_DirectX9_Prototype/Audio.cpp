@@ -163,7 +163,11 @@ AudioSource * Audio::getAudioSource(const string & audioFileName)
 void Audio::playBackGroundSound(const string & audioFileName)
 {
 	if (currentBackGroundSound)
+	{
+		currentBackGroundSound->pause();
 		currentBackGroundSound->stop();
+	}
+
 
 	auto it = audioSources.find(audioFileName);
 	if (it == audioSources.end()) return;

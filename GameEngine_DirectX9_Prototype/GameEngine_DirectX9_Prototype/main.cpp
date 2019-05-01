@@ -57,13 +57,15 @@ const int Height = 1080;
 //	d3d::DrawBasicScene(0, 0.0f);
 //}
 
-int EnterMsgLoop(void(Scene::* ptr_display)(void), Scene * scene, GameObject & objToAccessSystem)
+int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSystem)
 {
 	MSG msg;
 	::ZeroMemory(&msg, sizeof(MSG));
 
 	//static float lastTime = (float)timeGetTime(); 
-
+	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+	objToAccessSystem.getGameUI().setStartSceneUI();
+	Scene * scene = &objToAccessSystem.getScene();
 
 
 	while (msg.message != WM_QUIT)
@@ -209,33 +211,33 @@ void SetStartScene()
 	mainCamera->getTransform()->setWorldPosition(0, 40, -100);
 	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 
-	// player
-	GameObject * player = GameObject::Instantiate("player", "Player");
-	player->addChild(mainCamera);
-	//player->addComponent<MeshRenderer>()->loadXFile("car.x");
-	player->addComponent<PlayerScript>();
-	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	playerRigidBody->setSphereCollider(2);
+	//// player
+	//GameObject * player = GameObject::Instantiate("player", "Player");
+	//player->addChild(mainCamera);
+	////player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//player->addComponent<PlayerScript>();
+	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	//playerRigidBody->setSphereCollider(2);
 
-	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+	////FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	////fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	////AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
 
 
 
-	//MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
-	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	////MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
+	////car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
-	//playerMoveOnTerrainScript->setObjectHeight(4.0f);
-	player->getTransform()->setWorldPosition(-15, 0, 0);
-	player->getTransform()->setWorldRotation(0, 180, 0);
+	////playerMoveOnTerrainScript->setObjectHeight(4.0f);
+	//player->getTransform()->setWorldPosition(-15, 0, 0);
+	//player->getTransform()->setWorldRotation(0, 180, 0);
 
-	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
-	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
+	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	//playerChild1->getTransform()->setLocalRotation(0, 0, 0);
 
-	playerChild1->addComponent<MoveScript_C>();
+	//playerChild1->addComponent<MoveScript_C>();
 
 
 }
@@ -251,33 +253,33 @@ void SetEndScene()
 	mainCamera->getTransform()->setWorldPosition(0, 40, -100);
 	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 
-	// player
-	GameObject * player = GameObject::Instantiate("player", "Player");
-	player->addChild(mainCamera);
-	//player->addComponent<MeshRenderer>()->loadXFile("car.x");
-	player->addComponent<PlayerScript>();
-	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	playerRigidBody->setSphereCollider(2);
+	//// player
+	//GameObject * player = GameObject::Instantiate("player", "Player");
+	//player->addChild(mainCamera);
+	////player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	//player->addComponent<PlayerScript>();
+	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
+	//playerRigidBody->setSphereCollider(2);
 
-	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
+	////FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
+	////fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
+	////AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
 
 
 
-	//MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
-	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	////MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
+	////car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
-	//playerMoveOnTerrainScript->setObjectHeight(4.0f);
-	player->getTransform()->setWorldPosition(-15, 0, 0);
-	player->getTransform()->setWorldRotation(0, 180, 0);
+	////playerMoveOnTerrainScript->setObjectHeight(4.0f);
+	//player->getTransform()->setWorldPosition(-15, 0, 0);
+	//player->getTransform()->setWorldRotation(0, 180, 0);
 
-	GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
-	playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	playerChild1->getTransform()->setLocalRotation(0, 0, 0);
+	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
+	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
+	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
+	//playerChild1->getTransform()->setLocalRotation(0, 0, 0);
 
-	playerChild1->addComponent<MoveScript_C>();
+	//playerChild1->addComponent<MoveScript_C>();
 }
 
 
@@ -576,18 +578,18 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
-	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
 	playerMoveOnTerrainScript->setObjectHeight(3.0f);
-	player->getTransform()->setWorldPosition(-15, 0, 0);
+	player->getTransform()->setWorldPosition(-50, 0, 0);
 	player->getTransform()->setWorldRotation(0, 0, 0);
 
-	player->addComponent<DamageableScript>()->setMaxHp(300000000.0f);
+	player->addComponent<DamageableScript>()->setMaxHp(3000.0f);
 
 	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
 	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
@@ -610,8 +612,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//enemy->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 
 	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
-	fbxModelRendererEnemy->loadFbxFile("mutant.fbx");
-	BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+	fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
+	fbxModelRendererEnemy->setScaleFactor(Vector3(20, 20, 20));
+	//BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
 
 
 	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
@@ -662,11 +665,12 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
 	//---------------------------------------------------------------------------------------------------------
 
-	Scene & scene = mainCamera->getScene();
+
+
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
-	EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, &scene, *dummy);
+	EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, *dummy);
 
 
 	// void(*ptr_display)(void)

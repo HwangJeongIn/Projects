@@ -101,8 +101,8 @@
 
 
 
-		if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)
-			Sleep(MS_PER_FRAME - FrameTime::GetDeltaTime());
+		//if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)
+		//	Sleep(MS_PER_FRAME - FrameTime::GetDeltaTime());
 
 	}
 

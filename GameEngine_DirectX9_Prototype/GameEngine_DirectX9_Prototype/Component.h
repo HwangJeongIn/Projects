@@ -885,20 +885,46 @@ class FbxModelMesh;
 
 class FbxModelRenderer : public Component
 {
+public :
+	struct MeshForShading
+	{
+		IDirect3DVertexBuffer9* vb;
+		IDirect3DIndexBuffer9* ib;
+		unsigned int vertexCount;
+		unsigned int indexCount;
+		unsigned int triCount;
+
+		MeshForShading()
+			: vb(nullptr), ib(nullptr), vertexCount(0), indexCount(0), triCount(0) {}
+
+		~MeshForShading()
+		{
+			if (vb)
+				vb->Release();
+			if (ib)
+				ib->Release();
+		}
+
+
+	};
 private:
 	// 쉐이더 관련 변수들
 	IDirect3DVertexDeclaration9* declaration;
 	IDirect3DVertexShader9* fbxModelRendererWithAnimationShader;
 	ID3DXConstantTable* constTable;
 	D3DXHANDLE worldViewProjectionMatrixHandle;
+	// 스케일 관련 변수
+	Vector3 scaleFactor;
+	D3DXHANDLE scaleFactorHandle;
 
 
 	// 여러가지 메쉬정보를 담고 있음
 	vector<FbxModelMesh *> fbxMeshes;
+	vector<MeshForShading *> meshesForShading;
 
-	vector<ID3DXMesh *>  meshes;
-	map<ID3DXMesh *,vector<D3DMATERIAL9>> materialsTable;
-	map<ID3DXMesh *,vector<IDirect3DTexture9*>> texturesTable;
+	//vector<ID3DXMesh *>  meshes;
+	map<MeshForShading *,vector<D3DMATERIAL9>> materialsTable;
+	map<MeshForShading *,vector<IDirect3DTexture9*>> texturesTable;
 
 	FbxModelAnimations * animations;
 	FbxModelSkeletonBones * skeletonBones;
@@ -932,12 +958,16 @@ private:
 	void processSkeletonBonesAnimation(FbxModelAnimations * animations);
 
 	// FbxModelMesh -> DXMesh
-	void processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
-	void processSubsets(ID3DXMesh * mesh);
-	void optimizeMesh(ID3DXMesh * mesh);
+	void processVertices(MeshForShading * mesh, FbxModelMesh * fbxModelMesh);
+	//void processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processIndices(MeshForShading * mesh, FbxModelMesh * fbxModelMesh);
+	//void processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	void processTextures(MeshForShading * mesh, FbxModelMesh * fbxModelMesh);
+	//void processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh);
+	//void processSubsets(MeshForShading * mesh);
+	//void optimizeMesh(MeshForShading * mesh);
+	//void processSubsets(ID3DXMesh * mesh);
+	//void optimizeMesh(ID3DXMesh * mesh);
 
 	//void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag);
 	//void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls);
@@ -946,28 +976,28 @@ private:
 		float position[3];
 		float normal[3];
 		float uv[2];
-		//float animationMatrix[4][4];
+		float animationMatrix[16];
 		FbxModelVertex()
-			: position{}, normal{}, uv{}//, animationMatrix{}
+			: position{}, normal{}, uv{}, animationMatrix{}
 		{
 		
 		}
 
 		FbxModelVertex(float x, float y, float z,
-			float nx, float ny, float nz, float u, float v
-			//float m11, float m12, float m13, float m14,
-			//float m21, float m22, float m23, float m24,
-			//float m31, float m32, float m33, float m34,
-			//float m41, float m42, float m43, float m44
+			float nx, float ny, float nz, float u, float v,
+			float m11, float m12, float m13, float m14,
+			float m21, float m22, float m23, float m24,
+			float m31, float m32, float m33, float m34,
+			float m41, float m42, float m43, float m44
 		)
 		{
 			position[0] = x; position[1] = y; position[2] = z;
 			normal[0] = nx; normal[1] = ny; normal[2] = nz;
 			uv[0] = u; uv[1] = v;
-			//animationMatrix[0][0] = m11; animationMatrix[0][1] = m12; animationMatrix[0][2] = m13; animationMatrix[0][3] = m14;
-			//animationMatrix[1][0] = m21; animationMatrix[1][1] = m22; animationMatrix[1][2] = m23; animationMatrix[1][3] = m24;
-			//animationMatrix[2][0] = m31; animationMatrix[2][1] = m32; animationMatrix[2][2] = m33; animationMatrix[2][3] = m34;
-			//animationMatrix[3][0] = m41; animationMatrix[3][1] = m42; animationMatrix[3][2] = m43; animationMatrix[3][3] = m44;
+			animationMatrix[0] = m11; animationMatrix[1] = m12; animationMatrix[2] = m13; animationMatrix[3] = m14;
+			animationMatrix[4] = m21; animationMatrix[5] = m22; animationMatrix[6] = m23; animationMatrix[7] = m24;
+			animationMatrix[8] = m31; animationMatrix[9] = m32; animationMatrix[10] = m33; animationMatrix[11] = m34;
+			animationMatrix[12] = m41; animationMatrix[13] = m42; animationMatrix[14] = m43; animationMatrix[15] = m44;
 		}
 
 		float& operator[] (unsigned int index) 
@@ -1032,13 +1062,16 @@ public:
 	void playWithFileName(const string & animationFileName);
 	void stop();
 
+	void setScaleFactor(const Vector3 & scaleFactor);
+	const Vector3 & getScaleFactor() const { return scaleFactor; }
+
 
 	FbxModelAnimations * getAnimations()
 	{
 		return animations;
 	}
 
-	void setScale(const Vector3 & value);
+	//void setScale(const Vector3 & value);
 
 	// FbxFile -> FbxModelRednerer(FbxModelMesh, FbxAnimations)
 

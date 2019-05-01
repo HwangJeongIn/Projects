@@ -519,11 +519,11 @@ void BasicEnemyScript::update()
 {
 	basicEnemyBT->tick();
 
-	Vector3 temp = transform->getWorldRotation();
-	Trace::Write("TAG_DEBUG", "enemy rotation", "");
-	Trace::Write("TAG_DEBUG", "x", temp.getX());
-	Trace::Write("TAG_DEBUG", "y", temp.getY());
-	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	//Vector3 temp = transform->getWorldRotation();
+	//Trace::Write("TAG_DEBUG", "enemy rotation", "");
+	//Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
 	//temp = transform->getWorldPosition();
 	//Trace::Write("TAG_DEBUG", "enemy position", "");
@@ -914,16 +914,25 @@ void DamageableScript::getDamaged(float power)
 		power = 0;
 
 	currentHp -= power;
-	if (currentHp <= 0)
-	{
-		currentHp = 0.0f;
-		GameObject::Destroy(gameObject);
-	}
 
 	if (gameObject->getTag() == "Player")
 	{
 		gameObject->getGameUI().setCurrentPlayerHpFactor(currentHp / maxHp);
 	}
+	if (currentHp <= 0)
+	{
+		if (gameObject->getTag() == "Player")
+		{
+			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+			gameObject->getGameUI().setEndSceneUI();
+			// 리셋
+			return;
+		}
+		currentHp = 0.0f;
+		GameObject::Destroy(gameObject);
+	}
+
+
 }
 void MoveScript_C::start()
 {
@@ -1320,24 +1329,20 @@ const string FbxModelRenderer::filePathToLoadFbxTextureFiles = "../Fbx/Textures/
 
 void FbxModelRenderer::render()
 {
-	if (meshes.size() ==0) return;
+	if (meshesForShading.size() ==0) return;
 
-	// 현재 transform행렬로 적용시킨다.
-	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
-
-
-	int meshCount = meshes.size();
+	int meshCount = meshesForShading.size();
 	int fbxCount = fbxMeshes.size();
 
 
-	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator tempMaterialForMesh;
-	map<ID3DXMesh *, vector<IDirect3DTexture9*>>::iterator tempTexturesForMesh;
+	map<MeshForShading *, vector<D3DMATERIAL9>>::iterator tempMaterialForMesh;
+	map<MeshForShading *, vector<IDirect3DTexture9*>>::iterator tempTexturesForMesh;
 	D3DMATERIAL9 * material = nullptr;
 	IDirect3DBaseTexture9 * texture = nullptr;
 
-	for(int i =0; i< meshes.size(); ++i)
+	for(int i =0; i< meshesForShading.size(); ++i)
 	{
-		if (!meshes[i]) continue;
+		if (!meshesForShading[i]) continue;
 		//animation-------------------------------------------------------------
 		// 본들이 있을때			
 		// 애니메이션 매니저가있을때
@@ -1356,11 +1361,11 @@ void FbxModelRenderer::render()
 
 			// FbxModelMesh(mesh와 인덱스 1:1 매칭)에 접근해서(vectorMyVertex)
 			// 렌더링할 mesh의 버텍스 버퍼를 열어서 최종적인 위치 값들을 다시 넣어준다.
-			processVerticesWithAnimation(meshes[i], fbxMeshes[i]);
+			//processVerticesWithAnimation(meshes[i], fbxMeshes[i]);
 			
 
 			// 애니메이션이 있을때 애니메이션 메트릭스가 계속 변하기 때문에 최신화시켜준다.
-			//processVertices(meshes[i], fbxMeshes[i]);
+
 
 
 			// FbxModelMesh의 각 버텍스에서 MyFbxVertex->getPositionWithAnimation해서 초기화 
@@ -1371,14 +1376,14 @@ void FbxModelRenderer::render()
 			// 만약에 애니메이션이 멈춘다면 모든 메쉬들을 processVertice함수로 // 초기값으로 지정해준다.
 		}
 
-
+		processVertices(meshesForShading[i], fbxMeshes[i]);
 
 
 		
 		//material, texture-----------------------------------------------------
 		// 일단 맵에 등록되어있는지 확인한다.
-		tempMaterialForMesh = materialsTable.find(meshes[i]);
-		tempTexturesForMesh = texturesTable.find(meshes[i]);
+		tempMaterialForMesh = materialsTable.find(meshesForShading[i]);
+		tempTexturesForMesh = texturesTable.find(meshesForShading[i]);
 
 		material = nullptr;
 		texture = nullptr;
@@ -1405,8 +1410,17 @@ void FbxModelRenderer::render()
 			}
 		}
 
+
+
+
+		// 쉐이더 지정 // 내부적으로 빛 계산도 다 해준다.
 		device->SetVertexShader(fbxModelRendererWithAnimationShader);
 		device->SetVertexDeclaration(declaration);
+
+
+		// 소스 지정
+		device->SetStreamSource(0, meshesForShading[i]->vb, 0, sizeof(FbxModelVertex));
+		device->SetIndices(meshesForShading[i]->ib);
 
 		D3DXMATRIX viewMatrix;
 		D3DXMATRIX projectionMatrix;
@@ -1415,6 +1429,9 @@ void FbxModelRenderer::render()
 		device->GetTransform(D3DTS_VIEW, &viewMatrix);
 		device->GetTransform(D3DTS_PROJECTION, &projectionMatrix);
 
+
+		//gameObject->getScene().getMainCamera()->getComponent<MainCamera>()->getViewMatrix(&viewMatrix);
+		/*쉐이더 파라미터 초기화*/
 		// worldViewProjection 초기화
 		constTable->SetMatrix
 		(
@@ -1423,6 +1440,16 @@ void FbxModelRenderer::render()
 			&D3DXMATRIX(transform->getTransformMatrix() * viewMatrix * projectionMatrix)
 		);
 
+		constTable->SetVector
+		(
+			device,
+			scaleFactorHandle,
+			&D3DXVECTOR4(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ(),0)
+		);
+
+		// 텍스처 지정
+
+
 
 		// rendering-----------------------------------------------------
 		if(material)
@@ -1430,10 +1457,15 @@ void FbxModelRenderer::render()
 		if(texture)
 			device->SetTexture(0, texture);
 		
-		meshes[i]->DrawSubset(0);
+		device->DrawIndexedPrimitive(
+			D3DPT_TRIANGLELIST, 0, 0, meshesForShading[i]->vertexCount, 0, meshesForShading[i]->triCount);
+
 
 		device->SetVertexShader(NULL);
 		device->SetVertexDeclaration(NULL);
+
+
+
 	}
 
 }
@@ -1456,20 +1488,25 @@ void FbxModelRenderer::start()
 		: NORMAL2
 		}
 		과 매핑된다.
+		/*
+
+		float position[3];
+		float normal[3];
+		float uv[2];
+		float animationMatrix[4][4];
 
 		*/
 		// offsets in bytes
 		{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
 		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0 },
-		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,   0 },
+		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
 
 		// 나머지 매트릭스
-		//{ 0, 32, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   1 },
-		//{ 0, 44, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2 },
-		//{ 0, 56, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   3 },
-		//{ 0, 68, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   4 },
+		{ 0, 32, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 1 },
+		{ 0, 48, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 2 },
+		{ 0, 64, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 3 },
+		{ 0, 80, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 4 },
 
-		//{ 0, 36, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2 },
 		D3DDECL_END()
 	};
 
@@ -1526,7 +1563,7 @@ void FbxModelRenderer::start()
 		compiledCode->Release();
 
 	worldViewProjectionMatrixHandle = constTable->GetConstantByName(0, "WorldViewProjectionMatrix");
-
+	scaleFactorHandle = constTable->GetConstantByName(0, "ScaleFactor");
 }
 
 void FbxModelRenderer::onDestroy()
@@ -1550,13 +1587,13 @@ void FbxModelRenderer::onDestroy()
 		}
 
 		// 메쉬 정보 삭제
-		for (auto it = meshes.begin(); it != meshes.end(); ++it)
+		for (auto it = meshesForShading.begin(); it != meshesForShading.end(); ++it)
 		{
 			if ((*it) != nullptr)
-				(*it)->Release();
+				delete (*it);
 			(*it) = nullptr;
 		}
-		meshes.clear();
+		meshesForShading.clear();
 
 		// fbx 메쉬 정보 삭제
 		for (auto it = fbxMeshes.begin(); it != fbxMeshes.end(); ++it)
@@ -1590,6 +1627,7 @@ void FbxModelRenderer::onDestroy()
 
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
 	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr),
+	scaleFactor(1,1,1),
 	// 쉐이더
 	declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr), worldViewProjectionMatrixHandle(0)
 {
@@ -1607,47 +1645,12 @@ void FbxModelRenderer::stop()
 	animations->stop();
 }
 
-void FbxModelRenderer::setScale(const Vector3 & value)
+
+void FbxModelRenderer::setScaleFactor(const Vector3 & scaleFactor)
 {
-
-	float xScale = constrainNegativeNumber(value.getX());
-	float yScale = constrainNegativeNumber(value.getY());
-	float zScale = constrainNegativeNumber(value.getZ());
-	
-	for (int i = 0; i < meshes.size(); ++i)
-	{
-		ID3DXMesh * mesh = nullptr;
-		mesh = meshes[i];
-		FbxModelMesh * fbxModelMesh = nullptr;
-		fbxModelMesh = fbxMeshes[i];
-
-		if (!mesh||!fbxModelMesh) continue;
-
-		FbxModelVertex * fbxV = nullptr;
-		MyFbxVertex * tVertex = nullptr;
-
-		processVertices(mesh, fbxModelMesh);
-		mesh->LockVertexBuffer(0, (void**)&fbxV);
-		for (int j = 0; j < fbxMeshes[i]->getVertexCount(); ++j)
-		{
-			//tVertex = fbxMeshInfos[i]->getVertex(j);
-			//if (tVertex)
-			//{
-			//	fbxV[j][0] = (float)tVertex->getPosition().mData[0] / 10;
-			//	fbxV[j][1] = (float)tVertex->getPosition().mData[1] / 10;
-			//	fbxV[j][2] = (float)tVertex->getPosition().mData[2] / 10;
-			//}
-
-
-			fbxV[j][0] *= xScale;
-			fbxV[j][1] *= yScale;
-			fbxV[j][2] *= zScale;
-		}
-
-		mesh->UnlockVertexBuffer();
-	}
-	
+	this->scaleFactor.setVector3(scaleFactor.getX(), scaleFactor.getX(), scaleFactor.getX());
 }
+
 
 
 
@@ -1693,45 +1696,73 @@ void FbxModelRenderer::loadFbxFile(const string & fileName)
 		// 미리 초기화된 FbxMesh를 가지는 fbxModelMesh에서 부터 필요한 정보 추출 완료 // fbxModelMeshes에 담겨있음
 		//---------------------------------------------------------------------------
 		// 정보를 가지고 DirectX에서 지원하는 mesh형식으로 변환
-
-		ID3DXMesh * mesh = nullptr;
+		MeshForShading * meshForShading = new MeshForShading;
+		//ID3DXMesh * mesh = nullptr;
 		HRESULT hr = 0;
+		meshForShading->indexCount = (*it)->getIndexCount();
+		meshForShading->vertexCount = (*it)->getVertexCount();
+		meshForShading->triCount = (*it)->getTriCount();
 
-		hr = D3DXCreateMeshFVF(
-			// 메쉬가 가질 면의 개수 
-			// 여기서 인덱스 버퍼의 크기도 자동으로 알수 있다.
-			// 삼각형의 개수/3 = 인덱스의 수
-			(*it)->getTriCount(),
+		hr = device->CreateVertexBuffer(
+			meshForShading->vertexCount * sizeof(FbxModelVertex),
+			D3DUSAGE_WRITEONLY,
 
-			// 메쉬가 가질 버텍스의 수
-			(*it)->getVertexCount(),
-
-			// 메쉬를 만드는데 이용될 하나 이상의 플래그
-			// 여기서는 메쉬는 관리 메모리 풀내에 보관되도록 하였다.
-			D3DXMESH_MANAGED,
-
-			// 복제된 메쉬를 만드는데 이용될 포맷
-			FbxModelRenderer::FbxModelVertex::DefaultFVF,
-			device,
-			// 복제된 메쉬가 담길 포인터
-			&mesh);
+			// FVF는 버텍스 정보 선언을 사용하기 때문에 사용하지 않는다.
+			// 버텍스 정보 선언은 FVF보다 확장된 버전이라고 보면된다.
+			0, // using vertex declaration
+			D3DPOOL_MANAGED,
+			&(meshForShading->vb),
+			0);
 
 		if (FAILED(hr))
 		{
-			mesh = nullptr;
-			meshes.push_back(mesh);
+			if (meshForShading->vb)
+				meshForShading->vb->Release();
+			if (meshForShading->ib)
+				meshForShading->ib->Release();
+
+			meshForShading->vb = nullptr;
+			meshForShading->ib = nullptr;
+
+			meshesForShading.push_back(meshForShading);
 			continue;
 		}
 
+		// 32비트 이므로 나중에 읽을 때 DWORD로 읽어야 한다.
+		device->CreateIndexBuffer(
+			// 2개의 삼각형을 이루기 위한 인덱스의 갯수는 6개이다.
+			meshForShading->indexCount * sizeof(DWORD), // 2 triangles per edge
+			D3DUSAGE_WRITEONLY,
+			D3DFMT_INDEX32,
+			D3DPOOL_MANAGED,
+			&(meshForShading->ib),
+			0);
+
+		if (FAILED(hr))
+		{
+			if (meshForShading->vb)
+				meshForShading->vb->Release();
+			if (meshForShading->ib)
+				meshForShading->ib->Release();
+
+			meshForShading->vb = nullptr;
+			meshForShading->ib = nullptr;
+
+			meshesForShading.push_back(meshForShading);
+			continue;
+		}
+
+
+
 		// mesh내부의 버텍스 정보와 인덱스 정보를 초기화 시켜준다.
-		processVertices(mesh, (*it));
-		processIndices(mesh, (*it));
-		processTextures(mesh, (*it));
+		processVertices(meshForShading, (*it));
+		processIndices(meshForShading, (*it));
+		processTextures(meshForShading, (*it));
 
-		processSubsets(mesh);
-		optimizeMesh(mesh);
+		//processSubsets(meshForShading);
+		//optimizeMesh(meshForShading);
 
-		meshes.push_back(mesh);
+		meshesForShading.push_back(meshForShading);
 	}
 
 }
@@ -1946,117 +1977,186 @@ void FbxModelRenderer::processSkeletonBonesAnimation(FbxModelAnimations * animat
 	skeletonBones->setAllBonesAnimationMatrix(animationFileName, animationName, currentKeyFrame, nextKeyFrame, keyFrameFactor);
 }
 
-void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+//void FbxModelRenderer::processVertices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+//{
+//	if (!mesh || !fbxModelMesh) return;
+//	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
+//	FbxModelVertex * fbxV = nullptr;
+//	MyFbxVertex * tVertex = nullptr;
+//	
+//	//int t1 = mesh->GetNumVertices();
+//	//int t2 = fbxModelMesh->getVertexCount();
+//
+//	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+//	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+//	mesh->LockVertexBuffer(0, (void**)&fbxV);
+//	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
+//	{
+//		tVertex = fbxModelMesh->getVertex(i);
+//		
+//		// 값이 있을때
+//		if (tVertex)
+//		{
+//			const D3DXMATRIX & tempAnimationMatrix = tVertex->getAnimationMatrix();
+//			// 각각의 정보를 초기화 시켜준다.
+//			fbxV[i] = 
+//			{
+//				// Position
+//				(float)tVertex->getPosition().mData[0]/10,(float)tVertex->getPosition().mData[1]/10, (float)tVertex->getPosition().mData[2]/10,
+//				// Normal
+//				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
+//				// UV
+//				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1],
+//				// AnimationMatrix
+//				tempAnimationMatrix._11,tempAnimationMatrix._12,tempAnimationMatrix._13,tempAnimationMatrix._14,
+//				tempAnimationMatrix._21,tempAnimationMatrix._22,tempAnimationMatrix._23,tempAnimationMatrix._24,
+//				tempAnimationMatrix._31,tempAnimationMatrix._32,tempAnimationMatrix._33,tempAnimationMatrix._34,
+//				tempAnimationMatrix._41,tempAnimationMatrix._42,tempAnimationMatrix._43,tempAnimationMatrix._44
+//			};
+//			continue;
+//		}
+//		// 값이 없을때 // nullptr일때
+//		fbxV[i] = 
+//		{
+//			// Position
+//			0,0,0,
+//			// Normal
+//			0,0,0,
+//			// UV
+//			0,0,
+//
+//			// AnimationMatrix
+//			1,0,0,0,
+//			0,1,0,0,
+//			0,0,1,0,
+//			0,0,0,1
+//		};
+//	}
+//
+//	//t1 = mesh->GetNumVertices();
+//	//t2 = fbxModelMesh->getVertexCount();
+//
+//	mesh->UnlockVertexBuffer();
+//}
+
+//void FbxModelRenderer::processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+//{
+//	if (!mesh || !fbxModelMesh) return;
+//
+//	FbxModelVertex * fbxV = nullptr;
+//	MyFbxVertex * tVertex = nullptr;
+//	D3DXVECTOR3 temp{};
+//
+//	mesh->LockVertexBuffer(0, (void**)&fbxV);
+//	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
+//	{
+//		tVertex = fbxModelMesh->getVertex(i);
+//		// 값이 있을때
+//		if (tVertex)
+//		{
+//			temp = tVertex->getPositionWithAnimation();
+//			// 내부적으로 애니메이션 행렬을 곱한 것들을 처리해준다.
+//			// 애니메이션 행렬을 곱하기 전에 본들의 가중치에 따른 애니메이션 행렬을 내부적으로 계산해준다.
+//			//fbxV[i][0] = (float)tVertex->getPositionWithAnimation().x / 10;
+//			//fbxV[i][1] = (float)tVertex->getPositionWithAnimation().y / 10;
+//			//fbxV[i][2] = (float)tVertex->getPositionWithAnimation().z / 10;
+//			// 각각의 정보를 초기화 시켜준다.
+//			fbxV[i] =
+//			{
+//				// Position
+//				temp.x / 10, temp.y/ 10, temp.z / 10,
+//				// Normal
+//				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
+//				// UV
+//				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
+//			};
+//			continue;
+//
+//			// 노말값이나 UV값은 안바꿔도 될까..
+//			// UV값은 어차피 같은 텍스처 좌표이기때문에 상관없을것같은데 노말값은 달라져야하는거아닐까?
+//		}
+//		// 값이 없을때 // 아무것도 해주지않는다.
+//	}
+//
+//
+//	mesh->UnlockVertexBuffer();
+//}
+
+void FbxModelRenderer::processVertices(MeshForShading * mesh, FbxModelMesh * fbxModelMesh)
 {
+
 	if (!mesh || !fbxModelMesh) return;
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
 	FbxModelVertex * fbxV = nullptr;
 	MyFbxVertex * tVertex = nullptr;
-	
+
 	//int t1 = mesh->GetNumVertices();
 	//int t2 = fbxModelMesh->getVertexCount();
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
-	mesh->LockVertexBuffer(0, (void**)&fbxV);
+	mesh->vb->Lock(0,0, (void**)&fbxV,0);
 	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
 	{
 		tVertex = fbxModelMesh->getVertex(i);
-		
+
+		//*************** 무조건 매트릭스를 곱해서 최종 위치를 만들기 전까지 스케일을 변경하지 않는다.
+		//*************** 무조건 매트릭스를 곱해서 최종 위치를 만들기 전까지 스케일을 변경하지 않는다.
+		//*************** 무조건 매트릭스를 곱해서 최종 위치를 만들기 전까지 스케일을 변경하지 않는다.
+		// 예를들어 스케일을 1/10으로 조정하고 애니메이션 행렬을 곱하는 것과 
+		// 애니메이션행렬을 곱하고 1/10으로 조정하는 것은 다르다.
+
 		// 값이 있을때
 		if (tVertex)
 		{
-			const D3DXMATRIX & tempAnimationMatrix = tVertex->getAnimationMatrix();
+			//D3DXVECTOR3 temp = tVertex->getPositionWithAnimation();
+			 const D3DXMATRIX & tempAnimationMatrix = tVertex->getAnimationMatrix();
+
 			// 각각의 정보를 초기화 시켜준다.
-			fbxV[i] = 
+			fbxV[i] =
 			{
 				// Position
-				(float)tVertex->getPosition().mData[0]/10,(float)tVertex->getPosition().mData[1]/10, (float)tVertex->getPosition().mData[2]/10,
+
+				(float)tVertex->getPosition().mData[0] ,(float)tVertex->getPosition().mData[1], (float)tVertex->getPosition().mData[2],
 				// Normal
 				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
 				// UV
-				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
-				//// AnimationMatrix
-				//tempAnimationMatrix._11,tempAnimationMatrix._12,tempAnimationMatrix._13,tempAnimationMatrix._14,
-				//tempAnimationMatrix._21,tempAnimationMatrix._22,tempAnimationMatrix._23,tempAnimationMatrix._24,
-				//tempAnimationMatrix._31,tempAnimationMatrix._32,tempAnimationMatrix._33,tempAnimationMatrix._34,
-				//tempAnimationMatrix._41,tempAnimationMatrix._42,tempAnimationMatrix._43,tempAnimationMatrix._44
+				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1],
+				// AnimationMatrix
+				tempAnimationMatrix._11,tempAnimationMatrix._12,tempAnimationMatrix._13,tempAnimationMatrix._14,
+				tempAnimationMatrix._21,tempAnimationMatrix._22,tempAnimationMatrix._23,tempAnimationMatrix._24,
+				tempAnimationMatrix._31,tempAnimationMatrix._32,tempAnimationMatrix._33,tempAnimationMatrix._34,
+				tempAnimationMatrix._41,tempAnimationMatrix._42,tempAnimationMatrix._43,tempAnimationMatrix._44
 			};
 			continue;
 		}
 		// 값이 없을때 // nullptr일때
-		fbxV[i] = 
+		fbxV[i] =
 		{
 			// Position
 			0,0,0,
 			// Normal
 			0,0,0,
 			// UV
-			0,0
+			0,0,
 
-			//// AnimationMatrix
-			//1,0,0,0,
-			//0,1,0,0,
-			//0,0,1,0,
-			//0,0,0,1
+			// AnimationMatrix
+			1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+			0,0,0,1
 		};
 	}
 
-	//t1 = mesh->GetNumVertices();
-	//t2 = fbxModelMesh->getVertexCount();
-
-	mesh->UnlockVertexBuffer();
+	mesh->vb->Unlock();
 }
 
-void FbxModelRenderer::processVerticesWithAnimation(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
-{
-	if (!mesh || !fbxModelMesh) return;
-
-	FbxModelVertex * fbxV = nullptr;
-	MyFbxVertex * tVertex = nullptr;
-	D3DXVECTOR3 temp{};
-
-	mesh->LockVertexBuffer(0, (void**)&fbxV);
-	for (int i = 0; i < fbxModelMesh->getVertexCount(); ++i)
-	{
-		tVertex = fbxModelMesh->getVertex(i);
-		// 값이 있을때
-		if (tVertex)
-		{
-			temp = tVertex->getPositionWithAnimation();
-			// 내부적으로 애니메이션 행렬을 곱한 것들을 처리해준다.
-			// 애니메이션 행렬을 곱하기 전에 본들의 가중치에 따른 애니메이션 행렬을 내부적으로 계산해준다.
-			//fbxV[i][0] = (float)tVertex->getPositionWithAnimation().x / 10;
-			//fbxV[i][1] = (float)tVertex->getPositionWithAnimation().y / 10;
-			//fbxV[i][2] = (float)tVertex->getPositionWithAnimation().z / 10;
-			// 각각의 정보를 초기화 시켜준다.
-			fbxV[i] =
-			{
-				// Position
-				temp.x / 10, temp.y/ 10, temp.z / 10,
-				// Normal
-				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
-				// UV
-				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1]
-			};
-			continue;
-
-			// 노말값이나 UV값은 안바꿔도 될까..
-			// UV값은 어차피 같은 텍스처 좌표이기때문에 상관없을것같은데 노말값은 달라져야하는거아닐까?
-		}
-		// 값이 없을때 // 아무것도 해주지않는다.
-	}
-
-
-	mesh->UnlockVertexBuffer();
-}
-
-void FbxModelRenderer::processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+void FbxModelRenderer::processIndices(MeshForShading * mesh, FbxModelMesh * fbxModelMesh)
 {
 	if (!mesh || !fbxModelMesh) return;
 
 	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
-	unsigned short * fbxI = nullptr;
+	unsigned long * fbxI = nullptr;
 	int tIndex = -1;
 
 	//int t1 = mesh->GetNumFaces();
@@ -2066,7 +2166,7 @@ void FbxModelRenderer::processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelM
 
 	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
 	// 버텍스 정보는 포지션 / 노말 / UV값이다.
-	mesh->LockIndexBuffer(0, (void**)&fbxI);
+	mesh->ib->Lock(0,0, (void**)&fbxI,0);
 	for (int i = 0; i < fbxModelMesh->getIndexCount(); ++i)
 	{
 
@@ -2081,49 +2181,18 @@ void FbxModelRenderer::processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelM
 		// 값이 없을때
 		fbxI[i] = 0;
 	}
-	mesh->UnlockIndexBuffer();
+	mesh->ib->Unlock();
 }
 
-//if (mtrlBuffer == 0 || numMtrls == 0) return;
-//
-//// D3DXMATERAL 형식으로 읽으려면 타입캐스팅이 필요하다.
-//D3DXMATERIAL* pMtrls = (D3DXMATERIAL*)mtrlBuffer->GetBufferPointer();
-//
-//for (int i = 0; i < numMtrls; i++)
-//{
-//	// 로드될때 ambient값을 가지지 않으므로 이를 지정한다.
-//	pMtrls[i].MatD3D.Ambient = pMtrls[i].MatD3D.Diffuse;
-//
-//	mtrls.push_back(pMtrls[i].MatD3D);
-//
-//	if (pMtrls[i].pTextureFilename != 0)
-//	{
-//		// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
-//		IDirect3DTexture9* tex = 0;
-//		D3DXCreateTextureFromFile(
-//			device,
-//			pMtrls[i].pTextureFilename,
-//			&tex);
-//
-//		// 텍스처가 있을때 그 텍스처를 넣어주고
-//		textures.push_back(tex);
-//	}
-//	else
-//	{
-//		// 없을때도 서브셋과 같은 인덱스 번호를 맞춰주기 위해서 널값을 넣어준다.
-//		textures.push_back(0);
-//	}
-//}
-
-void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+void FbxModelRenderer::processTextures(MeshForShading * mesh, FbxModelMesh * fbxModelMesh)
 {
 	if (!mesh || !fbxModelMesh) return;
 	FbxNode * fbxMeshNode = fbxModelMesh->getNode();
 	if (!fbxMeshNode) return;
 
 
-	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator materials_it = materialsTable.find(mesh);
-	map<ID3DXMesh *, vector<IDirect3DTexture9*>>::iterator textures_it = texturesTable.find(mesh);
+	map<MeshForShading *, vector<D3DMATERIAL9>>::iterator materials_it = materialsTable.find(mesh);
+	map<MeshForShading *, vector<IDirect3DTexture9*>>::iterator textures_it = texturesTable.find(mesh);
 
 	// 각각 등록이 안되어있으면 등록해준다.
 	if (materials_it == materialsTable.end())
@@ -2141,23 +2210,6 @@ void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 	vector<D3DMATERIAL9> & materials = materialsTable[mesh];
 	vector<IDirect3DTexture9*> & textures = texturesTable[mesh];
 
-	//	if (pMtrls[i].pTextureFilename != 0)
-	//	{
-	//		// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
-	//		IDirect3DTexture9* tex = 0;
-	//		D3DXCreateTextureFromFile(
-	//			device,
-	//			pMtrls[i].pTextureFilename,
-	//			&tex);
-	//
-	//		// 텍스처가 있을때 그 텍스처를 넣어주고
-	//		textures.push_back(tex);
-	//	}
-	//	else
-	//	{
-	//		// 없을때도 서브셋과 같은 인덱스 번호를 맞춰주기 위해서 널값을 넣어준다.
-	//		textures.push_back(0);
-	//	}
 
 	int materialCount = fbxMeshNode->GetSrcObjectCount<FbxSurfaceMaterial>();
 
@@ -2195,7 +2247,7 @@ void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 			tempMtrl.MatD3D.Specular = specular;
 
 			materials.push_back(tempMtrl.MatD3D);
-	
+
 			// Check if it's layeredtextures
 			int layeredTextureCount = prop.GetSrcObjectCount<FbxLayeredTexture>();
 
@@ -2206,7 +2258,7 @@ void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 					FbxLayeredTexture* layered_texture = FbxCast<FbxLayeredTexture>(prop.GetSrcObject<FbxLayeredTexture>(j));
 					int lcount = layered_texture->GetSrcObjectCount<FbxTexture>();
 
-					
+
 					for (int k = 0; k < lcount; k++)
 					{
 						FbxFileTexture* texture = FbxCast<FbxFileTexture>(layered_texture->GetSrcObject<FbxFileTexture>(k));
@@ -2254,7 +2306,7 @@ void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 				for (int j = 0; j < textureCount; j++)
 				{
 					FbxFileTexture* texture = FbxCast<FbxFileTexture>(prop.GetSrcObject<FbxFileTexture>(j));
-		
+
 					string textureName = texture->GetFileName();
 
 					//FbxProperty p = texture->RootProperty.Find(/*"Filename"*/textureName.c_str());
@@ -2278,10 +2330,12 @@ void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 					// 이미 지정해둔 경로를 뒤져서 확인해본다.
 
 					// 먼저 파일이름을 받아오고 > 그다음 지정해둔 경로를 더하는 작업을 해준다.
-					int index = textureName.find_last_of('\\');
+					int index = textureName.find_last_of("/\\");
 					textureName = textureName.substr(index + 1);
 					//textureName = texture->GetRelativeFileName();
 					textureName = filePathToLoadFbxTextureFiles + textureName;
+
+					Trace::Write("TAG_DEBUG", textureName);
 
 					D3DXCreateTextureFromFile(
 						device,
@@ -2295,70 +2349,318 @@ void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModel
 		}
 
 	}
+
 }
 
-void FbxModelRenderer::processSubsets(ID3DXMesh * mesh)
-{
-	if (!mesh ) return;
 
-	unsigned long* attributeBuffer = nullptr;
+//void FbxModelRenderer::processIndices(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+//{
+//	if (!mesh || !fbxModelMesh) return;
+//
+//	// mesh에 넣어줄때 fbxVertex형식으로 넣어줄것이다.
+//	unsigned short * fbxI = nullptr;
+//	int tIndex = -1;
+//
+//	//int t1 = mesh->GetNumFaces();
+//	//int t2 = fbxModelMesh->getIndexCount();
+//	//int t3 = fbxModelMesh->getVertexCount();
+//	//int t4 = fbxModelMesh->getTriCount();
+//
+//	// 생성한 메쉬를 잠그고 그안에 버텍스 정보를 집어넣는다.
+//	// 버텍스 정보는 포지션 / 노말 / UV값이다.
+//	mesh->LockIndexBuffer(0, (void**)&fbxI);
+//	for (int i = 0; i < fbxModelMesh->getIndexCount(); ++i)
+//	{
+//
+//		tIndex = fbxModelMesh->getIndex(i);
+//		// 값이 있을때
+//		if (tIndex != -1)
+//		{
+//			// 각각의 정보를 초기화 시켜준다.
+//			fbxI[i] = tIndex;
+//			continue;
+//		}
+//		// 값이 없을때
+//		fbxI[i] = 0;
+//	}
+//	mesh->UnlockIndexBuffer();
+//}
 
-	// 다시 속성 데이터를 수정하기 위해서 버퍼를 잠궈준다.
-	mesh->LockAttributeBuffer(0, &attributeBuffer);
+//if (mtrlBuffer == 0 || numMtrls == 0) return;
+//
+//// D3DXMATERAL 형식으로 읽으려면 타입캐스팅이 필요하다.
+//D3DXMATERIAL* pMtrls = (D3DXMATERIAL*)mtrlBuffer->GetBufferPointer();
+//
+//for (int i = 0; i < numMtrls; i++)
+//{
+//	// 로드될때 ambient값을 가지지 않으므로 이를 지정한다.
+//	pMtrls[i].MatD3D.Ambient = pMtrls[i].MatD3D.Diffuse;
+//
+//	mtrls.push_back(pMtrls[i].MatD3D);
+//
+//	if (pMtrls[i].pTextureFilename != 0)
+//	{
+//		// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
+//		IDirect3DTexture9* tex = 0;
+//		D3DXCreateTextureFromFile(
+//			device,
+//			pMtrls[i].pTextureFilename,
+//			&tex);
+//
+//		// 텍스처가 있을때 그 텍스처를 넣어주고
+//		textures.push_back(tex);
+//	}
+//	else
+//	{
+//		// 없을때도 서브셋과 같은 인덱스 번호를 맞춰주기 위해서 널값을 넣어준다.
+//		textures.push_back(0);
+//	}
+//}
 
-	int ttt = mesh->GetNumFaces();
+//void FbxModelRenderer::processTextures(ID3DXMesh * mesh, FbxModelMesh * fbxModelMesh)
+//{
+//	if (!mesh || !fbxModelMesh) return;
+//	FbxNode * fbxMeshNode = fbxModelMesh->getNode();
+//	if (!fbxMeshNode) return;
+//
+//
+//	map<ID3DXMesh *, vector<D3DMATERIAL9>>::iterator materials_it = materialsTable.find(mesh);
+//	map<ID3DXMesh *, vector<IDirect3DTexture9*>>::iterator textures_it = texturesTable.find(mesh);
+//
+//	// 각각 등록이 안되어있으면 등록해준다.
+//	if (materials_it == materialsTable.end())
+//	{
+//		materialsTable[mesh] = vector<D3DMATERIAL9>{};
+//	}
+//	if (textures_it == texturesTable.end())
+//	{
+//		texturesTable[mesh] = vector<IDirect3DTexture9*>{};
+//	}
+//
+//	// 없으면 자동으로 삽입하는 []연산자이지만
+//	// 있다면 그 value값을 반환한다 앞서 없을때 모두 등록을 해준상태이므로 []로 접근해도 새롭게 할당되는 일은 없다.
+//	// 레퍼런스 형으로 반환하기 때문에 레퍼런스로 받으면 참조해서 접근할 수 있다.
+//	vector<D3DMATERIAL9> & materials = materialsTable[mesh];
+//	vector<IDirect3DTexture9*> & textures = texturesTable[mesh];
+//
+//	//	if (pMtrls[i].pTextureFilename != 0)
+//	//	{
+//	//		// 파일이름이 정상적으로 들어가 있을때만 그 파일명으로 파일을 열어서 텍스처를 로드한다.
+//	//		IDirect3DTexture9* tex = 0;
+//	//		D3DXCreateTextureFromFile(
+//	//			device,
+//	//			pMtrls[i].pTextureFilename,
+//	//			&tex);
+//	//
+//	//		// 텍스처가 있을때 그 텍스처를 넣어주고
+//	//		textures.push_back(tex);
+//	//	}
+//	//	else
+//	//	{
+//	//		// 없을때도 서브셋과 같은 인덱스 번호를 맞춰주기 위해서 널값을 넣어준다.
+//	//		textures.push_back(0);
+//	//	}
+//
+//	int materialCount = fbxMeshNode->GetSrcObjectCount<FbxSurfaceMaterial>();
+//
+//	for (int index = 0; index < materialCount; index++)
+//	{
+//		FbxSurfaceMaterial* material = (FbxSurfaceMaterial*)fbxMeshNode->GetSrcObject<FbxSurfaceMaterial>(index);
+//
+//		if (material != NULL)
+//		{
+//			//LOG(INFO) << "\nmaterial: " << material->GetNameOnly() << std::endl;
+//			string tempMatrial = material->GetNameOnly();
+//			// This only gets the material of type sDiffuse, you probably need to traverse all Standard Material Property by its name to get all possible textures.
+//
+//			// material 초기화
+//			FbxProperty prop{};
+//			D3DXMATERIAL tempMtrl{};
+//			FbxDouble3 result(0, 0, 0);
+//
+//			prop = material->FindProperty(FbxSurfaceMaterial::sAmbient);
+//			result = prop.Get<FbxDouble3>();
+//			D3DCOLORVALUE ambient = { result.mData[0],result.mData[1],result.mData[2] };
+//
+//			prop = material->FindProperty(FbxSurfaceMaterial::sSpecular);
+//			result = prop.Get<FbxDouble3>();
+//			D3DCOLORVALUE specular = { result.mData[0],result.mData[1],result.mData[2] };
+//
+//			// 텍스처는 디퓨즈만 사용할것이기 때문에 마지막으로 처리해주는 부분은 디퓨즈이다.
+//			// 이 prop을 이용해서 텍스처를 받아올것이다.
+//			prop = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
+//			result = prop.Get<FbxDouble3>();
+//			D3DCOLORVALUE diffuse = { result.mData[0],result.mData[1],result.mData[2] };
+//
+//			tempMtrl.MatD3D.Ambient = ambient;
+//			tempMtrl.MatD3D.Diffuse = diffuse;
+//			tempMtrl.MatD3D.Specular = specular;
+//
+//			materials.push_back(tempMtrl.MatD3D);
+//	
+//			// Check if it's layeredtextures
+//			int layeredTextureCount = prop.GetSrcObjectCount<FbxLayeredTexture>();
+//
+//			if (layeredTextureCount > 0)
+//			{
+//				for (int j = 0; j < layeredTextureCount; j++)
+//				{
+//					FbxLayeredTexture* layered_texture = FbxCast<FbxLayeredTexture>(prop.GetSrcObject<FbxLayeredTexture>(j));
+//					int lcount = layered_texture->GetSrcObjectCount<FbxTexture>();
+//
+//					
+//					for (int k = 0; k < lcount; k++)
+//					{
+//						FbxFileTexture* texture = FbxCast<FbxFileTexture>(layered_texture->GetSrcObject<FbxFileTexture>(k));
+//						// Then, you can get all the properties of the texture, include its name
+//						string textureName = texture->GetFileName();
+//
+//						// 처음에는 바로 파일 경로를 받아서 열어보고
+//
+//						IDirect3DTexture9* tex = nullptr;
+//						D3DXCreateTextureFromFile(
+//							device,
+//							textureName.c_str(),
+//							&tex);
+//
+//						// 텍스처가 있을때 그 텍스처를 넣어주고
+//						if (tex)
+//						{
+//							textures.push_back(tex);
+//							continue;
+//						}
+//
+//
+//						// 파일 경로로 접근했을때 없는 경우
+//						// 이미 지정해둔 경로를 뒤져서 확인해본다.
+//
+//						// 먼저 파일이름을 받아오고 > 그다음 지정해둔 경로를 더하는 작업을 해준다.
+//						int index = textureName.find_last_of('\\');
+//						textureName = textureName.substr(index + 1);
+//						//textureName = texture->GetRelativeFileName();
+//						textureName = filePathToLoadFbxTextureFiles + textureName;
+//
+//						D3DXCreateTextureFromFile(
+//							device,
+//							textureName.c_str(),
+//							&tex);
+//
+//						textures.push_back(tex);
+//
+//					}
+//				}
+//			}
+//			else
+//			{
+//				int textureCount = prop.GetSrcObjectCount<FbxFileTexture>();
+//				for (int j = 0; j < textureCount; j++)
+//				{
+//					FbxFileTexture* texture = FbxCast<FbxFileTexture>(prop.GetSrcObject<FbxFileTexture>(j));
+//		
+//					string textureName = texture->GetFileName();
+//
+//					//FbxProperty p = texture->RootProperty.Find(/*"Filename"*/textureName.c_str());
+//					// 처음에는 바로 파일 경로를 받아서 열어보고
+//
+//					IDirect3DTexture9* tex = nullptr;
+//					D3DXCreateTextureFromFile(
+//						device,
+//						textureName.c_str(),
+//						&tex);
+//
+//					// 텍스처가 있을때 그 텍스처를 넣어주고
+//					if (tex)
+//					{
+//						textures.push_back(tex);
+//						continue;
+//					}
+//
+//
+//					// 파일 경로로 접근했을때 없는 경우
+//					// 이미 지정해둔 경로를 뒤져서 확인해본다.
+//
+//					// 먼저 파일이름을 받아오고 > 그다음 지정해둔 경로를 더하는 작업을 해준다.
+//					int index = textureName.find_last_of('\\');
+//					textureName = textureName.substr(index + 1);
+//					//textureName = texture->GetRelativeFileName();
+//					textureName = filePathToLoadFbxTextureFiles + textureName;
+//
+//					D3DXCreateTextureFromFile(
+//						device,
+//						textureName.c_str(),
+//						&tex);
+//
+//					textures.push_back(tex);
+//
+//				}
+//			}
+//		}
+//
+//	}
+//}
 
-	// 서브셋을 0번으로 지정해준다.
-	for (int i = 0; i < mesh->GetNumFaces(); ++i)
-		attributeBuffer[i] = 0;
+//void FbxModelRenderer::processSubsets(ID3DXMesh * mesh)
+//{
+//	if (!mesh ) return;
+//
+//	unsigned long* attributeBuffer = nullptr;
+//
+//	// 다시 속성 데이터를 수정하기 위해서 버퍼를 잠궈준다.
+//	mesh->LockAttributeBuffer(0, &attributeBuffer);
+//
+//	int ttt = mesh->GetNumFaces();
+//
+//	// 서브셋을 0번으로 지정해준다.
+//	for (int i = 0; i < mesh->GetNumFaces(); ++i)
+//		attributeBuffer[i] = 0;
+//
+//
+//	// 설정이 완료되었으므로 다시 잠궈준다.
+//	mesh->UnlockAttributeBuffer();
+//}
 
-
-	// 설정이 완료되었으므로 다시 잠궈준다.
-	mesh->UnlockAttributeBuffer();
-}
-
-void FbxModelRenderer::optimizeMesh(ID3DXMesh * mesh)
-{
-	if (!mesh) return;
-
-	// 인접버퍼를 이용한 최적화 작업
-	vector<unsigned long> adjacencyBuffer(mesh->GetNumFaces() * 3);
-	// 메쉬의 인접정보를 받아온다.
-	mesh->GenerateAdjacency(0.0f, &adjacencyBuffer[0]);
-
-
-	int faceCount1 = mesh->GetNumFaces();
-	int vertexCount1 = mesh->GetNumVertices();
-
-	HRESULT hr = 0;
-	// 그 인접 정보를 기반으로 최적화 작업을 시작한다.
-	hr = mesh->OptimizeInplace
-	(
-		// 속성으로(서브셋기준) 삼각형으로 정렬하고, 별도의 속성테이블을 생성
-		// GetAttributeTable함수를 이용해서 D3DXATTRIBUTERANGE구조체 배열을 받아올 수 있다.
-		// 내부 정보에는 서브셋ID / 각 면과 버텍스의 수 / 각 시작 지점이 들어있다.
-		// 속성 테이블의 각항목은 메쉬의 각 서브셋과 대응되며, 
-		// 서브셋의 기하정보들이 보관되는 버텍스/ 인덱스 버퍼내의 메모리 블록을 지정한다.
-		D3DXMESHOPT_ATTRSORT |
-		// 메쉬에서 이용하지 않는 인덱스와 버텍스를 제거한다.
-		D3DXMESHOPT_COMPACT |
-		// 버텍스 캐시의 히트율을 높인다.
-		D3DXMESHOPT_VERTEXCACHE,
-
-		// 최적화 되지않은 메쉬의 인접 배열 포인터
-		// 인접배열이 필요한이유?	// 최적화 목록에 인접정보가 필요한 부분이 있어서 필요할듯
-		&adjacencyBuffer[0],
-		// 최적화된 메쉬의 인접 배열 포인터
-		nullptr,
-		// 리맵정보 Face
-		nullptr,
-		// 리맵정보 Vertex
-		nullptr
-	);
-
-	int faceCount = mesh->GetNumFaces();
-	int vertexCount = mesh->GetNumVertices();
-}
+//void FbxModelRenderer::optimizeMesh(ID3DXMesh * mesh)
+//{
+//	if (!mesh) return;
+//
+//	// 인접버퍼를 이용한 최적화 작업
+//	vector<unsigned long> adjacencyBuffer(mesh->GetNumFaces() * 3);
+//	// 메쉬의 인접정보를 받아온다.
+//	mesh->GenerateAdjacency(0.0f, &adjacencyBuffer[0]);
+//
+//
+//	int faceCount1 = mesh->GetNumFaces();
+//	int vertexCount1 = mesh->GetNumVertices();
+//
+//	HRESULT hr = 0;
+//	// 그 인접 정보를 기반으로 최적화 작업을 시작한다.
+//	hr = mesh->OptimizeInplace
+//	(
+//		// 속성으로(서브셋기준) 삼각형으로 정렬하고, 별도의 속성테이블을 생성
+//		// GetAttributeTable함수를 이용해서 D3DXATTRIBUTERANGE구조체 배열을 받아올 수 있다.
+//		// 내부 정보에는 서브셋ID / 각 면과 버텍스의 수 / 각 시작 지점이 들어있다.
+//		// 속성 테이블의 각항목은 메쉬의 각 서브셋과 대응되며, 
+//		// 서브셋의 기하정보들이 보관되는 버텍스/ 인덱스 버퍼내의 메모리 블록을 지정한다.
+//		D3DXMESHOPT_ATTRSORT |
+//		// 메쉬에서 이용하지 않는 인덱스와 버텍스를 제거한다.
+//		D3DXMESHOPT_COMPACT |
+//		// 버텍스 캐시의 히트율을 높인다.
+//		D3DXMESHOPT_VERTEXCACHE,
+//
+//		// 최적화 되지않은 메쉬의 인접 배열 포인터
+//		// 인접배열이 필요한이유?	// 최적화 목록에 인접정보가 필요한 부분이 있어서 필요할듯
+//		&adjacencyBuffer[0],
+//		// 최적화된 메쉬의 인접 배열 포인터
+//		nullptr,
+//		// 리맵정보 Face
+//		nullptr,
+//		// 리맵정보 Vertex
+//		nullptr
+//	);
+//
+//	int faceCount = mesh->GetNumFaces();
+//	int vertexCount = mesh->GetNumVertices();
+//}
 
 void AnimationFSM::start()
 {

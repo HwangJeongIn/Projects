@@ -28,6 +28,8 @@ private:
 	// for animation
 	WeightOfBones weightOfBones;
 	D3DXMATRIX animationMatrix;
+
+
 public:
 	MyFbxVertex(const FbxDouble3 & position, const FbxDouble3 & normal,
 		const FbxDouble2 & uv, const FbxDouble3 & binormal, const FbxDouble3 & tangent, const WeightOfBones & weightOfBones)
@@ -37,7 +39,7 @@ public:
 		D3DXMatrixIdentity(&animationMatrix);
 	}
 	friend class FbxModelMesh;
-	const FbxDouble3 & getPosition() const { return position; }
+
 	D3DXVECTOR3 getPositionWithAnimation()
 	{
 		D3DXVECTOR3 result;
@@ -63,11 +65,14 @@ public:
 		animationMatrix = weightOfBones.getCombinedBonesMatrixWithWeight(skeletonBones);
 	}
 
+	const FbxDouble3 & getPosition() const { return position; }
 	const FbxDouble3 & getNormal()const { return normal; }
 	const FbxDouble2 & getUV()const { return uv; }
 	const FbxDouble3 & getBinormal()const { return binormal; }
 	const FbxDouble3 & getTangent() const { return tangent; }
 	const D3DXMATRIX & getAnimationMatrix() const { return animationMatrix; }
+
+
 
 	void setPosition(const FbxDouble3 & other) { position = other; }
 	void setNormal(const FbxDouble3 & other) { normal = other; }
