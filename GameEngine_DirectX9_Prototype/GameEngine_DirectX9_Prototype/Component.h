@@ -300,23 +300,25 @@ public:
 		D3DXVECTOR3 up_DX{ 0,1,0 };
 		D3DXVECTOR3 forward_DX{ 0,0,1 };
 
+		Vector3 worldRot = getWorldRotation();
+
 		/*
 		로테이션 순서 생각해보기
 		*/
 
 		// 월드 방향 벡터기준으로 각도만큼 각각을 회전시켜서 객체의 방향벡터를 구해준다.
 		// 월드벡터 기준 pitch
-		D3DXMatrixRotationAxis(&T, &WorldRight, DegreeToRadian(rotation.getX()));
+		D3DXMatrixRotationAxis(&T, &WorldRight, DegreeToRadian(worldRot.getX()));
 		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
 		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
 
 		// 월드벡터 기준 yaw
-		D3DXMatrixRotationAxis(&T, &WorldUp, DegreeToRadian(rotation.getY()));
+		D3DXMatrixRotationAxis(&T, &WorldUp, DegreeToRadian(worldRot.getY()));
 		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
 		D3DXVec3TransformCoord(&forward_DX, &forward_DX, &T);
 
 		// 월드벡터 기준 roll
-		D3DXMatrixRotationAxis(&T, &WorldForward, DegreeToRadian(rotation.getZ()));
+		D3DXMatrixRotationAxis(&T, &WorldForward, DegreeToRadian(worldRot.getZ()));
 		D3DXVec3TransformCoord(&up_DX, &up_DX, &T);
 		D3DXVec3TransformCoord(&right_DX, &right_DX, &T);
 
@@ -508,12 +510,20 @@ public:
 };
 
 //class AnimationFSM;
-
+class BulletController;
 class PlayerScript : public Component
 {
 private:
 	float shootingPower;
 	const float chargingSpeed;
+
+	float defaultShootingPower;
+	float maxShootingPower;
+
+	float moveSpeed;
+
+	BulletController * bulletController;
+
 protected:
 	virtual void update();
 	virtual void start();
@@ -521,7 +531,7 @@ protected:
 
 public:
 	PlayerScript(GameObject * go, Transform * tf)
-		: Component(go, tf), shootingPower(0.0f), chargingSpeed(6.0f)
+		: Component(go, tf), shootingPower(0.0f), chargingSpeed(6.0f), defaultShootingPower(30), maxShootingPower(100), bulletController(nullptr), moveSpeed(0.85f)
 	{
 		start();
 	}
@@ -607,6 +617,7 @@ public:
 class BasicEnemySearchRangeScript : public Component
 {
 private:
+
 	BasicEnemyScript * basicEnemyScript;
 protected:
 	//virtual void update();
@@ -681,6 +692,7 @@ public:
 
 };
 
+class BulletController;
 class BulletScript : public Component
 {
 private:
@@ -691,6 +703,8 @@ private:
 
 	float power;
 
+	BulletController * bulletController;
+
 protected:
 	virtual void start();
 	virtual void update();
@@ -698,7 +712,7 @@ protected:
 
 public:
 	BulletScript(GameObject * go, Transform * tf)
-		: Component(go, tf), bulletMesh(nullptr), texture(nullptr), power(1.0f)
+		: Component(go, tf), bulletMesh(nullptr), texture(nullptr), power(1.0f), bulletController(nullptr)
 	{
 		start();
 		
@@ -711,6 +725,12 @@ public:
 
 	void setPower(float power) { this->power = power; }
 	float getPower() const { return power; }
+
+	void setBulletController(BulletController * bulletController)
+	{
+		this->bulletController = bulletController;
+	}
+	BulletController * getBulletController() { return bulletController; }
 };
 class FireExplosion;
 class BulletParticle : public Component
@@ -737,6 +757,57 @@ public:
 	void generateParticle(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
 	void setAmountFactor(float factor);
 	void setDuration(float duration);
+};
+
+class BulletController : public Component
+{
+private:
+	vector<pair<GameObject *, Vector3 >> bullets;
+	float lagTime;
+	float creationInterval;
+	float maxNumOfBullets;
+
+	float bulletSpeed;
+	float bulletSpaceRadius;
+
+
+	float valueFactor;
+
+	void setValueFactor(float valueFactor) { this->valueFactor = valueFactor; }
+	float getValueFactor() const { return valueFactor; }
+
+protected:
+	virtual void start();
+	virtual void update();
+	virtual void onDestroy();
+public:
+	BulletController(GameObject * go, Transform * tf)
+		: Component(go, tf), lagTime(0.0f), maxNumOfBullets(5), bulletSpaceRadius(10), creationInterval(2), bulletSpeed(0.1f), valueFactor(1.0f)
+	{
+		start();
+	}
+
+	virtual ~BulletController()
+	{
+		onDestroy();
+	}
+
+	void setCreationInterval(float interval)
+	{
+		creationInterval = interval;
+	}
+
+	float getCreationInterval() const { return creationInterval; }
+
+	void removeBullet(GameObject * bullet);
+	bool addBullet();
+	bool shootBullet(float power);
+
+
+
+
+	void unAccelerate() { valueFactor = 1.0f; }
+	void accelerate() { valueFactor = 3.5f; }
 };
 
 
@@ -912,6 +983,9 @@ public :
 
 	};
 private:
+	// 업데이트 막기위한 플래그
+	bool updateFlag;
+
 	// 쉐이더 관련 변수들
 	IDirect3DVertexDeclaration9* declaration;
 	IDirect3DVertexShader9* fbxModelRendererWithAnimationShader;
@@ -1030,6 +1104,7 @@ protected:
 	virtual void start();
 	virtual void update()
 	{
+		if (!updateFlag) return;
 
 		render();
 		//if (::GetAsyncKeyState('F') & 0x8000f)
@@ -1090,7 +1165,7 @@ public:
 	// 외부 애니메이션 파일 불러올때 사용
 	void loadFbxFileForAnimation(const string & fileName);
 
-
+	void setUpdateFlag(bool updateFlag) { this->updateFlag = updateFlag; }
 
 };
 

@@ -66,16 +66,37 @@ GameUI & GameObject::getGameUI()
 
 void GameObject::setParent(GameObject * parent)
 {
+	// 기존 부모객체가 있다면 기존 부모목록에서 삭제해준다.
+	if (this->parent != nullptr)
+	{
+		for (auto it = this->parent->children.begin(); it != this->parent->children.end(); ++it)
+		{
+			if ((*it) == this)
+			{
+				this->parent->children.erase(it);
+				break;
+			}
+		}
+	}
+
+
 	// 나중에 수정
 	if (parent != nullptr && this->parent == nullptr)
 	{
+		// 먼저 부모객체부터 바꿔준다.
+		this->parent = parent;
 		// 루트 객체 > 다른 자식 객체
 		getScene().baseDestroy(this, true);
 		getScene().baseInstantiate(this, false);
+
+		// 루트객체가 아닐때 현재부모객체에 대해서도 자식등록을 해준다.
+		parent->children.push_back(this);
 	}
 
 	if (parent == nullptr && this->parent != nullptr)
 	{
+		// 먼저 부모객체부터 바꿔준다.
+		this->parent = parent;
 		// 다른 자식 객체 > 루트객체
 		getScene().baseDestroy(this, false);
 		getScene().baseInstantiate(this, true);
@@ -83,12 +104,17 @@ void GameObject::setParent(GameObject * parent)
 
 	if (parent != nullptr && this->parent != nullptr)
 	{
+		// 먼저 부모객체부터 바꿔준다.
+		this->parent = parent;
 		// 다른 자식 객체 > 다른 자식 객체
 		getScene().baseDestroy(this, false);
 		getScene().baseInstantiate(this, false);
+
+		// 루트객체가 아닐때 현재부모객체에 대해서도 자식등록을 해준다.
+		parent->children.push_back(this);
 	}
 
-	this->parent = parent;
+
 }
 
 int GameObject::getPath(string & path)
@@ -249,22 +275,37 @@ GameObject * GameObject::getChild(const string & name)
 	return nullptr;
 }
 
-
+// 모든 부모 자식 함수는 setParent중심으로 이루어진다.
+// 내부적으로 Scene에 다시등록 / 해제
+// 부모의 자식객체 목록에서 삭제 / 자식객체의 부모설정이 이루어진다. 
 void GameObject::removeChild(GameObject * child)
 {
 	if (!child) return;
 
-	child->setWhetherDestroyed(true);
+	// 자식목록에서 삭제하였기 때문에 자식객체는 루트 객체가 된다.
+	child->setParent(nullptr);
+
+	//for (auto it = children.begin(); it != children.end(); ++it)
+	//{
+	//	if ((*it) == child)
+	//	{
+	//		children.erase(it);
+	//		return;
+	//	}
+	//}
+	//child->setWhetherDestroyed(true);
 }
 GameObject * GameObject::addChild(GameObject * child)
 {
 	if (!child) return nullptr;
 
-	child->parent = this;
-	// 먼저 객체 children에 등록해주고
-	children.push_back(child);
+	child->setParent(this);
 
-	child->getScene().baseInstantiate(child, child->isRootObj());
+	//child->parent = this;
+	//// 먼저 객체 children에 등록해주고
+	//children.push_back(child);
+
+	//child->getScene().baseInstantiate(child, child->isRootObj());
 
 	return child;
 }
@@ -305,7 +346,9 @@ GameObject * GameObject::Instantiate
 	vector<Component *> * components)
 {
 	GameObject * tempGameObject = new GameObject(name, tag, position, rotation, scale, parent, children, components);
-
+	
+	if(parent !=nullptr)
+		parent->children.push_back(tempGameObject);
 
 	tempGameObject->getScene().baseInstantiate(tempGameObject, tempGameObject->isRootObj());
 

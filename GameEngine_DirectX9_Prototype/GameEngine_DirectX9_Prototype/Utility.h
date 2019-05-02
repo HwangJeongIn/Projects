@@ -9,8 +9,24 @@
 #include <cmath>
 #include <d3dx9.h>
 #include <fbxsdk.h>
+#include <sstream>
+
 
 using namespace std;
+
+class MyUtility
+{
+public :
+	template < typename Type > 
+	static string ToStr(const Type & t)
+	{
+		ostringstream os;
+		os << t;
+		return os.str();
+	}
+
+};
+
 
 
 class Vector3

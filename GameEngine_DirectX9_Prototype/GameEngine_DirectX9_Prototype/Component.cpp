@@ -80,6 +80,8 @@ void Transform::transformUpdate(bool dirty, const D3DXMATRIX & parentTransformMa
 		if (gameObject->getRigidBody() && toPhysicsSystem)
 			gameObject->getPhysics().setTransformToSystem(gameObject);
 
+		// 로컬 방향벡터도 최신화시켜준다
+		setDirectionVectorWithRotation_DX();
 
 		this->dirty = false;
 	}
@@ -410,78 +412,71 @@ void Transform::setLocalRotation(float x, float y, float z)
 
 void PlayerScript::update()
 {
-	Vector3 temp = transform->getWorldRotation();
+	Vector3 temp = transform->getWorldPosition();
 	Trace::Write("TAG_DEBUG", "player", "");
 	Trace::Write("TAG_DEBUG", "x", temp.getX());
 	Trace::Write("TAG_DEBUG", "y", temp.getY());
 	Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
 
-	//if (::GetAsyncKeyState('Q') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,0 });
-	//if (::GetAsyncKeyState('E') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,0 });
-
-	//if (::GetAsyncKeyState('Z') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ -.05f,0,0 });
-	//if (::GetAsyncKeyState('C') & 0x8000f)
-	//	transform->setRotation(transform->getRotation() + Vector3{ .05f,0,0 });
 
 	if (InputManager::GetKeyStay(0x57))
 	{
 		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
-		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()));
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()* .1f *(transform->getForward()) * moveSpeed);
 
 	}
 	if (InputManager::GetKeyStay(0x53))
 	{
 		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
-		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()));
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f *(-1)*(transform->getForward()) * moveSpeed);
 	}
 	
 	if (InputManager::GetKeyStay(0x44))
 	{
 		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
-		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()));
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (transform->getRight()) * moveSpeed);
 	}
 
 	if (InputManager::GetKeyStay(0x41))
 	{
 		gameObject->getAudio().playEffectSound("BS_Effect_FootStep.mp3", false);
-		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()));
+		transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime()*.1f * (-1)*(transform->getRight()) * moveSpeed);
 	}
 
 
 	if (InputManager::GetKeyUp(0x31))
 	{
 		gameObject->getAudio().playEffectSound("BS_Effect_Arrow.mp3", true);
-		Vector3 direction = transform->getForward() + Vector3(0, 0.01, 0);
-		GameObject * bullet = GameObject::Instantiate("bullet1", "Bullet");
-		//bullet->addComponent<MeshRenderer>()->loadXFile("car.x");
-		//FbxModelRenderer * bulletFbxModelRenderer = bullet->addComponent<FbxModelRenderer>();
-		//bulletFbxModelRenderer->loadFbxFile("Arrow_Regular.fbx");
-		//bulletFbxModelRenderer->setScale(Vector3(10, 10, 10));
-		//bullet->getTransform()->setWorldRotation(Vector3(0, 180, 0));
 
-		bullet->getTransform()->setWorldPosition(transform->getWorldPosition()+direction + Vector3(0,3.0f,0));
+		//Vector3 direction = transform->getForward() + Vector3(0, 0.1, 0);
+		if(bulletController)
+			bulletController->shootBullet(shootingPower);// , direction);
 
-		bullet->addComponent<BulletScript>();
-		RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
-		bulletRigidBody->setSphereCollider(1);
-		bulletRigidBody->addForce(direction * shootingPower);
-
-		shootingPower = 100.0f;
-
-
-		//car1RigidBody->setGravity(Vector3(0, 0, 0));
-		//car1->addComponent<BoxCollider>();
+		shootingPower = defaultShootingPower;
 	}
 	else if (InputManager::GetKeyStay(0x31))
 	{
-		if (shootingPower < 200.0f)
+		if (shootingPower <maxShootingPower)
 		{
 			shootingPower += FrameTime::GetDeltaTime()*.1f * chargingSpeed;
 		}
+	}
+
+	if (InputManager::GetKeyUp(0x32))
+	{
+		//gameObject->getAudio().playEffectSound("BS_Effect_Wind.mp3", true);
+
+		if (bulletController)
+			bulletController->unAccelerate();
+
+	}
+	else if (InputManager::GetKeyStay(0x32))
+	{
+		gameObject->getAudio().playEffectSound("BS_Effect_Wind.mp3", false);
+
+		if (bulletController)
+			bulletController->accelerate();
 	}
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
@@ -493,13 +488,11 @@ void PlayerScript::update()
 
 void PlayerScript::start()
 {
-	//animationFSM = gameObject->getComponent<AnimationFSM>();
-	//AudioSource * temp = gameObject->getAudio().getAudioSource("BS_BackGround_1.mp3");
-	//if (temp)
-	//{
-	//	temp->play(false);
-	//	temp->setVolume(7.0f);
-	//}
+	GameObject * bulletSpawner = gameObject->getChild("bulletSpawner");
+	if (bulletSpawner)
+	{
+		bulletController = bulletSpawner->getComponent<BulletController>();
+	}
 }
 
 void PlayerScript::onCollisionStay(GameObjectWithCollision & other)
@@ -708,7 +701,7 @@ void BasicEnemyScript::returnToStartPoint()
 	// 이동한다
 	transform->setWorldPosition(transform->getWorldPosition() + FrameTime::GetDeltaTime() * .1f * speed * direction);
 
-	//lookAtTarget(direction);
+	lookAtTarget(direction);
 }
 
 void BasicEnemyScript::idle()
@@ -861,6 +854,7 @@ void BasicEnemySearchRangeScript::onCollisionStay(GameObjectWithCollision & othe
 	// 들어온 오브젝트 태그가 플레이어일때
 	if (other.gameObject->getTag() == "Player")
 	{
+		gameObject->getParent()->getComponent<FbxModelRenderer>()->setUpdateFlag(true);
 		// 타겟이 없을때
 		if (basicEnemyScript->isNotTargeting())
 		{
@@ -923,6 +917,18 @@ void DamageableScript::getDamaged(float power)
 	{
 		if (gameObject->getTag() == "Player")
 		{
+			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+			gameObject->getGameUI().setEndSceneUI();
+			// 리셋
+			return;
+		}
+		else if (gameObject->getTag() == "Enemy")
+		{
+			gameObject->getGameUI().addScore(100);
+		}
+		else if (gameObject->getTag() == "EnemyBoss")
+		{
+			gameObject->getGameUI().addScore(1000);
 			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
 			gameObject->getGameUI().setEndSceneUI();
 			// 리셋
@@ -1238,6 +1244,8 @@ void RigidBody::fixedUpdate()
 
 void RigidBody::update()
 {
+
+
 	if (colliderInfo.type == ColliderType::NONE) return;
 
 	Vector3 worldPos = transform->getWorldPosition();
@@ -1685,7 +1693,7 @@ void FbxModelRenderer::onDestroy()
 
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
 	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr),
-	/*scaleFactor(1,1,1),*/ scaleFactorHandle(0),
+	/*scaleFactor(1,1,1),*/ scaleFactorHandle(0), updateFlag(true),
 	// 쉐이더
 	declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr),
 	viewProjectionMatrixHandle(0), worldMatrixHandle(0), cameraPositionHandle(0),
@@ -3170,6 +3178,11 @@ void BasicEnemyAnimationFSM::update()
 void BulletScript::start()
 {
 	device = &(gameObject->getDevice());
+	// 부모객체가 불릿을 관리하는 컨트롤러 컴포넌트를 가지고 있다고 가정한다.
+	if (gameObject->getParent() != nullptr)
+	{
+		bulletController = gameObject->getParent()->getComponent<BulletController>();
+	}
 
 	D3DXCreateSphere(device, 1.0f, 10, 10, &bulletMesh, 0);
 
@@ -3255,6 +3268,10 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 		Vector3::ToD3DXVECTOR3(origin, transform->getWorldPosition());
 		bulletParticle->getTransform()->setWorldPosition(transform->getWorldPosition());
 		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare.bmp", 2000, .9f, origin);
+
+		// 불릿컨트롤러에 의해 관리되고 있다면 그 리스트에서 삭제한다.
+		if (bulletController)
+			bulletController->removeBullet(gameObject);
 		GameObject::Destroy(gameObject);
 	}
 }
@@ -3301,6 +3318,153 @@ void BulletParticle::setDuration(float duration)
 {
 	if (fireExplosion)
 		fireExplosion->setDuration(duration);
+}
+
+void BulletController::start()
+{
+	srand((unsigned int)time(0));
+}
+
+void BulletController::update()
+{
+	lagTime += ((float)FrameTime::GetDeltaTime() / 1000.0f) * valueFactor;
+
+	if (lagTime >= creationInterval)
+	{
+		lagTime -= creationInterval;
+		addBullet();
+	}
+
+	// 불릿들 업데이트
+	GameObject * currentBullet = nullptr;
+	
+	for (int i = 0; i < bullets.size(); ++i)
+	{
+		currentBullet = bullets[i].first;
+		currentBullet->getTransform()->setLocalPosition(currentBullet->getTransform()->getLocalPosition() + bullets[i].second * FrameTime::GetDeltaTime() * .1f * bulletSpeed * valueFactor);
+		
+		const Vector3 & currentBulletLocalPosition = currentBullet->getTransform()->getLocalPosition();
+
+		//if (abs(currentBulletLocalPosition.getX()) > bulletSpaceRadius || abs(currentBulletLocalPosition.getY()) > bulletSpaceRadius
+		//	|| abs(currentBulletLocalPosition.getZ()) > bulletSpaceRadius)
+		//{
+		//	Vector3 randomVelocity
+		//	(
+		//		ParticleSystem::getRandomFloat(-1.0, 1.0),
+		//		ParticleSystem::getRandomFloat(-1.0, 1.0),
+		//		ParticleSystem::getRandomFloat(-1.0, 1.0)
+		//	);
+		//	bullets[i].second = randomVelocity;
+		//}
+		// 경계밖으로 나가려고하면 반대방향으로 속도를 지정해준다.
+
+		bool flag = false;
+		if (abs(currentBulletLocalPosition.getX()) > bulletSpaceRadius)
+		{
+			flag = true;
+			bullets[i].second.setX(-bullets[i].second.getX());
+		}
+
+		if (abs(currentBulletLocalPosition.getY()) > bulletSpaceRadius)
+		{
+			flag = true;
+			bullets[i].second.setY(-bullets[i].second.getY());
+		}
+
+		if (abs(currentBulletLocalPosition.getZ()) > bulletSpaceRadius)
+		{
+			flag = true;
+			bullets[i].second.setZ(-bullets[i].second.getZ());
+		}
+
+		if(flag)
+			currentBullet->getTransform()->setLocalPosition(currentBulletLocalPosition * .95f);
+		
+	}
+}
+
+void BulletController::onDestroy()
+{
+	for (int i = 0; i < bullets.size(); ++i)
+	{
+		GameObject::Destroy( bullets[i].first);
+		bullets[i].first = nullptr;
+	}
+	bullets.clear();
+}
+
+void BulletController::removeBullet(GameObject * bullet)
+{
+	if (!bullet) return;
+	for (auto it = bullets.begin(); it != bullets.end(); ++it)
+	{
+		if ((*it).first == bullet)
+		{
+			bullets.erase(it);
+			return;
+		}
+
+	}
+}
+
+bool BulletController::addBullet()
+{
+	if (bullets.size() >= maxNumOfBullets) return false;
+
+
+	// 랜덤위치 랜덤속도를 갖는다 // position velocity
+	Vector3 randomVelocity
+	(
+		ParticleSystem::getRandomFloat(-1.0, 1.0),
+		ParticleSystem::getRandomFloat(-1.0, 1.0),
+		ParticleSystem::getRandomFloat(-1.0, 1.0)
+	);
+	Vector3::Normalized(randomVelocity, randomVelocity);
+
+	GameObject * bullet = GameObject::Instantiate("bullet", "Bullet", Vector3::Zero, Vector3::Zero, Vector3::One, gameObject);
+	bullet->addComponent<BulletScript>();
+	RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
+	bulletRigidBody->setSphereCollider(1);
+	bulletRigidBody->turnOnIsTriggerFlag();
+
+	bullet->getTransform()->setLocalPosition
+	(
+		ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius),
+		ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius),
+		ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius)
+	);
+	// 현재 객체를 부모로 등록한다 // 나중에 삭제될때 알아서 자식들 목록에서 삭제됨
+	//bullet->setParent(this->gameObject);
+	// 부모를 빠져나온다고해도 자식들 목록에서 삭제됨 // 자식객체에서 setParent(nullptr) / 부모객체에서 removeChild() 사용
+	bullets.push_back(pair<GameObject *, Vector3>{bullet, randomVelocity});
+
+	return true;
+}
+
+bool BulletController::shootBullet(float power)
+{
+	if (bullets.size() <= 0) return false;
+
+	const Vector3 & forwardDirection = gameObject->getTransform()->getForward();
+	const Vector3 & upDirection = gameObject->getTransform()->getUp();
+	Vector3 direction = (forwardDirection + upDirection*0.01f);
+
+	auto bulletToShoot = bullets.begin();
+	GameObject * bulletObj = (*bulletToShoot).first;
+	bulletObj->setParent(nullptr);
+
+	// 삭제될때 BulletController의 bullets를 순회하지 않도록 해준다.
+	bulletObj->getComponent<BulletScript>()->setBulletController(nullptr);
+
+	// 초기 위치를 잡고 쏜다
+	bulletObj->getTransform()->setLocalPosition(gameObject->getTransform()->getWorldPosition() + direction + Vector3(0,1,0));
+	bulletObj->getComponent<RigidBody>()->addForce(power * FrameTime::GetDeltaTime() * .1f * direction);
+
+	// 최종적으로 삭제
+	bullets.erase(bulletToShoot);
+
+	return true;
+
 }
 
 
@@ -3571,9 +3735,9 @@ void Terrain::processVertices()
 			Vector3::Cross(normal, vector1, vector2);
 
 
-			Trace::Write("TAG_INFO1", "x", x);
-			Trace::Write("TAG_INFO1", "y", heightMap[i * verticesPerRow + j]);
-			Trace::Write("TAG_INFO1", "z", z);
+			//Trace::Write("TAG_INFO1", "x", x);
+			//Trace::Write("TAG_INFO1", "y", heightMap[i * verticesPerRow + j]);
+			//Trace::Write("TAG_INFO1", "z", z);
 
 			// 인덱스를 제대로 설정해주지 않아서 제대로 렌더링이되지 않는 버그가 발생했다.
 			// 주의해서 인덱스를 넣어주자
@@ -4214,4 +4378,5 @@ void BillBoard::optimizeMesh()
 		nullptr
 	);
 }
+
 

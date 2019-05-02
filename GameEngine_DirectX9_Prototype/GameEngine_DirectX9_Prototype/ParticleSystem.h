@@ -42,7 +42,7 @@ public:
 	bool init(const char * texFileName);
 	void addParticle();
 	void removeParticle(int index);
-	float getRandomFloat(float value1, float value2)
+	static float getRandomFloat(float value1, float value2)
 	{
 		if (value1 >= value2)
 		{

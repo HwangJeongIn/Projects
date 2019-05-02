@@ -5,6 +5,8 @@
 #include "Audio.h"
 #include "Utility.h"
 
+
+
 const string GameUI::filePathToLoadImageFiles = "../Qt/";
 
 GameUI::GameUI(QWidget *parent)
@@ -100,6 +102,9 @@ void GameUI::addScore(float value)
 {
 	if (value < 0) return;
 	score += value;
+	string temp = "Score : ";
+	temp += MyUtility::ToStr<float>(score);
+	ui.main_label_score->setText(temp.c_str());
 }
 
 void GameUI::setMainSceneUI()

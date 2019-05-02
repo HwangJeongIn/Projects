@@ -15,47 +15,6 @@
 const int Width  = 1920;
 const int Height = 1080;
 
-//Camera TheCamera(Camera::LANDOBJECT);
-
-//
-// Framework functions
-//
-/*bool Setup()
-{
-	//
-	// Setup a basic scene.  The scene will be created the
-	// first time this function is called.
-	//
-
-	d3d::DrawBasicScene(Device, 0.0f); 
-
-	//
-	// Set projection matrix.
-	//
-
-	D3DXMATRIX proj;
-	D3DXMatrixPerspectiveFovLH(
-			&proj,
-			D3DX_PI * 0.25f, // 45 - degree
-			(float)Width / (float)Height,
-			1.0f,
-			1000.0f);
-	Device->SetTransform(D3DTS_PROJECTION, &proj);
-
-
-	Trace::LoadFileNames();
-	Trace::Clear("TAG_DEBUG");
-
-
-
-	return true;
-}*/
-
-//void Cleanup()
-//{
-//	// pass 0 for the first parameter to instruct cleanup.
-//	d3d::DrawBasicScene(0, 0.0f);
-//}
 
 int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSystem)
 {
@@ -63,8 +22,8 @@ int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSyste
 	::ZeroMemory(&msg, sizeof(MSG));
 
 	//static float lastTime = (float)timeGetTime(); 
-	//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
-	//objToAccessSystem.getGameUI().setStartSceneUI();
+	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+	objToAccessSystem.getGameUI().setStartSceneUI();
 	Scene * scene = &objToAccessSystem.getScene();
 
 
@@ -211,35 +170,6 @@ void SetStartScene()
 	mainCamera->getTransform()->setWorldPosition(0, 40, -100);
 	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 
-	//// player
-	//GameObject * player = GameObject::Instantiate("player", "Player");
-	//player->addChild(mainCamera);
-	////player->addComponent<MeshRenderer>()->loadXFile("car.x");
-	//player->addComponent<PlayerScript>();
-	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	//playerRigidBody->setSphereCollider(2);
-
-	////FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	////fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	////AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
-
-
-
-	////MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
-	////car1MoveOnTerrainScript->setTerrain(groundTerrain);
-
-	////playerMoveOnTerrainScript->setObjectHeight(4.0f);
-	//player->getTransform()->setWorldPosition(-15, 0, 0);
-	//player->getTransform()->setWorldRotation(0, 180, 0);
-
-	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
-	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	//playerChild1->getTransform()->setLocalRotation(0, 0, 0);
-
-	//playerChild1->addComponent<MoveScript_C>();
-
-
 }
 
 void SetEndScene()
@@ -252,37 +182,68 @@ void SetEndScene()
 	mainCamera->addComponent<MainCamera>();
 	mainCamera->getTransform()->setWorldPosition(0, 40, -100);
 	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
-
-	//// player
-	//GameObject * player = GameObject::Instantiate("player", "Player");
-	//player->addChild(mainCamera);
-	////player->addComponent<MeshRenderer>()->loadXFile("car.x");
-	//player->addComponent<PlayerScript>();
-	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	//playerRigidBody->setSphereCollider(2);
-
-	////FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	////fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	////AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
-
-
-
-	////MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
-	////car1MoveOnTerrainScript->setTerrain(groundTerrain);
-
-	////playerMoveOnTerrainScript->setObjectHeight(4.0f);
-	//player->getTransform()->setWorldPosition(-15, 0, 0);
-	//player->getTransform()->setWorldRotation(0, 180, 0);
-
-	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
-	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	//playerChild1->getTransform()->setLocalRotation(0, 0, 0);
-
-	//playerChild1->addComponent<MoveScript_C>();
 }
 
+MoveOnTerrainScript * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = false)
+{
+	// enemy
+	GameObject * enemy = nullptr;
+	if (isBoss)
+		enemy = GameObject::Instantiate("enemyBoss", "EnemyBoss");
+	else
+		enemy = GameObject::Instantiate("enemy", "Enemy");
 
+	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
+	fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
+	fbxModelRendererEnemy->setUpdateFlag(false);
+	if(isBoss)
+		enemy->getTransform()->setLocalScale(50, 50, 50);
+	else
+		enemy->getTransform()->setLocalScale(25, 25, 25);
+
+	enemy->getTransform()->setWorldPosition(startPosition);
+	//BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+
+	// 스타트포인트 알아서 설정됨
+	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
+
+	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
+
+	if (isBoss)
+		enemyRigidBody->setSphereCollider(20);
+	else
+		enemyRigidBody->setSphereCollider(5);
+	//enemyRigidBody->setGravity(Vector3(0, 0.00001, 0));
+	enemyRigidBody->turnOnStaticFlag();
+	//enemyRigidBody->turnOnIsTriggerFlag();
+
+	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
+	//enemyRangeCollider->getTransform()->setLocalPosition(0, 0, 0);
+	//enemyRangeCollider->addComponent<MeshRenderer>()->loadXFile("car.x");
+
+	RigidBody * enemyRangeColliderRigidBody = enemyRangeCollider->addComponent<RigidBody>();
+	// 탐색 범위 40 // 안움직여야 하기 때문에 static객체 설정 + 뚫어야 하기 때문에 trigger객체 설정
+	enemyRangeColliderRigidBody->setSphereCollider(150.0f);
+	enemyRangeColliderRigidBody->turnOnIsTriggerFlag();
+	//enemyRangeColliderRigidBody->setGravity(Vector3(0, 0, 0));
+	enemyRangeColliderRigidBody->turnOnStaticFlag();
+	enemyRangeCollider->addComponent<BasicEnemySearchRangeScript>();
+
+	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
+
+	if (isBoss)
+		enemyMoveOnTerrainScript->setObjectHeight(150.0f);
+	else
+		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
+
+
+	if (isBoss)
+		enemy->addComponent<DamageableScript>()->setMaxHp(100.0f);
+	else
+		enemy->addComponent<DamageableScript>()->setMaxHp(30.0f);
+
+	return enemyMoveOnTerrainScript;
+}
 Terrain * GenerateTerrain()
 {
 	// ground
@@ -296,12 +257,14 @@ Terrain * GenerateTerrain()
 
 
 	//groundTerrain->loadRawFile("coastMountain64.raw", 64, 64, 25, .5f);
-	//groundTerrain->loadRawFile("terrain.raw", 129, 129, 10.0, .5f);
-	groundTerrain->loadRawFile("terrain.raw", 12, 12, 10.0, .5f);
+	groundTerrain->loadRawFile("terrain.raw", 129, 129, 10.0, .5f);
+	//groundTerrain->loadRawFile("terrain.raw", 12, 12, 10.0, .5f);
 	
 	groundTerrain->loadTextureFromFile("grass.bmp");
-	return groundTerrain;
+	//return groundTerrain;
+
 	srand(time(0));
+
 
 	for (int i = 0; i < 10; ++i)
 	{
@@ -439,7 +402,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * dummy = GameObject::Instantiate("dummy", "Dummy");
 	Locator::provideGameUI(&device, dummy);
 
-	Locator::provideAudio(Locator::SystemType::NULLTYPE);
+	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
@@ -575,76 +538,47 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// player
 	GameObject * player = GameObject::Instantiate("player", "Player");
+
+	// player children
 	player->addChild(mainCamera);
-	//player->addComponent<MeshRenderer>()->loadXFile("car.x");
+	GameObject * bulletSpawner = GameObject::Instantiate("bulletSpawner", "BulletSpawner");
+	BulletController * bulletSpawnerBulletController = bulletSpawner->addComponent<BulletController>();
+	bulletSpawner->getTransform()->setLocalPosition(0, 6, 0);
+	bulletSpawner->getTransform()->setLocalRotation(0, 0, 0);
+	player->addChild(bulletSpawner);
+
+	// player components
 	player->addComponent<PlayerScript>();
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	playerRigidBody->setSphereCollider(2);
+	playerRigidBody->setSphereCollider(10);
+	playerRigidBody->setGravity(Vector3(0, 5, 0));
+	//playerRigidBody->turnOnStaticFlag();
+	//playerRigidBody->turnOnIsTriggerFlag();
 
 	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
 	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
 	playerMoveOnTerrainScript->setObjectHeight(3.0f);
-	player->getTransform()->setWorldPosition(-50, 0, 0);
+	player->getTransform()->setWorldPosition(-544, 3, 374);
 	player->getTransform()->setWorldRotation(0, 0, 0);
 
-	player->addComponent<DamageableScript>()->setMaxHp(3000.0f);
-
-	//GameObject * playerChild1 = player->addChild("bigShip1", "BigShip");
-	//playerChild1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//playerChild1->getTransform()->setLocalPosition(5, 3, 0);
-	//playerChild1->getTransform()->setLocalRotation(0, 0, 0);
-
-	//playerChild1->addComponent<MoveScript_C>();
-
-	//GameObject * playerChild1Child1 = playerChild1->addChild("bigShip1", "BigShip");
-	//playerChild1Child1->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	////playerChild1Child1->getTransform()->setLocalPosition(5, 3, 0);
-	//playerChild1Child1->getTransform()->setLocalRotation(30, 30, 50);
-
-	//playerChild1Child1->addComponent<MoveScript_C>();
+	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
 
 
-	// enemy
-	GameObject * enemy = GameObject::Instantiate("enemy", "EnemyBoss");
-	//enemy->addChild(mainCamera);
-	//enemy->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
 
-	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
-	fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
-	enemy->getTransform()->setLocalScale(20, 20, 20);
-	//fbxModelRendererEnemy->setScaleFactor(Vector3(20, 20, 20));
-	//BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+	// Enemys
+	MoveOnTerrainScript * enemy1MoveOnTerrainScript = GenerateBasicEnemy(Vector3(-202,3,-305) , true);
+	MoveOnTerrainScript * enemy2MoveOnTerrainScript = GenerateBasicEnemy(Vector3(148,3,-375));
+	MoveOnTerrainScript * enemy3MoveOnTerrainScript = GenerateBasicEnemy(Vector3(477,3,-475));
+	MoveOnTerrainScript * enemy4MoveOnTerrainScript = GenerateBasicEnemy(Vector3(395,3,-288));
+	MoveOnTerrainScript * enemy5MoveOnTerrainScript = GenerateBasicEnemy(Vector3(425,4,106));
+	MoveOnTerrainScript * enemy6MoveOnTerrainScript = GenerateBasicEnemy(Vector3(457, 3, 450));
 
 
-	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
-
-	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
-	enemyRigidBody->setSphereCollider(2);
-
-	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
-	//enemyRangeCollider->getTransform()->setLocalPosition(0, 0, 0);
-	//enemyRangeCollider->addComponent<MeshRenderer>()->loadXFile("car.x");
-
-	RigidBody * enemyRangeColliderRigidBody = enemyRangeCollider->addComponent<RigidBody>();
-	// 탐색 범위 10 // 안움직여야 하기 때문에 static객체 설정 + 뚫어야 하기 때문에 trigger객체 설정
-	enemyRangeColliderRigidBody->setSphereCollider(30.0f);
-	enemyRangeColliderRigidBody->turnOnIsTriggerFlag();
-	//enemyRangeColliderRigidBody->setGravity(Vector3{ 0, 0, 0 });
-	enemyRangeColliderRigidBody->turnOnStaticFlag();
-	enemyRangeCollider->addComponent<BasicEnemySearchRangeScript>();
-
-	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
-	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
-	enemyMoveOnTerrainScript->setObjectHeight(3.0f);
-	//enemy->getTransform()->setPosition(0, 0, 0);
-	//enemy->getTransform()->setRotation(0, 0, 0);
-
-	enemy->addComponent<DamageableScript>()->setMaxHp(50.0f);
 
 	// 2단계
 
@@ -660,13 +594,20 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// 맵등록 + 맵을 사용할 Script 등록
 	Terrain * groundTerrain = GenerateTerrain();
 	playerMoveOnTerrainScript->setTerrain(groundTerrain);
-	enemyMoveOnTerrainScript->setTerrain(groundTerrain);
+	//enemy1MoveOnTerrainScript->setTerrain(groundTerrain);
+	enemy2MoveOnTerrainScript->setTerrain(groundTerrain);
+	enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
+	enemy4MoveOnTerrainScript->setTerrain(groundTerrain);
+	enemy5MoveOnTerrainScript->setTerrain(groundTerrain);
+	enemy6MoveOnTerrainScript->setTerrain(groundTerrain);
+
+
 
 	// 하드코딩 스타트지점 맞추기------------------------------------------------------------------------------
-	float tempHeight = 0.0f;
-	groundTerrain->getHeight(enemy->getTransform()->getWorldPosition(), &tempHeight);
-	const Vector3 & startPoint = enemyBasicEnemyScript->getStartPoint();
-	enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
+	//float tempHeight = 0.0f;
+	//groundTerrain->getHeight(enemy->getTransform()->getWorldPosition(), &tempHeight);
+	//const Vector3 & startPoint = enemyBasicEnemyScript->getStartPoint();
+	//enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
 	//---------------------------------------------------------------------------------------------------------
 
 

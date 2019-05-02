@@ -76,8 +76,8 @@ void Physics::init()
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
 	// 다이나믹 월드에 중력 적용한다.
-	// y방향으로 -10만큼 설정
-	dynamicsWorld->setGravity(btVector3(0, -20, 0));
+	// y방향으로 -30만큼 설정
+	dynamicsWorld->setGravity(btVector3(0, -30, 0));
 
 	currentPhysics = this;
 	// 콜백함수 등록
