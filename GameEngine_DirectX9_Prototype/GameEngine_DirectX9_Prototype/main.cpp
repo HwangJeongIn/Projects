@@ -63,8 +63,8 @@ int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSyste
 	::ZeroMemory(&msg, sizeof(MSG));
 
 	//static float lastTime = (float)timeGetTime(); 
-	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
-	objToAccessSystem.getGameUI().setStartSceneUI();
+	//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+	//objToAccessSystem.getGameUI().setStartSceneUI();
 	Scene * scene = &objToAccessSystem.getScene();
 
 
@@ -439,7 +439,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * dummy = GameObject::Instantiate("dummy", "Dummy");
 	Locator::provideGameUI(&device, dummy);
 
-	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
+	Locator::provideAudio(Locator::SystemType::NULLTYPE);
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
@@ -494,6 +494,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//Scene의 카메라와 기본 월드 세팅을 해준다.
 	GameObject * mainCamera = GameObject::Instantiate("mainCamera", "MainCamera");
 	mainCamera->addComponent<MainCamera>();
+
+	//mainCamera->getTransform()->setWorldPosition(0, 20, 10);
+	//mainCamera->getTransform()->setWorldRotation(0, 180, 0);
 	mainCamera->getTransform()->setWorldPosition(0, 50, -100);
 	mainCamera->getTransform()->setWorldRotation(25, 0, 0);
 
@@ -578,8 +581,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(2);
 
-	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
 	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
@@ -613,7 +616,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
 	fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
-	fbxModelRendererEnemy->setScaleFactor(Vector3(20, 20, 20));
+	enemy->getTransform()->setLocalScale(20, 20, 20);
+	//fbxModelRendererEnemy->setScaleFactor(Vector3(20, 20, 20));
 	//BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
 
 

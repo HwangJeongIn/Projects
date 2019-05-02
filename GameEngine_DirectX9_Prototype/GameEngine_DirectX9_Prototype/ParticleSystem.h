@@ -116,7 +116,17 @@ private :
 public:
 	FireExplosion(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
 	bool init();
+	virtual ~FireExplosion()
+	{
+		if (declaration)
+			declaration->Release();
 
+		if (constTable)
+			constTable->Release();
+
+		if (fireExplosionShader)
+			fireExplosionShader->Release();
+	}
 	virtual void resetParticle(ParticleAttribute & attribute);
 	virtual void update(float deltaTime);
 	virtual void render();

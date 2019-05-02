@@ -42,6 +42,7 @@ ParticleSystem::~ParticleSystem()
 		vb->Release();
 	if (texture)
 		texture->Release();
+
 }
 
 bool ParticleSystem::init(const char * texFileName)

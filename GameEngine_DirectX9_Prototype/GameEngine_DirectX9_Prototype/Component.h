@@ -424,11 +424,15 @@ public:
 	void setWorldPosition(const Vector3 & other);
 	void setWorldRotation(const Vector3 & other);
 
+	void setLocalScale(const Vector3 & other) { scale = other; }
+	// 현재는 로컬과 같지만 변경예정
 	void setWorldScale(const Vector3 & other) { scale = other; }
 
 	void setWorldPosition(float x, float y, float z);
 	void setWorldRotation(float x, float y, float z);
 
+	void setLocalScale(float x, float y, float z) { scale = { x,y,z }; }
+	// 현재는 로컬과 같지만 변경예정
 	void setWorldScale(float x, float y, float z) { scale = { x,y,z }; }
 
 	void setWorldTransform(const Vector3 & position, const Vector3 & rotation, const Vector3 & scale)
@@ -912,9 +916,15 @@ private:
 	IDirect3DVertexDeclaration9* declaration;
 	IDirect3DVertexShader9* fbxModelRendererWithAnimationShader;
 	ID3DXConstantTable* constTable;
-	D3DXHANDLE worldViewProjectionMatrixHandle;
+	D3DXHANDLE viewProjectionMatrixHandle;
+	D3DXHANDLE worldMatrixHandle;
+	D3DXHANDLE cameraPositionHandle;
+
+	D3DXHANDLE textureHandle;
+	D3DXCONSTANT_DESC textureDesc;
+
 	// 스케일 관련 변수
-	Vector3 scaleFactor;
+	//Vector3 scaleFactor;
 	D3DXHANDLE scaleFactorHandle;
 
 
@@ -1062,8 +1072,8 @@ public:
 	void playWithFileName(const string & animationFileName);
 	void stop();
 
-	void setScaleFactor(const Vector3 & scaleFactor);
-	const Vector3 & getScaleFactor() const { return scaleFactor; }
+	//void setScaleFactor(const Vector3 & scaleFactor);
+	//const Vector3 & getScaleFactor() const { return scaleFactor; }
 
 
 	FbxModelAnimations * getAnimations()

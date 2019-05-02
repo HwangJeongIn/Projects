@@ -1385,6 +1385,7 @@ void FbxModelRenderer::render()
 		tempMaterialForMesh = materialsTable.find(meshesForShading[i]);
 		tempTexturesForMesh = texturesTable.find(meshesForShading[i]);
 
+
 		material = nullptr;
 		texture = nullptr;
 
@@ -1416,7 +1417,7 @@ void FbxModelRenderer::render()
 		// 쉐이더 지정 // 내부적으로 빛 계산도 다 해준다.
 		device->SetVertexShader(fbxModelRendererWithAnimationShader);
 		device->SetVertexDeclaration(declaration);
-
+		//device->LightEnable(0, false);
 
 		// 소스 지정
 		device->SetStreamSource(0, meshesForShading[i]->vb, 0, sizeof(FbxModelVertex));
@@ -1424,6 +1425,8 @@ void FbxModelRenderer::render()
 
 		D3DXMATRIX viewMatrix;
 		D3DXMATRIX projectionMatrix;
+		const Vector3 & cameraPosition = gameObject->getScene().getMainCamera()->getTransform()->getWorldPosition();
+		const Vector3 & scaleFactor = gameObject->getTransform()->getLocalScale();
 
 		// 먼저 카메라 부터 최신화
 		device->GetTransform(D3DTS_VIEW, &viewMatrix);
@@ -1432,12 +1435,18 @@ void FbxModelRenderer::render()
 
 		//gameObject->getScene().getMainCamera()->getComponent<MainCamera>()->getViewMatrix(&viewMatrix);
 		/*쉐이더 파라미터 초기화*/
-		// worldViewProjection 초기화
 		constTable->SetMatrix
 		(
 			device,
-			worldViewProjectionMatrixHandle,
-			&D3DXMATRIX(transform->getTransformMatrix() * viewMatrix * projectionMatrix)
+			worldMatrixHandle,
+			&D3DXMATRIX(transform->getTransformMatrix())
+		);
+
+		constTable->SetMatrix
+		(
+			device,
+			viewProjectionMatrixHandle,
+			&D3DXMATRIX(viewMatrix * projectionMatrix)
 		);
 
 		constTable->SetVector
@@ -1447,22 +1456,35 @@ void FbxModelRenderer::render()
 			&D3DXVECTOR4(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ(),0)
 		);
 
+		constTable->SetVector
+		(
+			device,
+			cameraPositionHandle,
+			&D3DXVECTOR4(cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(),1)
+		);
+
 		// 텍스처 지정
-
-
-
-		// rendering-----------------------------------------------------
 		if(material)
 			device->SetMaterial(material);
-		if(texture)
-			device->SetTexture(0, texture);
-		
+		if (texture)
+		{
+			device->SetTexture(textureDesc.RegisterIndex, texture);
+			//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
+			//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+			//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
+			// 초기화당시 필터링 걸어준다.
+		}
+
+		/*쉐이더 파라미터 초기화 완료*/
+
+
 		device->DrawIndexedPrimitive(
 			D3DPT_TRIANGLELIST, 0, 0, meshesForShading[i]->vertexCount, 0, meshesForShading[i]->triCount);
 
 
 		device->SetVertexShader(NULL);
 		device->SetVertexDeclaration(NULL);
+		//device->LightEnable(0, true);
 
 
 
@@ -1562,8 +1584,33 @@ void FbxModelRenderer::start()
 	if (compiledCode)
 		compiledCode->Release();
 
-	worldViewProjectionMatrixHandle = constTable->GetConstantByName(0, "WorldViewProjectionMatrix");
+	viewProjectionMatrixHandle = constTable->GetConstantByName(0, "ViewProjectionMatrix");
+	worldMatrixHandle = constTable->GetConstantByName(0, "WorldMatrix");
+	cameraPositionHandle = constTable->GetConstantByName(0, "CameraPosition");
 	scaleFactorHandle = constTable->GetConstantByName(0, "ScaleFactor");
+	textureHandle = constTable->GetConstantByName(0, "Texture");
+	unsigned int uint;
+	constTable->GetConstantDesc(textureHandle, &textureDesc, &uint);
+
+	device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+
+	/*
+	D3DTEXF_POINT
+	D3DTEXF_POINT
+	D3DTEXF_POINT
+
+	D3DTEXF_LINEAR
+	D3DTEXF_LINEAR
+	D3DTEXF_LINEAR
+
+	D3DTEXF_ANISOTROPIC
+	D3DTEXF_ANISOTROPIC
+	D3DTEXF_ANISOTROPIC
+	*/
+
+
 }
 
 void FbxModelRenderer::onDestroy()
@@ -1617,6 +1664,17 @@ void FbxModelRenderer::onDestroy()
 		if (scene)
 			scene->Destroy();
 
+		if (declaration)
+			declaration->Release();
+
+		if(constTable)
+			constTable->Release();
+
+		if (fbxModelRendererWithAnimationShader)
+			fbxModelRendererWithAnimationShader->Release();
+
+
+
 		//d3d::Release<ID3DXMesh*>(mesh);
 
 		// 텍스처만 할당된 값이고 재질은 복사된 값이다.
@@ -1627,9 +1685,11 @@ void FbxModelRenderer::onDestroy()
 
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
 	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr),
-	scaleFactor(1,1,1),
+	/*scaleFactor(1,1,1),*/ scaleFactorHandle(0),
 	// 쉐이더
-	declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr), worldViewProjectionMatrixHandle(0)
+	declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr),
+	viewProjectionMatrixHandle(0), worldMatrixHandle(0), cameraPositionHandle(0),
+	textureHandle(0), textureDesc{nullptr}
 {
 	start();
 }
@@ -1646,10 +1706,10 @@ void FbxModelRenderer::stop()
 }
 
 
-void FbxModelRenderer::setScaleFactor(const Vector3 & scaleFactor)
-{
-	this->scaleFactor.setVector3(scaleFactor.getX(), scaleFactor.getX(), scaleFactor.getX());
-}
+//void FbxModelRenderer::setScaleFactor(const Vector3 & scaleFactor)
+//{
+//	this->scaleFactor.setVector3(scaleFactor.getX(), scaleFactor.getX(), scaleFactor.getX());
+//}
 
 
 
@@ -2111,17 +2171,20 @@ void FbxModelRenderer::processVertices(MeshForShading * mesh, FbxModelMesh * fbx
 		{
 			//D3DXVECTOR3 temp = tVertex->getPositionWithAnimation();
 			 const D3DXMATRIX & tempAnimationMatrix = tVertex->getAnimationMatrix();
+			 const FbxDouble3 & tempPosition = tVertex->getPosition();
+			 const FbxDouble3 & tempNormal = tVertex->getNormal();
+			 const FbxDouble2 & tempUV = tVertex->getUV();
 
 			// 각각의 정보를 초기화 시켜준다.
 			fbxV[i] =
 			{
 				// Position
 
-				(float)tVertex->getPosition().mData[0] ,(float)tVertex->getPosition().mData[1], (float)tVertex->getPosition().mData[2],
+				(float)tempPosition.mData[0] ,(float)tempPosition.mData[1], (float)tempPosition.mData[2],
 				// Normal
-				(float)tVertex->getNormal().mData[0],(float)tVertex->getNormal().mData[1], (float)tVertex->getNormal().mData[2],
+				(float)tempNormal.mData[0],(float)tempNormal.mData[1], (float)tempNormal.mData[2],
 				// UV
-				(float)tVertex->getUV().mData[0],(float)tVertex->getUV().mData[1],
+				(float)tempUV.mData[0],(float)tempUV.mData[1],
 				// AnimationMatrix
 				tempAnimationMatrix._11,tempAnimationMatrix._12,tempAnimationMatrix._13,tempAnimationMatrix._14,
 				tempAnimationMatrix._21,tempAnimationMatrix._22,tempAnimationMatrix._23,tempAnimationMatrix._24,
