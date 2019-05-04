@@ -122,6 +122,8 @@
 
 	void Scene::fixedUpdate()
 	{
+		// dumpAllGameObjects();
+
 		unsigned int count = rootGameObjects.size();
 		for (int i = 0; i < count; ++i)
 		{
@@ -388,5 +390,22 @@
 	{
 		if (mainObjectsTable.find(MOT_MAINCAMERA) == mainObjectsTable.end()) return nullptr;
 		return mainObjectsTable[MOT_MAINCAMERA];
+	}
+
+	GameObject * Scene::findWithNamePath(const string & namePath)
+	{
+		map<string, GameObject *>::iterator it = gameObjectsTable.find(namePath);
+		if (it == gameObjectsTable.end()) return nullptr;
+		return (*it).second;
+	}
+
+	void Scene::dumpAllGameObjects()
+	{
+		Trace::Write("TAG_INFO2", "DumpStart");
+		for (auto it = gameObjectsTable.begin(); it != gameObjectsTable.end(); ++it)
+		{
+			Trace::Write("TAG_INFO2", (*it).first);
+		}
+
 	}
 

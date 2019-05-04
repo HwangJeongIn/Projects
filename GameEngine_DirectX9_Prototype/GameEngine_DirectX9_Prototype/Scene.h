@@ -90,6 +90,10 @@ public :
 
 	GameObject * getMainCamera();
 
+	GameObject * findWithNamePath(const string & namePath);
+
+	void dumpAllGameObjects();
+
 
 
 };

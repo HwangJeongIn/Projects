@@ -184,6 +184,7 @@
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ShaderContainer.cpp" />
     <ClCompile Include="Trace.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="WeightOfBones.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="ShaderContainer.h" />
     <ClInclude Include="Trace.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="WeightOfBones.h" />

@@ -1106,6 +1106,186 @@ void MainCamera::getViewMatrix(D3DXMATRIX* v)
 
 }
 
+void GamePlayManager::removeObjectsIfNotExist(StageType stageType)
+{
+	GameObject * object = nullptr;
+	pair<multimap<StageType, string>::iterator, multimap<StageType, string>::iterator> equalRange = gameObjectsOfStages.equal_range(stageType);
+	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
+	{
+		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
+		object = gameObject->getScene().findWithNamePath((*it).second);
+		// 오브젝트가 없으면 등록해제한다
+		if (!object)
+		{
+			unregisterStageObject(stageType, (*it).second);
+		}
+	}
+}
+
+void GamePlayManager::resetCurrentStage()
+{
+	resetStage(currentStage);
+}
+
+void GamePlayManager::resetStage(StageType stageType)
+{
+	removeObjectsIfNotExist(stageType);
+	// 일단 렌더만 비활성화해준다.
+	resetFbxModelRenderer(stageType);
+}
+
+void GamePlayManager::setStage(StageType stageType)
+{
+	removeObjectsIfNotExist(stageType);
+	// 일단 렌더만 활성화해준다.
+	setFbxModelRenderer(stageType);
+}
+
+void GamePlayManager::resetFbxModelRenderer(StageType stageType)
+{
+	FbxModelRenderer * fbxModelRenderer = nullptr;
+	GameObject * object = nullptr;
+	pair<multimap<StageType, string>::iterator, multimap<StageType, string>::iterator> equalRange = gameObjectsOfStages.equal_range(stageType);
+	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
+	{
+		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
+		object = gameObject->getScene().findWithNamePath((*it).second);
+		// 오브젝트가 없으면 다음 객체를 찾아본다
+		if (!object) continue;
+
+		// 오브젝트가 있으면 FbxModelRenderer를 받아본다
+		fbxModelRenderer = object->getComponent<FbxModelRenderer>();
+		// FbxModelRenderer가 없으면 다음 객체를 찾아본다
+		if (!fbxModelRenderer) continue;
+
+		// 이스테이지에 등록된 객체들에 대해서 FbxModelRenderer플래그를 꺼준다.
+		fbxModelRenderer->setUpdateFlag(false);
+	}
+}
+
+void GamePlayManager::setFbxModelRenderer(StageType stageType)
+{
+	FbxModelRenderer * fbxModelRenderer = nullptr;
+	GameObject * object = nullptr;
+	pair<multimap<StageType, string>::iterator, multimap<StageType, string>::iterator> equalRange = gameObjectsOfStages.equal_range(stageType);
+	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
+	{
+		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
+		object = gameObject->getScene().findWithNamePath((*it).second);
+		// 오브젝트가 없으면 다음 객체를 찾아본다
+		if (!object) continue;
+
+		// 오브젝트가 있으면 FbxModelRenderer를 받아본다
+		fbxModelRenderer = object->getComponent<FbxModelRenderer>();
+		// FbxModelRenderer가 없으면 다음 객체를 찾아본다
+		if (!fbxModelRenderer) continue;
+
+		// 이스테이지에 등록된 객체들에 대해서 FbxModelRenderer플래그를 켜준다.
+		fbxModelRenderer->setUpdateFlag(true);
+	}
+}
+
+void GamePlayManager::changePlayerPosition(StageType stageType)
+{
+	if (!player) return;
+
+	map<StageType, pair<Vector3, Vector3>>::iterator it = stageStartPoints.find(stageType);
+	// 만약 등록된 시작위치가 없다면 리턴
+	if (it == stageStartPoints.end()) return;
+
+	// 포지션 지정
+	player->getTransform()->setWorldPosition((*it).second.first);
+	// 로테이션 지정
+	player->getTransform()->setWorldRotation((*it).second.second);
+
+}
+
+void GamePlayManager::start()
+{
+	if (!player)
+	{
+		// 플레이어를 찾아준다.
+		player = gameObject->getScene().findWithNamePath("/player");
+	}
+
+	// 각스테이지의 시작지점을 정해준다 // 월드좌표기준
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TUTORIAL, pair<Vector3, Vector3>(Vector3(0, 0, 0), Vector3(0, 0, 0))));
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_ONE, pair<Vector3, Vector3>(Vector3(50, 0, 50), Vector3(0, 0, 0))));
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TWO, pair<Vector3, Vector3>(Vector3(100, 0, 100), Vector3(0, 0, 0))));
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_BOSS, pair<Vector3, Vector3>(Vector3(150, 0, 150), Vector3(0, 0, 0))));
+}
+
+void GamePlayManager::update()
+{
+	if (InputManager::GetKeyDown(0x33))
+	{
+		changeStage(StageType::STAGE_TUTORIAL);
+	}
+	else if (InputManager::GetKeyDown(0x34))
+	{
+		changeStage(StageType::STAGE_ONE);
+	}
+	else if (InputManager::GetKeyDown(0x35))
+	{
+		changeStage(StageType::STAGE_TWO);
+	}
+	else if (InputManager::GetKeyDown(0x36))
+	{
+		changeStage(StageType::STAGE_BOSS);
+	}
+}
+
+
+void GamePlayManager::resetAllStage()
+{
+	resetStage(StageType::STAGE_TUTORIAL);
+	resetStage(StageType::STAGE_ONE);
+	resetStage(StageType::STAGE_TWO);
+	resetStage(StageType::STAGE_BOSS);
+}
+
+void GamePlayManager::registerStageObject(StageType stageType, const string & namePath)
+{
+	// 중복 등록일수도 있기 때문에 같은 스테이지에 있는 객체들의 namePath들을 전부 받아서 만약 같은 namePath가 있다면 리턴한다.
+	pair<multimap<StageType, string>::iterator, multimap<StageType, string>::iterator> equalRange =  gameObjectsOfStages.equal_range(stageType);
+	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
+	{
+		// 같은스테이지에 중복된 객체가 나온상황 리턴
+		if ((*it).second == namePath) return;
+	}
+
+	// 추가해줘야할 상황
+	gameObjectsOfStages.insert(pair<StageType, string>(stageType, namePath));
+}
+
+void GamePlayManager::unregisterStageObject(StageType stageType, const string & namePath)
+{
+	pair<multimap<StageType, string>::iterator, multimap<StageType, string>::iterator> equalRange = gameObjectsOfStages.equal_range(stageType);
+	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
+	{
+		if ((*it).second == namePath)
+		{
+			// 삭제하려는 객체가 존재할때 삭제해준다.
+			gameObjectsOfStages.erase(it);
+		}
+	}
+}
+
+void GamePlayManager::changeStage(StageType stageType)
+{
+	// 현재스테이지를 먼저 reset해준다 
+	// reset / set 내부적으로 현재존재하지않는 오브젝트들을 멀티맵에서 삭제한다.
+	resetCurrentStage();
+
+	// 현재 스테이지를 설정
+	currentStage = stageType;
+	setStage(stageType);
+
+	// 플레이어 위치를 바꿔준다.
+	changePlayerPosition(stageType);
+}
+
+
 MeshRenderer::MeshRenderer(GameObject * go, Transform * tf)
 	: Component(go, tf), mesh(nullptr)
 {
@@ -3458,7 +3638,7 @@ bool BulletController::shootBullet(float power)
 
 	// 초기 위치를 잡고 쏜다
 	bulletObj->getTransform()->setLocalPosition(gameObject->getTransform()->getWorldPosition() + direction + Vector3(0,1,0));
-	bulletObj->getComponent<RigidBody>()->addForce(power * FrameTime::GetDeltaTime() * .1f * direction);
+	bulletObj->getComponent<RigidBody>()->addForce(power * 1.0f/(float)FrameTime::GetDeltaTime() * direction);
 
 	// 최종적으로 삭제
 	bullets.erase(bulletToShoot);
@@ -4378,5 +4558,4 @@ void BillBoard::optimizeMesh()
 		nullptr
 	);
 }
-
 

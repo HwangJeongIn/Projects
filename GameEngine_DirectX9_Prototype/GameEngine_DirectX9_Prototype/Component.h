@@ -828,6 +828,72 @@ public :
 	void getViewMatrix(D3DXMATRIX * V);
 };
 
+class GamePlayManager : public Component
+{
+public :
+	enum StageType
+	{
+		STAGE_NONE,
+		STAGE_TUTORIAL,
+		STAGE_BOSS,
+		STAGE_ONE,
+		STAGE_TWO
+	};
+private:
+	// 스테이지의 이름과 오브젝트의 이름경로를 통해서 등록한다.
+	// 만약에 스테이지가 바뀐다면 여기서도 다른 스테이지에 있는 것들을 더이상 렌더링하지 않도록 최적화를 시켜준다.
+	// 가장 문제가되는 것들은 FbxModelRenderer안 render함수인데 이를 켜고 끌수 있기 때문에 그 처리를 해준다.
+
+	// GameObject * 를 mapped value로 설정하지 않은 이유는 이 객체가 삭제되었을때 제어하기가 어렵기 때문이다.
+	// namePath로 등록해서 GameObject를 받아서 사용한다 // 만약 GameObject가 삭제된 상황이면 unregister한다 // findWithNamePath :: O(log n)
+	multimap<StageType, string> gameObjectsOfStages;
+	StageType currentStage;
+	GameObject * player;
+
+	// 스테이지 기준으로 초기 플레이어가 바라볼 방향과 회전값을 넣어준다.
+	// start함수에서 하드코딩으로 넣어준다. // 나중에 json파일읽어서 넣어줄예정
+	map<StageType, pair<Vector3, Vector3>> stageStartPoints;
+
+
+	void removeObjectsIfNotExist(StageType stageType);
+
+	void resetCurrentStage();
+	void resetStage(StageType stageType);
+	void setStage(StageType stageType);
+	
+	// 렌더상태를 리셋
+	void resetFbxModelRenderer(StageType stageType);
+	// 렌더상태를 활성화
+	void setFbxModelRenderer(StageType stageType);
+
+
+	void changePlayerPosition(StageType stageType);
+
+protected:
+	virtual void start();
+	virtual void update();
+public:
+	GamePlayManager(GameObject * go, Transform * tf)
+		: Component(go, tf), currentStage(STAGE_NONE), player(nullptr)
+	{
+		start();
+	}
+
+	~GamePlayManager()
+	{
+		onDestroy();
+	}
+
+	void resetAllStage();
+	void registerStageObject(StageType stageType, const string & namePath);
+	void unregisterStageObject(StageType stageType, const string & namePath);
+
+	void changeStage(StageType stageType);
+
+	void setPlayer(GameObject * player) { this->player = player; }
+	GameObject * getPlayer() { return player; }
+};
+
 
 // AABB를 이용한 BoxCollider
 // 컴포넌트를 추가하면 좌표를 중심으로 X Y Z 방향

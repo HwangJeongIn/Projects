@@ -87,6 +87,9 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderContainer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Trace.h">
@@ -147,6 +150,9 @@
       <Filter>FMOD</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderContainer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

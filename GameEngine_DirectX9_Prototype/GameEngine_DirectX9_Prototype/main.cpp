@@ -6,6 +6,7 @@
 #include "gameui.h"
 #include <QtWidgets/qapplication.h>
 
+#include "ShaderContainer.h"
 
 //
 // Globals
@@ -22,8 +23,8 @@ int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSyste
 	::ZeroMemory(&msg, sizeof(MSG));
 
 	//static float lastTime = (float)timeGetTime(); 
-	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
-	objToAccessSystem.getGameUI().setStartSceneUI();
+	//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+	//objToAccessSystem.getGameUI().setStartSceneUI();
 	Scene * scene = &objToAccessSystem.getScene();
 
 
@@ -394,9 +395,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	//////////////////////////////////////////////////////////////////////////
 
-	/*
-	서비스 등록
-	*/
+	/*서비스 등록*/
 	Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
 	// 디바이스를 여기서 초기화시켜줘야한다 // 더미객체 하나가 startScene에 남아있다.
 	GameObject * dummy = GameObject::Instantiate("dummy", "Dummy");
@@ -407,10 +406,13 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
 
-	// Gizmos클래스 초기화
+	/*Gizmos 초기화*/
 	Gizmos::InitGizmos(device);
 
-	// 디버깅용 txt파일을 로드
+	/* ShaderContainer 초기화 */
+	ShaderContainer::InitAllShader(device);
+
+	/* 디버깅용 클래스 초기화 */
 	Trace::LoadFileNames();
 	Trace::Clear("TAG_DEBUG");
 
@@ -461,31 +463,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//mainCamera->getTransform()->setWorldPosition(0, 20, 10);
 	//mainCamera->getTransform()->setWorldRotation(0, 180, 0);
 	mainCamera->getTransform()->setWorldPosition(0, 50, -100);
-	mainCamera->getTransform()->setWorldRotation(25, 0, 0);
-
-
-
-	//// remover
-	//GameObject * remover = GameObject::Instantiate("remover", "Remover");
-	////ground->addComponent<MeshRenderer>()->loadXFile("car.x");
-	//remover->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//RigidBody * removerRigidBody = remover->addComponent<RigidBody>();
-	//remover->getTransform()->setPosition(0, 0, 0);
-	//removerRigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
-	////removerRigidBody->turnOnIsTriggerFlag();
-	////removerRigidBody->turnOnStaticFlag();
-
-	//// remover2
-	//GameObject * remover2 = GameObject::Instantiate("remover2", "Remover");
-	////ground->addComponent<MeshRenderer>()->loadXFile("car.x");
-	//remover2->addComponent<MeshRenderer>()->loadXFile("bigship1.x");
-	//RigidBody * remover2RigidBody = remover2->addComponent<RigidBody>();
-	//remover2->getTransform()->setPosition(10, 0, 0);
-	//remover2RigidBody->setBoxCollider(Vector3{ 4, 4, 4 });
-	//remover2RigidBody->turnOnIsTriggerFlag();
-	//remover2RigidBody->turnOnStaticFlag();
-
-
+	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 
 	//D3DMATERIAL9 mtrl;
 	//// Set the RGBA for diffuse reflection.
@@ -511,34 +489,10 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//mtrl.Emissive.a = 0.0f;
 	//groundTerrain->setMaterial(mtrl);
 
-
-	// -1단계
-	//GameObject * player = GameObject::Instantiate("player", "Player");
-	//															// Fir_Tree.fbx / free_male_1.FBX / Fortress_Gate.FBX / Rabbit.fbx / akai_e_espiritu.fbx / Crouch Walk Left.fbx / Standing Aim Recoil.fbx
-	//// standing run forward.fbx
-	//FbxModelRenderer * fbxModelRendererplayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererplayer->loadFbxFile("akai_e_espiritu.fbx");
-	////fbxModelRendererplayer->play("mixamo.com");
-	////fbxModelRendererplayer->setScale(Vector3(3,1,3));
-	//AnimationFSM * playerAnimationFSM = player->addComponent<AnimationFSM>();
-
-	//player->getTransform()->setRotation(Vector3( 0,180,0 ));
-	//player->getTransform()->setPosition(Vector3(0, 00, 0));
-	//player->addComponent<PlayerScript>();
-	//RigidBody * playerRigidBody = player->addComponent<RigidBody>();
-	//playerRigidBody->setSphereCollider(2);
-
-
-
-	// 0단계
-	//GameObject * car0 = GameObject::Instantiate("car0", "Car");
-	//car0->addComponent<MeshRenderer>()->loadXFile("car.x");
-	//car0->addComponent<RigidBody>()->setSphereCollider(2);
-	///car0->addComponent<BoxCollider>();
-
 	// player
 	GameObject * player = GameObject::Instantiate("player", "Player");
-
+	// 플레이어가 먼저 등록되고 이컴포넌트를 넣어주면 따로 setPlayer를 안해줘도 알아서 GamePlayManager에 등록된다. // start함수
+	GamePlayManager * mainCameraGamePlayManager = mainCamera->addComponent<GamePlayManager>();
 	// player children
 	player->addChild(mainCamera);
 	GameObject * bulletSpawner = GameObject::Instantiate("bulletSpawner", "BulletSpawner");
@@ -555,9 +509,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//playerRigidBody->turnOnStaticFlag();
 	//playerRigidBody->turnOnIsTriggerFlag();
 
-	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
 	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
@@ -571,9 +525,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 	// Enemys
-	MoveOnTerrainScript * enemy1MoveOnTerrainScript = GenerateBasicEnemy(Vector3(-202,3,-305) , true);
-	MoveOnTerrainScript * enemy2MoveOnTerrainScript = GenerateBasicEnemy(Vector3(148,3,-375));
-	MoveOnTerrainScript * enemy3MoveOnTerrainScript = GenerateBasicEnemy(Vector3(477,3,-475));
+	//MoveOnTerrainScript * enemy1MoveOnTerrainScript = GenerateBasicEnemy(Vector3(-202,3,-305) , true);
+	//MoveOnTerrainScript * enemy2MoveOnTerrainScript = GenerateBasicEnemy(Vector3(148,3,-375));
+	//MoveOnTerrainScript * enemy3MoveOnTerrainScript = GenerateBasicEnemy(Vector3(477,3,-475));
 	MoveOnTerrainScript * enemy4MoveOnTerrainScript = GenerateBasicEnemy(Vector3(395,3,-288));
 	MoveOnTerrainScript * enemy5MoveOnTerrainScript = GenerateBasicEnemy(Vector3(425,4,106));
 	MoveOnTerrainScript * enemy6MoveOnTerrainScript = GenerateBasicEnemy(Vector3(457, 3, 450));
@@ -595,8 +549,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	Terrain * groundTerrain = GenerateTerrain();
 	playerMoveOnTerrainScript->setTerrain(groundTerrain);
 	//enemy1MoveOnTerrainScript->setTerrain(groundTerrain);
-	enemy2MoveOnTerrainScript->setTerrain(groundTerrain);
-	enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
+	//enemy2MoveOnTerrainScript->setTerrain(groundTerrain);
+	//enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
 	enemy4MoveOnTerrainScript->setTerrain(groundTerrain);
 	enemy5MoveOnTerrainScript->setTerrain(groundTerrain);
 	enemy6MoveOnTerrainScript->setTerrain(groundTerrain);
@@ -609,13 +563,19 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//const Vector3 & startPoint = enemyBasicEnemyScript->getStartPoint();
 	//enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
 	//---------------------------------------------------------------------------------------------------------
+	// 모든 스테이지를 초기화해주고
+	mainCameraGamePlayManager->resetAllStage();
+	// 튜토리얼 스테이지로 설정해준다.
+	mainCameraGamePlayManager->changeStage(GamePlayManager::StageType::STAGE_TUTORIAL);
 
 
-
+	//device->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
 	EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, *dummy);
+
 
 
 	// void(*ptr_display)(void)

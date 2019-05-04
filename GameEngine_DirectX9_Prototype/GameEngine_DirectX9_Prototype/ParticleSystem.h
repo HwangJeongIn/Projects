@@ -108,24 +108,26 @@ protected:
 class FireExplosion : public ParticleSystem
 {
 private :
-	IDirect3DVertexDeclaration9* declaration;
-	IDirect3DVertexShader9* fireExplosionShader;
-	ID3DXConstantTable* constTable;
-	D3DXHANDLE viewProjectionMatrixHandle;
+	//IDirect3DVertexDeclaration9* declaration;
+	//IDirect3DVertexShader9* fireExplosionShader;
+	//ID3DXConstantTable* constTable;
+	//D3DXHANDLE viewProjectionMatrixHandle;
+	//string shaderFileName;
+	//string viewProjectionMatrixName;
 
 public:
 	FireExplosion(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
 	bool init();
 	virtual ~FireExplosion()
 	{
-		if (declaration)
-			declaration->Release();
+		//if (declaration)
+		//	declaration->Release();
 
-		if (constTable)
-			constTable->Release();
+		//if (constTable)
+		//	constTable->Release();
 
-		if (fireExplosionShader)
-			fireExplosionShader->Release();
+		//if (fireExplosionShader)
+		//	fireExplosionShader->Release();
 	}
 	virtual void resetParticle(ParticleAttribute & attribute);
 	virtual void update(float deltaTime);

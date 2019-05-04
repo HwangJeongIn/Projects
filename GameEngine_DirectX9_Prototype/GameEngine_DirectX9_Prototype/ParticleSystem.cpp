@@ -12,6 +12,7 @@
 
 #include "ParticleSystem.h"
 #include "ctime"
+#include "ShaderContainer.h"
 
 
 
@@ -156,8 +157,9 @@ void ParticleSystem::postRender()
 
 
 FireExplosion::FireExplosion(IDirect3DDevice9 * device, /*const D3DXMATRIX & viewMatrix,*/ const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin)
-	: ParticleSystem(device, /*viewMatrix,*/ textureFileName, numOfParticles, particleSize, origin),
-	declaration(nullptr), fireExplosionShader(nullptr), constTable(nullptr), viewProjectionMatrixHandle(0)
+	: ParticleSystem(device, /*viewMatrix,*/ textureFileName, numOfParticles, particleSize, origin)//,
+	// shaderFileName("FireExplosion.vs"), viewProjectionMatrixName("ViewProjectionMatrix")
+	//declaration(nullptr), fireExplosionShader(nullptr), constTable(nullptr), viewProjectionMatrixHandle(0)
 {
 	if (!device) return;
 	resetAllParticles();
@@ -166,83 +168,83 @@ FireExplosion::FireExplosion(IDirect3DDevice9 * device, /*const D3DXMATRIX & vie
 
 bool FireExplosion::init()
 {
-	HRESULT hr = 0;
+	//HRESULT hr = 0;
 
-	D3DVERTEXELEMENT9 decl[] =
-	{
-		/*
-		나중에 셰이더 코드의 구조체
-		struct VS_INPUT
-		{
-		vector positi : POSITION // POSITION0
-		: NORMAL0
-		: NORMAL1
-		: NORMAL2
-		}
-		과 매핑된다.
+	//D3DVERTEXELEMENT9 decl[] =
+	//{
+	//	/*
+	//	나중에 셰이더 코드의 구조체
+	//	struct VS_INPUT
+	//	{
+	//	vector positi : POSITION // POSITION0
+	//	: NORMAL0
+	//	: NORMAL1
+	//	: NORMAL2
+	//	}
+	//	과 매핑된다.
 
-		*/
-		// offsets in bytes
-		{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,   0 },
-		//{ 0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   1 },
-		//{ 0, 36, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2 },
-		D3DDECL_END()
-	};
+	//	*/
+	//	// offsets in bytes
+	//	{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+	//	{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,   0 },
+	//	//{ 0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   1 },
+	//	//{ 0, 36, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2 },
+	//	D3DDECL_END()
+	//};
 
 
-	hr = device->CreateVertexDeclaration(decl, &declaration);
-	if (FAILED(hr))
-	{
-		::MessageBox(0, "CreateVertexDeclaration() - FAILED", 0, 0);
-		return false;
-	}
-	
+	//hr = device->CreateVertexDeclaration(decl, &declaration);
+	//if (FAILED(hr))
+	//{
+	//	::MessageBox(0, "CreateVertexDeclaration() - FAILED", 0, 0);
+	//	return false;
+	//}
+	//
 
-	// 쉐이더 컴파일 / 핸들 받아오기
-	//------------------------------------------------------------------
-	ID3DXBuffer* compiledCode = 0;
-	ID3DXBuffer* errorBuffer = 0;
+	//// 쉐이더 컴파일 / 핸들 받아오기
+	////------------------------------------------------------------------
+	//ID3DXBuffer* compiledCode = 0;
+	//ID3DXBuffer* errorBuffer = 0;
 
-	hr = D3DXCompileShaderFromFile(
-		"FireExplosion.vs",
-		0,
-		0,
-		"Main", // entry point function name
-		"vs_1_1",
+	//hr = D3DXCompileShaderFromFile(
+	//	"FireExplosion.vs",
+	//	0,
+	//	0,
+	//	"Main", // entry point function name
+	//	"vs_1_1",
 
-		D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY | D3DXSHADER_DEBUG,
-		&compiledCode,
-		&errorBuffer,
-		&constTable);
+	//	D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY | D3DXSHADER_DEBUG,
+	//	&compiledCode,
+	//	&errorBuffer,
+	//	&constTable);
 
-	// output any error messages
-	if (errorBuffer)
-	{
-		::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
-		errorBuffer->Release();
-	}
+	//// output any error messages
+	//if (errorBuffer)
+	//{
+	//	::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
+	//	errorBuffer->Release();
+	//}
 
-	if (FAILED(hr))
-	{
-		::MessageBox(0, "D3DXCompileShaderFromFile() - FAILED", 0, 0);
-		return false;
-	}
+	//if (FAILED(hr))
+	//{
+	//	::MessageBox(0, "D3DXCompileShaderFromFile() - FAILED", 0, 0);
+	//	return false;
+	//}
 
-	hr = device->CreateVertexShader(
-		(DWORD*)compiledCode->GetBufferPointer(),
-		&fireExplosionShader);
+	//hr = device->CreateVertexShader(
+	//	(DWORD*)compiledCode->GetBufferPointer(),
+	//	&fireExplosionShader);
 
-	if (FAILED(hr))
-	{
-		::MessageBox(0, "CreateVertexShader - FAILED", 0, 0);
-		return false;
-	}
+	//if (FAILED(hr))
+	//{
+	//	::MessageBox(0, "CreateVertexShader - FAILED", 0, 0);
+	//	return false;
+	//}
 
-	if (compiledCode)
-		compiledCode->Release();
+	//if (compiledCode)
+	//	compiledCode->Release();
 
-	viewProjectionMatrixHandle = constTable->GetConstantByName(0, "ViewProjectionMatrix");
+	//viewProjectionMatrixHandle = constTable->GetConstantByName(0, "ViewProjectionMatrix");
 
 	return true;
 }
@@ -288,7 +290,7 @@ void FireExplosion::resetParticle(ParticleAttribute & attribute)
 
 	// 수명 2초동안 유지하도록 설정
 	attribute.age      = 0.0f;
-	attribute.lifeTime = getRandomFloat(0.1f, 1.5f);// lives for 2 seconds
+	attribute.lifeTime = getRandomFloat(0.1f, 2.5f);// lives for 2 seconds
 }
 
 void FireExplosion::update(float deltaTime)
@@ -356,12 +358,19 @@ void FireExplosion::render()
 
 
 	// 먼저 카메라 부터 최신화
-	this->device->GetTransform(D3DTS_VIEW, &viewMatrix);
+	device->GetTransform(D3DTS_VIEW, &viewMatrix);
+	device->GetTransform(D3DTS_PROJECTION, &projectionMatrix);
 	// viewProjection 초기화
-	constTable->SetMatrix(
-		device,
-		viewProjectionMatrixHandle,
-		&D3DXMATRIX(viewMatrix * projectionMatrix));
+	ShaderContainer::SetFireExplosionShaderParameters(texture,viewMatrix * projectionMatrix);
+
+	// 쉐이더를 설정해준다.
+	ShaderContainer::SetFireExplosionShader();
+
+
+	//constTable->SetMatrix(
+	//	device,
+	//	viewProjectionMatrixHandle,
+	//	&D3DXMATRIX(viewMatrix * projectionMatrix));
 
 	device->DrawPrimitive(
 		D3DPT_POINTLIST,
@@ -381,8 +390,8 @@ void FireExplosion::preRender()
 
 	// read, but don't write particles to z-buffer
 	//device->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	device->SetVertexShader(fireExplosionShader);
-	device->SetVertexDeclaration(declaration);
+	//device->SetVertexShader(fireExplosionShader);
+	//device->SetVertexDeclaration(declaration);
 }
 
 void FireExplosion::postRender()
