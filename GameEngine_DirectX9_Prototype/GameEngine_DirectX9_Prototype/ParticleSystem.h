@@ -12,7 +12,7 @@ public:
 	struct Particle
 	{
 		D3DXVECTOR3 position;
-		D3DCOLOR    color;
+		D3DXCOLOR    color;
 		static const DWORD FVF;
 	};
 
@@ -36,7 +36,7 @@ public:
 		bool        isAlive;
 	};
 
-	ParticleSystem(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin, float duration = 1.5f);
+	ParticleSystem(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin, float duration = 2.5f);
 	virtual ~ParticleSystem();
 
 	bool init(const char * texFileName);
@@ -76,7 +76,7 @@ public:
 		this->duration = duration;
 	}
 	float getDuration() const { return duration; }
-
+	float getCurrentDuraion() const { return currentDuration; }
 	void resetAllParticles();
 
 	virtual void resetParticle(ParticleAttribute & attribute) = 0;
@@ -97,6 +97,8 @@ protected:
 	vector<ParticleAttribute> particlesAttribute;
 
 	float duration;
+	float currentDuration;
+
 	float particleSize;       // size of particles
 
 	int maxNumOfParticles;
@@ -114,6 +116,7 @@ private :
 	//D3DXHANDLE viewProjectionMatrixHandle;
 	//string shaderFileName;
 	//string viewProjectionMatrixName;
+	float preExplosionFactor;
 
 public:
 	FireExplosion(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
@@ -128,6 +131,28 @@ public:
 
 		//if (fireExplosionShader)
 		//	fireExplosionShader->Release();
+	}
+	virtual void resetParticle(ParticleAttribute & attribute);
+	virtual void update(float deltaTime);
+	virtual void render();
+
+	virtual void preRender();
+	virtual void postRender();
+
+};
+
+class GateEffect : public ParticleSystem
+{
+private:
+
+	float preExplosionFactor;
+
+public:
+	GateEffect(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
+	bool init();
+	virtual ~GateEffect()
+	{
+
 	}
 	virtual void resetParticle(ParticleAttribute & attribute);
 	virtual void update(float deltaTime);

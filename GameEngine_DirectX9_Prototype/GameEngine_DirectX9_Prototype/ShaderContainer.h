@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <d3dx9.h>
+#include "Utility.h"
 
 using namespace std;
 
@@ -41,18 +42,21 @@ public :
 		{
 			if (declaration)
 				declaration->Release();
-			if (shader)
-				shader->Release();
+
 			if (constTable)
 				constTable->Release();
+
+			if (shader)
+				shader->Release();
 		}
 
 		void selectShader()
 		{
 			if (!device) return;
 
-			device->SetVertexShader(shader);
 			device->SetVertexDeclaration(declaration);
+			device->SetVertexShader(shader);
+
 		}
 
 		void addHandle(const string & variableName)
@@ -144,6 +148,14 @@ private :
 		ShaderFileNames.clear();
 		ShaderTable.clear();
 	}
+	static bool SetShader(const string & shaderFileName)
+	{
+		map<string, ShaderInfo *>::iterator it = ShaderTable.find(shaderFileName);
+		if (it == ShaderTable.end()) return false;
+		// 내부적으로 버텍스 선언과 쉐이더설정을 해준다.
+		(*it).second->selectShader();
+		return true;
+	}
 	static void InitFbxModelRendererWithAnimationShader(IDirect3DDevice9 * device);
 	static void InitFireExplosionShader(IDirect3DDevice9 * device);
 public :
@@ -162,11 +174,69 @@ public :
 	}
 
 
-	static bool SetFbxModelRendererWithAnimationShaderParameters(D3DXMATRIX & viewProjectionMatrix)
+	static bool SetFbxModelRendererWithAnimationShaderParameters(IDirect3DTexture9* texture, const D3DXMATRIX & viewProjectionMatrix,
+		const D3DXMATRIX & worldMatrix, const Vector3 & cameraPosition, const Vector3 & scaleFactor)
 	{
+		string shaderFileName = "FbxModelRendererWithAnimation.vs";
+		map<string, ShaderInfo *>::iterator it = ShaderTable.find(shaderFileName);
+		if (it == ShaderTable.end()) return false;
+
+		D3DXHANDLE * handle = GetHandle(shaderFileName, "ViewProjectionMatrix");
+		if (handle)
+		{
+			(*it).second->constTable->SetMatrix(
+				ShaderContainer::Device,
+				*handle,
+				&viewProjectionMatrix);
+		}
+
+		handle = GetHandle(shaderFileName, "WorldMatrix");
+		if (handle)
+		{
+			(*it).second->constTable->SetMatrix(
+				ShaderContainer::Device,
+				*handle,
+				&worldMatrix);
+		}
+
+		handle = GetHandle(shaderFileName, "CameraPosition");
+		if (handle)
+		{
+			(*it).second->constTable->SetVector
+			(
+				ShaderContainer::Device,
+				*handle,
+				&D3DXVECTOR4(cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(), 1)
+			);
+		}
+
+		handle = GetHandle(shaderFileName, "ScaleFactor");
+		if (handle)
+		{
+			(*it).second->constTable->SetVector
+			(
+				ShaderContainer::Device,
+				*handle,
+				&D3DXVECTOR4(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ(), 0)
+			);
+		}
+
+		// 텍스처 설정
+		D3DXCONSTANT_DESC * textureDesc = GetDescription(shaderFileName, "Texture");
+		if (textureDesc && texture)
+		{
+			Device->SetTexture(textureDesc->RegisterIndex, texture);
+		}
+		return true;
 
 	}
-	static bool SetFireExplosionShaderParameters(IDirect3DTexture9* texture, D3DXMATRIX & viewProjectionMatrix)
+
+	static bool SetFbxModelRendererWithAnimationShader()
+	{
+		string shaderFileName = "FbxModelRendererWithAnimation.vs";
+		return SetShader(shaderFileName);
+	}
+	static bool SetFireExplosionShaderParameters(IDirect3DTexture9* texture, const D3DXMATRIX & viewProjectionMatrix)
 	{
 		string shaderFileName = "FireExplosion.vs";
 		map<string, ShaderInfo *>::iterator it = ShaderTable.find(shaderFileName);
@@ -193,11 +263,7 @@ public :
 	static bool SetFireExplosionShader()
 	{
 		string shaderFileName = "FireExplosion.vs";
-		map<string, ShaderInfo *>::iterator it = ShaderTable.find(shaderFileName);
-		if (it == ShaderTable.end()) return false;
-		// 내부적으로 버텍스 선언과 쉐이더설정을 해준다.
-		(*it).second->selectShader();
-		return true;
+		return SetShader(shaderFileName);
 	}
 
 

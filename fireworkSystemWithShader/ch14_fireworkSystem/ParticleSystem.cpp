@@ -372,7 +372,7 @@ void FireExPlosion::preRender()
     device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
 	// read, but don't write particles to z-buffer
-	device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	//device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 	device->SetVertexShader(fireExplosionShader);
 	device->SetVertexDeclaration(declaration);
 }
@@ -381,7 +381,7 @@ void FireExPlosion::postRender()
 {
 	ParticleSystem::postRender();
 
-	device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	//device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 	device->SetVertexShader(NULL);
 	device->SetVertexDeclaration(NULL);
 }

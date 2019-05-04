@@ -511,6 +511,7 @@ public:
 
 //class AnimationFSM;
 class BulletController;
+class FbxModelRenderer;
 class PlayerScript : public Component
 {
 private:
@@ -523,6 +524,7 @@ private:
 	float moveSpeed;
 
 	BulletController * bulletController;
+	FbxModelRenderer * fbxModelRenderer;
 
 protected:
 	virtual void update();
@@ -531,7 +533,8 @@ protected:
 
 public:
 	PlayerScript(GameObject * go, Transform * tf)
-		: Component(go, tf), shootingPower(0.0f), chargingSpeed(6.0f), defaultShootingPower(30), maxShootingPower(100), bulletController(nullptr), moveSpeed(0.85f)
+		: Component(go, tf), shootingPower(0.0f), chargingSpeed(50.0f), defaultShootingPower(200), maxShootingPower(800), bulletController(nullptr), moveSpeed(0.85f),
+		fbxModelRenderer(nullptr)
 	{
 		start();
 	}
@@ -1049,23 +1052,25 @@ public :
 
 	};
 private:
+	// 투명하게만드는 알파블렌딩을위한 플래그
+	bool isTransparent;
 	// 업데이트 막기위한 플래그
 	bool updateFlag;
 
-	// 쉐이더 관련 변수들
-	IDirect3DVertexDeclaration9* declaration;
-	IDirect3DVertexShader9* fbxModelRendererWithAnimationShader;
-	ID3DXConstantTable* constTable;
-	D3DXHANDLE viewProjectionMatrixHandle;
-	D3DXHANDLE worldMatrixHandle;
-	D3DXHANDLE cameraPositionHandle;
+	//// 쉐이더 관련 변수들
+	//IDirect3DVertexDeclaration9* declaration;
+	//IDirect3DVertexShader9* fbxModelRendererWithAnimationShader;
+	//ID3DXConstantTable* constTable;
+	//D3DXHANDLE viewProjectionMatrixHandle;
+	//D3DXHANDLE worldMatrixHandle;
+	//D3DXHANDLE cameraPositionHandle;
 
-	D3DXHANDLE textureHandle;
-	D3DXCONSTANT_DESC textureDesc;
+	//D3DXHANDLE textureHandle;
+	//D3DXCONSTANT_DESC textureDesc;
 
-	// 스케일 관련 변수
-	//Vector3 scaleFactor;
-	D3DXHANDLE scaleFactorHandle;
+	//// 스케일 관련 변수
+	////Vector3 scaleFactor;
+	//D3DXHANDLE scaleFactorHandle;
 
 
 	// 여러가지 메쉬정보를 담고 있음
@@ -1119,6 +1124,20 @@ private:
 	//void processSubsets(ID3DXMesh * mesh);
 	//void optimizeMesh(ID3DXMesh * mesh);
 
+	void preRenderIfIsTransparent()
+	{
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+		device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+		device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+		//device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	}
+
+	void postRenderIfIsTransparent()
+	{
+		device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	}
 	//void optimizeMesh(ID3DXBuffer * adjBuffer, unsigned long optimizeFlag = DefaultOptimizeFlag);
 	//void setMtrlsAndTextures(ID3DXBuffer * mtrlBuffer, unsigned long numMtrls);
 	struct FbxModelVertex
@@ -1232,6 +1251,9 @@ public:
 	void loadFbxFileForAnimation(const string & fileName);
 
 	void setUpdateFlag(bool updateFlag) { this->updateFlag = updateFlag; }
+	bool getUpdateFlag() const { return updateFlag; }
+	void setIsTransparent(bool isTransparent) { this->isTransparent = isTransparent; }
+	bool getIsTransparent()const { return isTransparent; }
 
 };
 

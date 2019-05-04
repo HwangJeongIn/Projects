@@ -15,6 +15,7 @@
 
 #include "Utility.h"
 #include "Trace.h"
+#include "ShaderContainer.h"
 
 
 const D3DXVECTOR3 Transform::WorldRight{ 1,0,0 };
@@ -479,6 +480,15 @@ void PlayerScript::update()
 			bulletController->accelerate();
 	}
 
+	if (InputManager::GetKeyStay(0x33))
+	{
+		fbxModelRenderer->setIsTransparent(true);
+	}
+	else
+	{
+		fbxModelRenderer->setIsTransparent(false);
+	}
+
 	if (::GetAsyncKeyState('N') & 0x8000f)
 			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,-1,0 });
 
@@ -493,6 +503,8 @@ void PlayerScript::start()
 	{
 		bulletController = bulletSpawner->getComponent<BulletController>();
 	}
+
+	fbxModelRenderer = gameObject->getComponent<FbxModelRenderer>();
 }
 
 void PlayerScript::onCollisionStay(GameObjectWithCollision & other)
@@ -1110,14 +1122,19 @@ void GamePlayManager::removeObjectsIfNotExist(StageType stageType)
 {
 	GameObject * object = nullptr;
 	pair<multimap<StageType, string>::iterator, multimap<StageType, string>::iterator> equalRange = gameObjectsOfStages.equal_range(stageType);
-	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
+	multimap<StageType, string>::iterator it = equalRange.first;
+	while (it != equalRange.second)
 	{
 		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
 		object = gameObject->getScene().findWithNamePath((*it).second);
 		// 오브젝트가 없으면 등록해제한다
 		if (!object)
 		{
-			unregisterStageObject(stageType, (*it).second);
+			it = gameObjectsOfStages.erase(it);
+		}
+		else
+		{
+			++it;
 		}
 	}
 }
@@ -1217,7 +1234,7 @@ void GamePlayManager::start()
 
 void GamePlayManager::update()
 {
-	if (InputManager::GetKeyDown(0x33))
+	if (InputManager::GetKeyDown(0x37))
 	{
 		changeStage(StageType::STAGE_TUTORIAL);
 	}
@@ -1526,7 +1543,7 @@ void FbxModelRenderer::render()
 	map<MeshForShading *, vector<D3DMATERIAL9>>::iterator tempMaterialForMesh;
 	map<MeshForShading *, vector<IDirect3DTexture9*>>::iterator tempTexturesForMesh;
 	D3DMATERIAL9 * material = nullptr;
-	IDirect3DBaseTexture9 * texture = nullptr;
+	IDirect3DTexture9 * texture = nullptr;
 
 	for(int i =0; i< meshesForShading.size(); ++i)
 	{
@@ -1603,8 +1620,8 @@ void FbxModelRenderer::render()
 
 
 		// 쉐이더 지정 // 내부적으로 빛 계산도 다 해준다.
-		device->SetVertexShader(fbxModelRendererWithAnimationShader);
-		device->SetVertexDeclaration(declaration);
+		//device->SetVertexShader(fbxModelRendererWithAnimationShader);
+		//device->SetVertexDeclaration(declaration);
 		//device->LightEnable(0, false);
 
 		// 소스 지정
@@ -1620,54 +1637,64 @@ void FbxModelRenderer::render()
 		device->GetTransform(D3DTS_VIEW, &viewMatrix);
 		device->GetTransform(D3DTS_PROJECTION, &projectionMatrix);
 
-
+		ShaderContainer::SetFbxModelRendererWithAnimationShaderParameters(texture, viewMatrix * projectionMatrix, transform->getTransformMatrix(), cameraPosition, scaleFactor);
+		ShaderContainer::SetFbxModelRendererWithAnimationShader();
 		//gameObject->getScene().getMainCamera()->getComponent<MainCamera>()->getViewMatrix(&viewMatrix);
 		/*쉐이더 파라미터 초기화*/
-		constTable->SetMatrix
-		(
-			device,
-			worldMatrixHandle,
-			&D3DXMATRIX(transform->getTransformMatrix())
-		);
+		//constTable->SetMatrix
+		//(
+		//	device,
+		//	worldMatrixHandle,
+		//	&D3DXMATRIX(transform->getTransformMatrix())
+		//);
 
-		constTable->SetMatrix
-		(
-			device,
-			viewProjectionMatrixHandle,
-			&D3DXMATRIX(viewMatrix * projectionMatrix)
-		);
+		//constTable->SetMatrix
+		//(
+		//	device,
+		//	viewProjectionMatrixHandle,
+		//	&D3DXMATRIX(viewMatrix * projectionMatrix)
+		//);
 
-		constTable->SetVector
-		(
-			device,
-			scaleFactorHandle,
-			&D3DXVECTOR4(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ(),0)
-		);
+		//constTable->SetVector
+		//(
+		//	device,
+		//	scaleFactorHandle,
+		//	&D3DXVECTOR4(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ(),0)
+		//);
 
-		constTable->SetVector
-		(
-			device,
-			cameraPositionHandle,
-			&D3DXVECTOR4(cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(),1)
-		);
+		//constTable->SetVector
+		//(
+		//	device,
+		//	cameraPositionHandle,
+		//	&D3DXVECTOR4(cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(),1)
+		//);
 
 		// 텍스처 지정
 		if(material)
 			device->SetMaterial(material);
-		if (texture)
-		{
-			device->SetTexture(textureDesc.RegisterIndex, texture);
-			//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
-			//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
-			//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
-			// 초기화당시 필터링 걸어준다.
-		}
+		//if (texture)
+		//{
+		//	device->SetTexture(textureDesc.RegisterIndex, texture);
+		//	//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
+		//	//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+		//	//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MIPFILTER, D3DTEXF_ANISOTROPIC);
+		//	// 초기화당시 필터링 걸어준다.
+		//}
 
 		/*쉐이더 파라미터 초기화 완료*/
+
+		if (isTransparent)
+			preRenderIfIsTransparent();
+
+
 
 
 		device->DrawIndexedPrimitive(
 			D3DPT_TRIANGLELIST, 0, 0, meshesForShading[i]->vertexCount, 0, meshesForShading[i]->triCount);
+
+
+		if (isTransparent)
+			postRenderIfIsTransparent();
 
 
 		device->SetVertexShader(NULL);
@@ -1684,119 +1711,119 @@ void FbxModelRenderer::start()
 {
 	device = &(gameObject->getDevice());
 
-	HRESULT hr = 0;
+	//HRESULT hr = 0;
 
-	D3DVERTEXELEMENT9 decl[] =
-	{
-		/*
-		나중에 셰이더 코드의 구조체
-		struct VS_INPUT
-		{
-		vector positi : POSITION // POSITION0
-		: NORMAL0
-		: NORMAL1
-		: NORMAL2
-		}
-		과 매핑된다.
-		/*
+	//D3DVERTEXELEMENT9 decl[] =
+	//{
+	//	/*
+	//	나중에 셰이더 코드의 구조체
+	//	struct VS_INPUT
+	//	{
+	//	vector positi : POSITION // POSITION0
+	//	: NORMAL0
+	//	: NORMAL1
+	//	: NORMAL2
+	//	}
+	//	과 매핑된다.
+	//	/*
 
-		float position[3];
-		float normal[3];
-		float uv[2];
-		float animationMatrix[4][4];
+	//	float position[3];
+	//	float normal[3];
+	//	float uv[2];
+	//	float animationMatrix[4][4];
 
-		*/
-		// offsets in bytes
-		{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0 },
-		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+	//	*/
+	//	// offsets in bytes
+	//	{ 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+	//	{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0 },
+	//	{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
 
-		// 나머지 매트릭스
-		{ 0, 32, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 1 },
-		{ 0, 48, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 2 },
-		{ 0, 64, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 3 },
-		{ 0, 80, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 4 },
+	//	// 나머지 매트릭스
+	//	{ 0, 32, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 1 },
+	//	{ 0, 48, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 2 },
+	//	{ 0, 64, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 3 },
+	//	{ 0, 80, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 4 },
 
-		D3DDECL_END()
-	};
-
-
-	hr = device->CreateVertexDeclaration(decl, &declaration);
-	if (FAILED(hr))
-	{
-		::MessageBox(0, "CreateVertexDeclaration() - FAILED", 0, 0);
-		return;
-	}
+	//	D3DDECL_END()
+	//};
 
 
-	// 쉐이더 컴파일 / 핸들 받아오기
-	//------------------------------------------------------------------
-	ID3DXBuffer* compiledCode = 0;
-	ID3DXBuffer* errorBuffer = 0;
+	//hr = device->CreateVertexDeclaration(decl, &declaration);
+	//if (FAILED(hr))
+	//{
+	//	::MessageBox(0, "CreateVertexDeclaration() - FAILED", 0, 0);
+	//	return;
+	//}
 
-	hr = D3DXCompileShaderFromFile(
-		"FbxModelRendererWithAnimation.vs",
-		0,
-		0,
-		"Main", // entry point function name
-		"vs_2_0",   //"vs_2_sw",//"vs_2_0",//"vs_1_1",
 
-		D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY | D3DXSHADER_DEBUG,
-		&compiledCode,
-		&errorBuffer,
-		&constTable);
+	//// 쉐이더 컴파일 / 핸들 받아오기
+	////------------------------------------------------------------------
+	//ID3DXBuffer* compiledCode = 0;
+	//ID3DXBuffer* errorBuffer = 0;
 
-	// output any error messages
-	if (errorBuffer)
-	{
-		::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
-		errorBuffer->Release();
-	}
+	//hr = D3DXCompileShaderFromFile(
+	//	"FbxModelRendererWithAnimation.vs",
+	//	0,
+	//	0,
+	//	"Main", // entry point function name
+	//	"vs_2_0",   //"vs_2_sw",//"vs_2_0",//"vs_1_1",
 
-	if (FAILED(hr))
-	{
-		::MessageBox(0, "D3DXCompileShaderFromFile() - FAILED", 0, 0);
-		return;
-	}
+	//	D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY | D3DXSHADER_DEBUG,
+	//	&compiledCode,
+	//	&errorBuffer,
+	//	&constTable);
 
-	hr = device->CreateVertexShader(
-		(DWORD*)compiledCode->GetBufferPointer(),
-		&fbxModelRendererWithAnimationShader);
+	//// output any error messages
+	//if (errorBuffer)
+	//{
+	//	::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
+	//	errorBuffer->Release();
+	//}
 
-	if (FAILED(hr))
-	{
-		::MessageBox(0, "CreateVertexShader - FAILED", 0, 0);
-		return;
-	}
+	//if (FAILED(hr))
+	//{
+	//	::MessageBox(0, "D3DXCompileShaderFromFile() - FAILED", 0, 0);
+	//	return;
+	//}
 
-	if (compiledCode)
-		compiledCode->Release();
+	//hr = device->CreateVertexShader(
+	//	(DWORD*)compiledCode->GetBufferPointer(),
+	//	&fbxModelRendererWithAnimationShader);
 
-	viewProjectionMatrixHandle = constTable->GetConstantByName(0, "ViewProjectionMatrix");
-	worldMatrixHandle = constTable->GetConstantByName(0, "WorldMatrix");
-	cameraPositionHandle = constTable->GetConstantByName(0, "CameraPosition");
-	scaleFactorHandle = constTable->GetConstantByName(0, "ScaleFactor");
-	textureHandle = constTable->GetConstantByName(0, "Texture");
-	unsigned int uint;
-	constTable->GetConstantDesc(textureHandle, &textureDesc, &uint);
+	//if (FAILED(hr))
+	//{
+	//	::MessageBox(0, "CreateVertexShader - FAILED", 0, 0);
+	//	return;
+	//}
 
-	device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	//if (compiledCode)
+	//	compiledCode->Release();
 
-	/*
-	D3DTEXF_POINT
-	D3DTEXF_POINT
-	D3DTEXF_POINT
+	//viewProjectionMatrixHandle = constTable->GetConstantByName(0, "ViewProjectionMatrix");
+	//worldMatrixHandle = constTable->GetConstantByName(0, "WorldMatrix");
+	//cameraPositionHandle = constTable->GetConstantByName(0, "CameraPosition");
+	//scaleFactorHandle = constTable->GetConstantByName(0, "ScaleFactor");
+	//textureHandle = constTable->GetConstantByName(0, "Texture");
+	//unsigned int uint;
+	//constTable->GetConstantDesc(textureHandle, &textureDesc, &uint);
 
-	D3DTEXF_LINEAR
-	D3DTEXF_LINEAR
-	D3DTEXF_LINEAR
+	//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	//device->SetSamplerState(textureDesc.RegisterIndex, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
-	D3DTEXF_ANISOTROPIC
-	D3DTEXF_ANISOTROPIC
-	D3DTEXF_ANISOTROPIC
-	*/
+	///*
+	//D3DTEXF_POINT
+	//D3DTEXF_POINT
+	//D3DTEXF_POINT
+
+	//D3DTEXF_LINEAR
+	//D3DTEXF_LINEAR
+	//D3DTEXF_LINEAR
+
+	//D3DTEXF_ANISOTROPIC
+	//D3DTEXF_ANISOTROPIC
+	//D3DTEXF_ANISOTROPIC
+	//*/
 
 
 }
@@ -1852,14 +1879,14 @@ void FbxModelRenderer::onDestroy()
 		if (scene)
 			scene->Destroy();
 
-		if (declaration)
-			declaration->Release();
+		//if (declaration)
+		//	declaration->Release();
 
-		if(constTable)
-			constTable->Release();
+		//if(constTable)
+		//	constTable->Release();
 
-		if (fbxModelRendererWithAnimationShader)
-			fbxModelRendererWithAnimationShader->Release();
+		//if (fbxModelRendererWithAnimationShader)
+		//	fbxModelRendererWithAnimationShader->Release();
 
 
 
@@ -1872,12 +1899,12 @@ void FbxModelRenderer::onDestroy()
 }
 
 FbxModelRenderer::FbxModelRenderer(GameObject * go, Transform * tf)
-	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr),
-	/*scaleFactor(1,1,1),*/ scaleFactorHandle(0), updateFlag(true),
+	: Component(go, tf), scene(nullptr), importer(nullptr), skeletonBones(nullptr), animations(nullptr), updateFlag(true), isTransparent(false)
+	//*scaleFactor(1,1,1),*/ scaleFactorHandle(0), 
 	// 쉐이더
-	declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr),
-	viewProjectionMatrixHandle(0), worldMatrixHandle(0), cameraPositionHandle(0),
-	textureHandle(0), textureDesc{nullptr}
+	//declaration(nullptr), fbxModelRendererWithAnimationShader(nullptr), constTable(nullptr),
+	//viewProjectionMatrixHandle(0), worldMatrixHandle(0), cameraPositionHandle(0),
+	//textureHandle(0), textureDesc{nullptr}
 {
 	start();
 }
@@ -3413,8 +3440,8 @@ void BulletScript::update()
 	// 현재 transform행렬로 적용시킨다.
 	device->SetTransform(D3DTS_WORLD, &transform->getTransformMatrix());
 
-	//if (texture)
-	//	device->SetTexture(0, texture);
+	if (texture)
+		device->SetTexture(0, texture);
 
 	device->SetMaterial(&mtrl);
 
@@ -3447,7 +3474,7 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 		D3DXVECTOR3 origin{};
 		Vector3::ToD3DXVECTOR3(origin, transform->getWorldPosition());
 		bulletParticle->getTransform()->setWorldPosition(transform->getWorldPosition());
-		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare.bmp", 2000, .9f, origin);
+		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare_alpha.dds", 2000, 70.5f, origin);
 
 		// 불릿컨트롤러에 의해 관리되고 있다면 그 리스트에서 삭제한다.
 		if (bulletController)
@@ -3486,6 +3513,7 @@ void BulletParticle::onDestroy()
 void BulletParticle::generateParticle(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin)
 {
 	fireExplosion = new FireExplosion(device, textureFileName, numOfParticles, particleSize, origin);
+	fireExplosion->setDuration(2.0f);
 }
 
 void BulletParticle::setAmountFactor(float factor)
@@ -3627,7 +3655,7 @@ bool BulletController::shootBullet(float power)
 
 	const Vector3 & forwardDirection = gameObject->getTransform()->getForward();
 	const Vector3 & upDirection = gameObject->getTransform()->getUp();
-	Vector3 direction = (forwardDirection + upDirection*0.01f);
+	Vector3 direction = (forwardDirection + upDirection*0.02f);
 
 	auto bulletToShoot = bullets.begin();
 	GameObject * bulletObj = (*bulletToShoot).first;
@@ -3638,7 +3666,7 @@ bool BulletController::shootBullet(float power)
 
 	// 초기 위치를 잡고 쏜다
 	bulletObj->getTransform()->setLocalPosition(gameObject->getTransform()->getWorldPosition() + direction + Vector3(0,1,0));
-	bulletObj->getComponent<RigidBody>()->addForce(power * 1.0f/(float)FrameTime::GetDeltaTime() * direction);
+	bulletObj->getComponent<RigidBody>()->addForce(power /** 1.0f/(float)FrameTime::GetDeltaTime()*/ * direction);
 
 	// 최종적으로 삭제
 	bullets.erase(bulletToShoot);
@@ -4226,7 +4254,7 @@ void BillBoard::render()
 	if (!mesh) return;
 
 	device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	//device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 
 	// Color = TexelColor x SourceBlend + CurrentPixelColor x DestBlend
 	// 여기서 소스알파값이 0이면 뒷배경이 1이 적용되어서 뒷배경이 반영되고
@@ -4250,7 +4278,7 @@ void BillBoard::render()
 
 
 	device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	//device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 }
 
 void BillBoard::rotateIfMainCameraMoves()

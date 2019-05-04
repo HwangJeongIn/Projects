@@ -21,14 +21,14 @@ extern sampler Texture;
 struct VS_INPUT
 {
     vector position : POSITION;
-    vector diffuse   : COLOR0;
+    float4 diffuse   : COLOR0;
 };
 
 struct VS_OUTPUT
 {
     vector position : POSITION;
-    vector diffuse  : COLOR0;
-   // vector specular   : COLOR1;
+    float4 diffuse  : COLOR0;
+    float4 specular   : COLOR1;
 };
 
 
@@ -44,10 +44,9 @@ VS_OUTPUT Main(VS_INPUT input)
 
     output.position = mul(input.position, ViewProjectionMatrix);
     output.diffuse = input.diffuse;
-	//if(input.diffuse.x > 0.5)
-	//	output.specular = vector(10.0f, 100.0f,10.0f, 1.0f);
-   // output.normal = defaultNormal;
-
+	// output.diffuse.w = 0.3;
+	  output.specular = input.diffuse;
+	 // output.specular.w = 0.3;
     return output;
 }
 

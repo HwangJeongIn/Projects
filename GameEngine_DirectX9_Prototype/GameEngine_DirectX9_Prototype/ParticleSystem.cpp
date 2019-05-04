@@ -20,7 +20,7 @@ const DWORD ParticleSystem::Particle::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
 
 
 ParticleSystem::ParticleSystem(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin, float duration)
-	: device(device), vb(nullptr), texture(nullptr), duration(duration),/*declaration(nullptr),*/
+	: device(device), vb(nullptr), texture(nullptr), duration(duration), currentDuration(0.0f),/*declaration(nullptr),*/
 	maxNumOfParticles(numOfParticles), currentNumOfParticles(0), particleSize(particleSize), origin(origin), amountFactor(0.5f)
 {
 	if (!device) return;
@@ -113,7 +113,7 @@ void ParticleSystem::removeParticle(int index)
 
 void ParticleSystem::preRender()
 {
-	device->SetRenderState(D3DRS_LIGHTING, false);
+	device->SetRenderState(D3DRS_LIGHTING, true);
 
 	// true인 경우 전체 텍스처를 포인트 스프라이트의 텍스처 매핑에 이용
 	device->SetRenderState(D3DRS_POINTSPRITEENABLE, true);
@@ -122,11 +122,12 @@ void ParticleSystem::preRender()
 	// 포인트 스프라이트의 크기는 카메라와의 거리에 따라 적절하게 조절된다.
 	device->SetRenderState(D3DRS_POINTSCALEENABLE, true);
 
-	float temp = 5.0f;
+
 	// 포인트 스프라이트의 크기 
 	// D3DRS_POINTSCALEENABLE에 따라서 뷰스페이스 내의 크기나 스크린 스페이스 내의 크기로 해석
-	device->SetRenderState(D3DRS_POINTSIZE, *((DWORD*)&temp));
-	temp = 0.0f;
+	device->SetRenderState(D3DRS_POINTSIZE, *((DWORD*)&particleSize));
+
+	float temp = 0.0f;
 	// 포인트 스프라이트의 지정할 수 있는 최소크기를 지정
 	device->SetRenderState(D3DRS_POINTSIZE_MIN, *((DWORD*)&temp));
 
@@ -148,6 +149,7 @@ void ParticleSystem::preRender()
 
 void ParticleSystem::postRender()
 {
+
 	device->SetRenderState(D3DRS_LIGHTING, true);
 	device->SetRenderState(D3DRS_POINTSPRITEENABLE, false);
 	device->SetRenderState(D3DRS_POINTSCALEENABLE, false);
@@ -157,13 +159,13 @@ void ParticleSystem::postRender()
 
 
 FireExplosion::FireExplosion(IDirect3DDevice9 * device, /*const D3DXMATRIX & viewMatrix,*/ const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin)
-	: ParticleSystem(device, /*viewMatrix,*/ textureFileName, numOfParticles, particleSize, origin)//,
+	: ParticleSystem(device, /*viewMatrix,*/ textureFileName, numOfParticles, particleSize, origin), preExplosionFactor(0.1f)
 	// shaderFileName("FireExplosion.vs"), viewProjectionMatrixName("ViewProjectionMatrix")
 	//declaration(nullptr), fireExplosionShader(nullptr), constTable(nullptr), viewProjectionMatrixHandle(0)
 {
 	if (!device) return;
 	resetAllParticles();
-	init();
+	//init();
 }
 
 bool FireExplosion::init()
@@ -253,34 +255,73 @@ void FireExplosion::resetParticle(ParticleAttribute & attribute)
 {
 
 	attribute.isAlive  = true;
-	attribute.position = origin;
+
 
 	//D3DXVECTOR3 min = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
 	//D3DXVECTOR3 max = D3DXVECTOR3( 1.0f,  1.0f,  1.0f);
 
-	// 여러가지 방향이 나온다
-	attribute.velocity
-		= D3DXVECTOR3
-		(
-			getRandomFloat(-1, 1),
-			getRandomFloat(-1, 1),
-			getRandomFloat(-1, 1)
-		);
+	float durationFactor = currentDuration / duration;
+
+	if (durationFactor <=preExplosionFactor)
+	{
+		attribute.position 
+			= D3DXVECTOR3
+			(
+				getRandomFloat(-1, 1),
+				getRandomFloat(-1, 1),
+				getRandomFloat(-1, 1)
+			);
+		D3DXVec3Normalize(
+			&attribute.position,
+			&attribute.position);
 
 
-	// normalize to make spherical
-	// 정규화한다 모두 일정한 속력으로 움직여야 해서
-	D3DXVec3Normalize(
-		&attribute.velocity,
-		&attribute.velocity);
+		attribute.position *= getRandomFloat(0.1, 20);
 
-	attribute.velocity *= getRandomFloat(1, 20);
+		attribute.position += origin;
+
+		// 여러가지 방향이 나온다
+		attribute.velocity = origin - attribute.position;
+
+		D3DXVec3Normalize(
+			&attribute.velocity,
+			&attribute.velocity);
+
+		attribute.velocity *= getRandomFloat(50, 100);
+		attribute.lifeTime = preExplosionFactor * duration;//getRandomFloat(0.5 * duration, 0.5 * duration);// lives for 2 seconds
+	}
+	else
+	{
+
+		attribute.position = origin;
+		// 여러가지 방향이 나온다
+		attribute.velocity
+			= D3DXVECTOR3
+			(
+				getRandomFloat(-1, 1),
+				getRandomFloat(-1, 1),
+				getRandomFloat(-1, 1)
+			);
+
+
+		// normalize to make spherical
+		// 정규화한다 모두 일정한 속력으로 움직여야 해서
+		D3DXVec3Normalize(
+			&attribute.velocity,
+			&attribute.velocity);
+
+		attribute.velocity *= getRandomFloat(50, 150);
+		attribute.lifeTime = (1- preExplosionFactor + 0.01f) * duration;//getRandomFloat(0.1f, 3.0f);// lives for 2 seconds
+
+	}
+
+
 
 	attribute.color = D3DXCOLOR(
 		getRandomFloat(0.8f, 1.0f),
 		getRandomFloat(0.0f, .3f),
 		getRandomFloat(0.0f, .3f),
-		1.0f);
+		.10f);
 
 	attribute.colorFade = D3DXCOLOR(
 		getRandomFloat(0.0f, .30f),
@@ -290,24 +331,35 @@ void FireExplosion::resetParticle(ParticleAttribute & attribute)
 
 	// 수명 2초동안 유지하도록 설정
 	attribute.age      = 0.0f;
-	attribute.lifeTime = getRandomFloat(0.1f, 2.5f);// lives for 2 seconds
+
 }
 
 void FireExplosion::update(float deltaTime)
 {
 	if (!device) return;
 	// 추후 수정
+	currentDuration += deltaTime;
 
 	while (currentNumOfParticles < currentMaxNumOfParticles)
 	{
 		addParticle();
 	}
 
+	bool preExplosion = (currentDuration / duration) < preExplosionFactor;
+
 	for (int i = 0; i < currentNumOfParticles; ++i)
 	{
 		// 살아있는 파티클에 대해서
 		// 속도 최신화
-		particlesAttribute[i].position += particlesAttribute[i].velocity * deltaTime;//(deltaTime /1000.0f);
+		if (preExplosion)
+		{
+			D3DXVECTOR3 distanceVector3 = origin - particlesAttribute[i].position;
+			float distance = D3DXVec3Length(&distanceVector3);
+			if(distance > 3.0f)
+				particlesAttribute[i].position += particlesAttribute[i].velocity * deltaTime;//(deltaTime /1000.0f);
+		}
+		else
+			particlesAttribute[i].position += particlesAttribute[i].velocity * deltaTime;//(deltaTime /1000.0f);
 
 		// 시간 최신화
 		particlesAttribute[i].age += deltaTime;
@@ -337,7 +389,8 @@ void FireExplosion::update(float deltaTime)
 
 		// 보간해서 넣어준다.
 		lifeFactor = particlesAttribute[i].age / particlesAttribute[i].lifeTime;
-		v[i].color = particlesAttribute[i].color * (1 - lifeFactor) + particlesAttribute[i].colorFade * lifeFactor;
+		v[i].color = D3DXCOLOR(particlesAttribute[i].color * (1 - lifeFactor) + particlesAttribute[i].colorFade * lifeFactor);
+
 	}
 
 	vb->Unlock();
@@ -350,10 +403,35 @@ void FireExplosion::render()
 	// 쉐이더 지정 포함
 	preRender();
 
-	if (texture)
-		device->SetTexture(0, texture);
+	//if (texture)
+	//	device->SetTexture(0, texture);
 
-	device->SetFVF(ParticleSystem::Particle::FVF);
+	//D3DMATERIAL9 mtrl;
+	//// Set the RGBA for diffuse reflection.
+	//mtrl.Diffuse.r = 1.0f;
+	//mtrl.Diffuse.g = 0.0f;
+	//mtrl.Diffuse.b = 0.0f;
+	//mtrl.Diffuse.a = 1.0f;
+	//// Set the RGBA for ambient reflection.
+	//mtrl.Ambient.r = 1.0f;
+	//mtrl.Ambient.g = 0.0f;
+	//mtrl.Ambient.b = 0.0f;
+	//mtrl.Ambient.a = 1.0f;
+	//// Set the color and sharpness of specular highlights.
+	//mtrl.Specular.r = 1.0f;
+	//mtrl.Specular.g = 1.0f;
+	//mtrl.Specular.b = 1.0f;
+	//mtrl.Specular.a = 1.0f;
+	//mtrl.Power = 500.0f;
+	//// Set the RGBA for emissive color.
+	//mtrl.Emissive.r = 0.0f;
+	//mtrl.Emissive.g = 0.0f;
+	//mtrl.Emissive.b = 0.0f;
+	//mtrl.Emissive.a = 0.0f;
+	//device->SetMaterial(&mtrl);
+
+
+	//device->SetFVF(ParticleSystem::Particle::FVF);
 	device->SetStreamSource(0, vb, 0, sizeof(ParticleSystem::Particle));
 
 
@@ -365,12 +443,11 @@ void FireExplosion::render()
 
 	// 쉐이더를 설정해준다.
 	ShaderContainer::SetFireExplosionShader();
-
-
 	//constTable->SetMatrix(
 	//	device,
 	//	viewProjectionMatrixHandle,
 	//	&D3DXMATRIX(viewMatrix * projectionMatrix));
+
 
 	device->DrawPrimitive(
 		D3DPT_POINTLIST,
@@ -384,12 +461,13 @@ void FireExplosion::preRender()
 {
 	ParticleSystem::preRender();
 
+	//device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
 	// 다른 블렌드 인수와 Z버퍼쓰기를 막기위해 오버라이드하였다.
-	device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-    device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	//device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
+    //device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	// read, but don't write particles to z-buffer
-	//device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+	device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 	//device->SetVertexShader(fireExplosionShader);
 	//device->SetVertexDeclaration(declaration);
 }
@@ -398,7 +476,45 @@ void FireExplosion::postRender()
 {
 	ParticleSystem::postRender();
 
-	//device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	//device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	device->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	device->SetVertexShader(NULL);
+	device->SetVertexDeclaration(NULL);
+}
+
+GateEffect::GateEffect(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin)
+	: ParticleSystem(device, /*viewMatrix,*/ textureFileName, numOfParticles, particleSize, origin), preExplosionFactor(0.1f)
+{
+}
+
+void GateEffect::resetParticle(ParticleAttribute & attribute)
+{
+}
+
+void GateEffect::update(float deltaTime)
+{
+}
+
+void GateEffect::render()
+{
+
+}
+
+void GateEffect::preRender()
+{
+	ParticleSystem::preRender();
+
+	device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+	device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+
+	device->SetRenderState(D3DRS_ZWRITEENABLE, false);
+}
+
+void GateEffect::postRender()
+{
+	ParticleSystem::postRender();
+
+	device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 	device->SetVertexShader(NULL);
 	device->SetVertexDeclaration(NULL);
 }

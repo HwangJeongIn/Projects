@@ -185,14 +185,16 @@ void SetEndScene()
 	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 }
 
-MoveOnTerrainScript * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = false)
+GameObject * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = false)
 {
 	// enemy
 	GameObject * enemy = nullptr;
+
 	if (isBoss)
 		enemy = GameObject::Instantiate("enemyBoss", "EnemyBoss");
 	else
 		enemy = GameObject::Instantiate("enemy", "Enemy");
+
 
 	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
 	fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
@@ -233,7 +235,7 @@ MoveOnTerrainScript * GenerateBasicEnemy(const Vector3 & startPosition, bool isB
 	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
 
 	if (isBoss)
-		enemyMoveOnTerrainScript->setObjectHeight(150.0f);
+		enemyMoveOnTerrainScript->setObjectHeight(30.0f);
 	else
 		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
 
@@ -243,7 +245,7 @@ MoveOnTerrainScript * GenerateBasicEnemy(const Vector3 & startPosition, bool isB
 	else
 		enemy->addComponent<DamageableScript>()->setMaxHp(30.0f);
 
-	return enemyMoveOnTerrainScript;
+	return enemy;
 }
 Terrain * GenerateTerrain()
 {
@@ -266,6 +268,41 @@ Terrain * GenerateTerrain()
 
 	srand(time(0));
 
+
+	for (int i = 0; i < 30; ++i)
+	{
+		// 터레인의 로컬좌표계 기준으로 풀을 심어준다. // 즉 중심이 원점이고 xz평면으로 뻗어있는 터레인기준으로 생각해준다.
+
+		Vector3 pos = { 0,0,0 };
+		float depth = groundTerrain->getDepth();
+		float width = groundTerrain->getWidth();
+
+		float y = 0.0f;
+
+		pos.setX((rand() % (int)width) - width / 2);
+		pos.setZ((rand() % (int)depth) - depth / 2);
+		while (!groundTerrain->getLocalHeight(pos, &y))
+		{
+			// 범위안에 들어올때까지 뽑아준다. 
+			// 범위 맞춰서 랜덤값 적용해서 무조건 통과하긴하겠지만 그냥 예외처리하였다.
+			pos.setX((rand() % (int)width) - width / 2);
+			pos.setZ((rand() % (int)depth) - depth / 2);
+
+		}
+		pos.setY(y + 5);
+
+		char randomChar = rand() % 2 + '0';
+
+		string tempName = "grass";
+		tempName += randomChar;
+		tempName += ".jpg";
+		GameObject * groundChild1 = ground->addChild("billBoard", "BillBoard");
+		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
+		billBoard1->setSize(20, 20);
+		billBoard1->generateBillBoard();
+		billBoard1->loadTextureFromFile(tempName);
+		groundChild1->getTransform()->setWorldPosition(pos);
+	}
 
 	for (int i = 0; i < 10; ++i)
 	{
@@ -301,40 +338,6 @@ Terrain * GenerateTerrain()
 		groundChild1->getTransform()->setWorldPosition(pos);
 	}
 
-	for (int i = 0; i < 30; ++i)
-	{
-		// 터레인의 로컬좌표계 기준으로 나무를 심어준다. // 즉 중심이 원점이고 xz평면으로 뻗어있는 터레인기준으로 생각해준다.
-
-		Vector3 pos = { 0,0,0 };
-		float depth = groundTerrain->getDepth();
-		float width = groundTerrain->getWidth();
-
-		float y = 0.0f;
-
-		pos.setX((rand() % (int)width) - width / 2);
-		pos.setZ((rand() % (int)depth) - depth / 2);
-		while (!groundTerrain->getLocalHeight(pos, &y))
-		{
-			// 범위안에 들어올때까지 뽑아준다. 
-			// 범위 맞춰서 랜덤값 적용해서 무조건 통과하긴하겠지만 그냥 예외처리하였다.
-			pos.setX((rand() % (int)width) - width / 2);
-			pos.setZ((rand() % (int)depth) - depth / 2);
-
-		}
-		pos.setY(y + 5);
-
-		char randomChar = rand() % 2 + '0';
-
-		string tempName = "grass";
-		tempName += randomChar;
-		tempName += ".jpg";
-		GameObject * groundChild1 = ground->addChild("billBoard", "BillBoard");
-		BillBoard * billBoard1 = groundChild1->addComponent<BillBoard>();
-		billBoard1->setSize(20, 20);
-		billBoard1->generateBillBoard();
-		billBoard1->loadTextureFromFile(tempName);
-		groundChild1->getTransform()->setWorldPosition(pos);
-	}
 	return groundTerrain;
 }
 
@@ -401,7 +404,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * dummy = GameObject::Instantiate("dummy", "Dummy");
 	Locator::provideGameUI(&device, dummy);
 
-	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
+	Locator::provideAudio(Locator::SystemType::NULLTYPE);
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
@@ -489,10 +492,18 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//mtrl.Emissive.a = 0.0f;
 	//groundTerrain->setMaterial(mtrl);
 
-	// player
+	Terrain * groundTerrain = GenerateTerrain();
+
+	/* player */
 	GameObject * player = GameObject::Instantiate("player", "Player");
+
+	// 위치설정
+	player->getTransform()->setWorldPosition(-544, 3, 374);
+	player->getTransform()->setWorldRotation(0, 0, 0);
+
 	// 플레이어가 먼저 등록되고 이컴포넌트를 넣어주면 따로 setPlayer를 안해줘도 알아서 GamePlayManager에 등록된다. // start함수
 	GamePlayManager * mainCameraGamePlayManager = mainCamera->addComponent<GamePlayManager>();
+
 	// player children
 	player->addChild(mainCamera);
 	GameObject * bulletSpawner = GameObject::Instantiate("bulletSpawner", "BulletSpawner");
@@ -501,7 +512,19 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	bulletSpawner->getTransform()->setLocalRotation(0, 0, 0);
 	player->addChild(bulletSpawner);
 
-	// player components
+	// player FbxModelRenderer
+	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+
+	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
+
+	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
+	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
+	playerMoveOnTerrainScript->setObjectHeight(3.0f);
+
+	// 최종적으로 등록해준다. 플레이어 스크립트에서 여러가지를 관리한다.
+	// player PlayerScript
 	player->addComponent<PlayerScript>();
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(10);
@@ -509,31 +532,35 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//playerRigidBody->turnOnStaticFlag();
 	//playerRigidBody->turnOnIsTriggerFlag();
 
-	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
-	MoveOnTerrainScript * playerMoveOnTerrainScript = player->addComponent<MoveOnTerrainScript>();
-	//car1MoveOnTerrainScript->setTerrain(groundTerrain);
 
-	playerMoveOnTerrainScript->setObjectHeight(3.0f);
-	player->getTransform()->setWorldPosition(-544, 3, 374);
-	player->getTransform()->setWorldRotation(0, 0, 0);
 
-	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
+
+
 
 
 
 	// Enemys
-	//MoveOnTerrainScript * enemy1MoveOnTerrainScript = GenerateBasicEnemy(Vector3(-202,3,-305) , true);
-	//MoveOnTerrainScript * enemy2MoveOnTerrainScript = GenerateBasicEnemy(Vector3(148,3,-375));
-	//MoveOnTerrainScript * enemy3MoveOnTerrainScript = GenerateBasicEnemy(Vector3(477,3,-475));
-	MoveOnTerrainScript * enemy4MoveOnTerrainScript = GenerateBasicEnemy(Vector3(395,3,-288));
-	MoveOnTerrainScript * enemy5MoveOnTerrainScript = GenerateBasicEnemy(Vector3(425,4,106));
-	MoveOnTerrainScript * enemy6MoveOnTerrainScript = GenerateBasicEnemy(Vector3(457, 3, 450));
+
+	GameObject * enemy1 = GenerateBasicEnemy(Vector3(395, 3, -288));
+	GameObject * enemy2 = GenerateBasicEnemy(Vector3(425, 4, 106));
+	GameObject * enemy3 = GenerateBasicEnemy(Vector3(457, 3, 450));
+
+
+	// 어떤스테이지인지 등록
+	string path;
+	enemy1->getPath(path);
+	mainCameraGamePlayManager->registerStageObject(GamePlayManager::StageType::STAGE_TUTORIAL, path);
+	enemy2->getPath(path);
+	mainCameraGamePlayManager->registerStageObject(GamePlayManager::StageType::STAGE_ONE, path);
+	enemy3->getPath(path);
+	mainCameraGamePlayManager->registerStageObject(GamePlayManager::StageType::STAGE_TWO, path);
 
 
 
+	MoveOnTerrainScript * enemy1MoveOnTerrainScript = enemy1->getComponent<MoveOnTerrainScript>();
+	MoveOnTerrainScript * enemy2MoveOnTerrainScript = enemy2->getComponent<MoveOnTerrainScript>();
+	MoveOnTerrainScript * enemy3MoveOnTerrainScript = enemy3->getComponent<MoveOnTerrainScript>();
 	// 2단계
 
 	/*GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
@@ -546,14 +573,15 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 
 	// 맵등록 + 맵을 사용할 Script 등록
-	Terrain * groundTerrain = GenerateTerrain();
+
 	playerMoveOnTerrainScript->setTerrain(groundTerrain);
-	//enemy1MoveOnTerrainScript->setTerrain(groundTerrain);
-	//enemy2MoveOnTerrainScript->setTerrain(groundTerrain);
-	//enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
-	enemy4MoveOnTerrainScript->setTerrain(groundTerrain);
-	enemy5MoveOnTerrainScript->setTerrain(groundTerrain);
-	enemy6MoveOnTerrainScript->setTerrain(groundTerrain);
+
+	if (enemy1MoveOnTerrainScript)
+		enemy1MoveOnTerrainScript->setTerrain(groundTerrain);
+	if (enemy2MoveOnTerrainScript)
+		enemy2MoveOnTerrainScript->setTerrain(groundTerrain);
+	if (enemy3MoveOnTerrainScript)
+		enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
 
 
 
@@ -574,7 +602,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	// 클래스 멤버함수의 함수포인터는 또 다른식으로 정의해줘야한다.
 	// 일단 클래스 명으로 지정 / 넘길때도 &을 붙여서 넘겨줌 / 사용할때는 그 클래스의 객체 기준으로 사용
-	EnterMsgLoop( &Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, *dummy);
+	EnterMsgLoop(&Scene::gameLoop/*&(Scene::getInstance()->gameLoop)*/, *dummy);
 
 
 

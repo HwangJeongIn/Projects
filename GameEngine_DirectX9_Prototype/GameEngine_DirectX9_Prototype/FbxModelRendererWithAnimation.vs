@@ -78,29 +78,6 @@ VS_OUTPUT Main(VS_INPUT input)
 	output.position = mul(output.position, ViewProjectionMatrix);
 
 
-	/*
-	output.specular  = float4(0,0,0,0);
-	if(input.normal.x != 0.0f)
-	{
-		output.diffuse = float4(1,1,1,1);
-		output.specular += float4(1,0,0,0);
-	}
-
-	if(input.normal.y != 0.0f)
-	{
-	output.diffuse = float4(1,1,1,1);
-		output.specular += float4(0,0,1,0);
-	}
-
-	if(input.normal.z != 0.0f)
-	{	
-	output.diffuse = float4(1,1,1,1);
-		output.specular += float4(0,1,0,0);
-	}
-
-
-	return output;
-	*/
 	//************************ 빛 계산 *************************
 	// 모델 > 카메라 벡터
 	float4 modelToCameraDirection = CameraPosition.xyzw - output.position.xyzw;
@@ -114,7 +91,7 @@ VS_OUTPUT Main(VS_INPUT input)
 	input.normal = normalize(input.normal);
 
 
-	output.diffuse = float4(1.0, 1.0, 1.0, 1.0);//AmbientColor;//float4(0,0,0,0);
+	output.diffuse = float4(1.0, 1.0, 1.0, 1.00);//AmbientColor;//float4(0,0,0,0);
 	output.specular = float4(0.001, 0.001, 0.001, 1.0);
 	
 	float4 lightDir = -LightDirection;
@@ -132,7 +109,14 @@ VS_OUTPUT Main(VS_INPUT input)
 		// 정사영길이에 normal * 2와 -lightDirection을 계산하면 반사벡터를 구할 수 있다.
 		float4 reflection = normalize(2 * lightIntensity * input.normal - lightDir);
 		output.specular = 0.001 * output.specular * saturate( dot(reflection, modelToCameraDirection) );
+
+
 	}
+
+	return output;
+
+
+
 
 	/*
 
@@ -145,11 +129,11 @@ VS_OUTPUT Main(VS_INPUT input)
 		// 최종 scecular계산
 		float4 reflection = normalize(2 * lightIntensity * input.normal - lightDirection);
 
-		output.specular = pow(saturate(dot(reflection, modelToCameraDirection)), SpecularPower);
-		output.specular = saturate(output.specular);
+		//output.specular = pow(saturate(dot(reflection, modelToCameraDirection)), SpecularPower);
+		//output.specular = saturate(output.specular);
 	}
 	*/
 	
 
-    return output;
+
 }
