@@ -785,7 +785,7 @@ protected:
 	virtual void onDestroy();
 public:
 	BulletController(GameObject * go, Transform * tf)
-		: Component(go, tf), lagTime(0.0f), maxNumOfBullets(5), bulletSpaceRadius(10), creationInterval(2), bulletSpeed(0.1f), valueFactor(1.0f)
+		: Component(go, tf), lagTime(0.0f), maxNumOfBullets(3), bulletSpaceRadius(10), creationInterval(2), bulletSpeed(0.1f), valueFactor(1.0f)
 	{
 		start();
 	}
@@ -1706,6 +1706,74 @@ public:
 	void generateBillBoard();
 
 
+};
+class GateEffect;
+class GateInScript : public Component
+{
+private:
+	GateEffect * gateEffect;
+	Vector3 destination;
+protected:
+	virtual void onDestroy();
+	virtual void start();
+	virtual void update();
+	virtual void onCollisionStay(GameObjectWithCollision & other);
+public:
+	GateInScript(GameObject * go, Transform * tf)
+		: Component(go, tf), gateEffect(nullptr)
+	{
+
+		start();
+	}
+
+	virtual ~GateInScript()
+	{
+		onDestroy();
+	}
+
+	void setDestination(const Vector3 & destination)
+	{
+		this->destination = destination;
+	}
+
+	void setDestination(GameObject * other);
+
+	void setOrigin(const Vector3 & origin);
+	//fireExplosion = new FireExplosion(device, textureFileName, numOfParticles, particleSize, origin);
+};
+
+class GateOutScript : public Component
+{
+private:
+	GateEffect * gateEffect;
+	float timeToDestroy;
+	float lagTime;
+protected:
+	virtual void onDestroy();
+	virtual void start();
+	virtual void update();
+	//virtual void onCollisionStay(GameObjectWithCollision & other);
+public:
+	GateOutScript(GameObject * go, Transform * tf)
+		: Component(go, tf), gateEffect(nullptr), timeToDestroy(3.0f), lagTime(0.0f)
+	{
+		start();
+	}
+
+	virtual ~GateOutScript()
+	{
+		onDestroy();
+	}
+
+	void setTimeToDestroy(float time)
+	{
+		if (time > 0)
+			timeToDestroy = time;
+	}
+
+	void setOrigin(const Vector3 & origin);
+
+	//fireExplosion = new FireExplosion(device, textureFileName, numOfParticles, particleSize, origin);
 };
 
 #endif

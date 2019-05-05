@@ -54,7 +54,7 @@ bool ParticleSystem::init(const char * texFileName)
 		maxNumOfParticles * sizeof(Particle),
 		D3DUSAGE_DYNAMIC | D3DUSAGE_POINTS | D3DUSAGE_WRITEONLY,
 		Particle::FVF,
-		D3DPOOL_DEFAULT, // D3DPOOL_MANAGED can't be used with D3DUSAGE_DYNAMIC 
+		D3DPOOL_DEFAULT,//D3DPOOL_MANAGED,//D3DPOOL_DEFAULT, // D3DPOOL_MANAGED can't be used with D3DUSAGE_DYNAMIC 
 		&vb,
 		0);
 
@@ -113,7 +113,7 @@ void ParticleSystem::removeParticle(int index)
 
 void ParticleSystem::preRender()
 {
-	device->SetRenderState(D3DRS_LIGHTING, true);
+	device->SetRenderState(D3DRS_LIGHTING, false);
 
 	// true인 경우 전체 텍스처를 포인트 스프라이트의 텍스처 매핑에 이용
 	device->SetRenderState(D3DRS_POINTSPRITEENABLE, true);
@@ -338,7 +338,8 @@ void FireExplosion::update(float deltaTime)
 {
 	if (!device) return;
 	// 추후 수정
-	currentDuration += deltaTime;
+	ParticleSystem::update(deltaTime);
+	//currentDuration += deltaTime;
 
 	while (currentNumOfParticles < currentMaxNumOfParticles)
 	{
@@ -406,31 +407,6 @@ void FireExplosion::render()
 	//if (texture)
 	//	device->SetTexture(0, texture);
 
-	//D3DMATERIAL9 mtrl;
-	//// Set the RGBA for diffuse reflection.
-	//mtrl.Diffuse.r = 1.0f;
-	//mtrl.Diffuse.g = 0.0f;
-	//mtrl.Diffuse.b = 0.0f;
-	//mtrl.Diffuse.a = 1.0f;
-	//// Set the RGBA for ambient reflection.
-	//mtrl.Ambient.r = 1.0f;
-	//mtrl.Ambient.g = 0.0f;
-	//mtrl.Ambient.b = 0.0f;
-	//mtrl.Ambient.a = 1.0f;
-	//// Set the color and sharpness of specular highlights.
-	//mtrl.Specular.r = 1.0f;
-	//mtrl.Specular.g = 1.0f;
-	//mtrl.Specular.b = 1.0f;
-	//mtrl.Specular.a = 1.0f;
-	//mtrl.Power = 500.0f;
-	//// Set the RGBA for emissive color.
-	//mtrl.Emissive.r = 0.0f;
-	//mtrl.Emissive.g = 0.0f;
-	//mtrl.Emissive.b = 0.0f;
-	//mtrl.Emissive.a = 0.0f;
-	//device->SetMaterial(&mtrl);
-
-
 	//device->SetFVF(ParticleSystem::Particle::FVF);
 	device->SetStreamSource(0, vb, 0, sizeof(ParticleSystem::Particle));
 
@@ -482,30 +458,303 @@ void FireExplosion::postRender()
 	device->SetVertexDeclaration(NULL);
 }
 
-GateEffect::GateEffect(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin)
-	: ParticleSystem(device, /*viewMatrix,*/ textureFileName, numOfParticles, particleSize, origin), preExplosionFactor(0.1f)
+GateEffect::GateEffect(IDirect3DDevice9 * device, const D3DXVECTOR3 & origin)
+// 게이트 주변에 움직이는 파티클사이즈 2.0 // 500개/2의 파티클 존재 // 텍스처 파일은 
+	: ParticleSystem(device, "../Fbx/Textures/flare_alpha.dds", 1000, 10.0f, origin, 100000000), maxGateSize(300), minGateSize(200), changeRateOfSize(50.0f),
+	gateParticleSpeed(2.0f), // 게이트주변을 움직이는 파티클은 매우 느리게 움직인다.
+	gateParticleLifeTime(9.0f)// , gateVb(nullptr)
 {
+	if (!device) return;
+	currentGateSize = minGateSize;
+	
+	//init();
+
+	//resetGate();
+	resetAllParticles();
 }
+
+//bool GateEffect::init()
+//{
+//	//HRESULT hr = 0;
+//	//// 게이트는 하나로 만든다.
+//
+//	//hr = device->CreateVertexBuffer(
+//	//	maxNumOfParticles * sizeof(Particle),
+//	//	D3DUSAGE_DYNAMIC | D3DUSAGE_POINTS | D3DUSAGE_WRITEONLY,
+//	//	Particle::FVF,
+//	//	D3DPOOL_DEFAULT,//D3DPOOL_MANAGED,//D3DPOOL_DEFAULT, // D3DPOOL_MANAGED can't be used with D3DUSAGE_DYNAMIC 
+//	//	&gateVb,
+//	//	0);
+//
+//	//hr = device->CreateVertexBuffer(
+//	//	1 * sizeof(Particle),
+//	//	/*D3DUSAGE_DYNAMIC |*/ D3DUSAGE_POINTS | D3DUSAGE_WRITEONLY,
+//	//	Particle::FVF,
+//	//	D3DPOOL_MANAGED,//D3DPOOL_DEFAULT, // D3DPOOL_MANAGED can't be used with D3DUSAGE_DYNAMIC 
+//	//	&gateVb,
+//	//	0);
+//
+//	//if (FAILED(hr))
+//	//{
+//	//	::MessageBox(0, "CreateVertexBuffer() - FAILED", "PSystem", 0);
+//	//	return false;
+//	//}
+//	return true;
+//}
+
+//void GateEffect::resetGate()
+//{
+//	gateAttribute.isAlive = true;
+//	gateAttribute.velocity = D3DXVECTOR3(0, 0, 0);
+//	gateAttribute.position = origin;
+//	gateAttribute.lifeTime =0.0f;
+//	gateAttribute.age = 0.0f;
+//
+//	gateAttribute.color = D3DXCOLOR(.5, .5, .5, 1);
+//	gateAttribute.colorFade = D3DXCOLOR(1, 1, 1, 1);
+//}
+
+//void GateEffect::updateGate(float deltaTime)
+//{
+//	if (!device) return;
+//
+//	gateAttribute.position = origin;
+//
+//	currentGateSize += changeRateOfSize * deltaTime;
+//
+//	if (currentGateSize < minGateSize)
+//	{
+//		currentGateSize = minGateSize + 5;
+//		changeRateOfSize *= -1;
+//	}
+//	else if (currentGateSize > maxGateSize)
+//	{
+//		currentGateSize = maxGateSize - 5;
+//		changeRateOfSize *= -1;
+//	}
+//
+//
+//
+//
+//	//// 쉐이더에서 사용할 버퍼 업데이트
+//	//ParticleSystem::Particle* v = 0;
+//	//gateVb->Lock(
+//	//	0,
+//	//	1 * sizeof(Particle),
+//	//	(void**)&v,
+//	//	0/*_vbOffset ? D3DLOCK_NOOVERWRITE : D3DLOCK_DISCARD*/);
+//
+//	//float gateFactor = currentGateSize / maxGateSize;
+//
+//	//v->position = gateAttribute.position;
+//	//v->color = D3DXCOLOR(gateAttribute.color * (1 - gateFactor) + gateAttribute.colorFade * gateFactor);
+//
+//
+//
+//	//gateVb->Unlock();
+//
+//}
 
 void GateEffect::resetParticle(ParticleAttribute & attribute)
 {
+	attribute.isAlive = true;
+
+	attribute.position
+		= D3DXVECTOR3
+		(
+			getRandomFloat(-maxGateSize/10, maxGateSize/10),
+			getRandomFloat(-maxGateSize/10, maxGateSize/10),
+			getRandomFloat(-maxGateSize/10, maxGateSize/10)
+		);
+
+	attribute.position += origin;
+
+	// 여러가지 방향이 나온다
+	attribute.velocity
+		= D3DXVECTOR3
+		(
+			getRandomFloat(-1, 1),
+			getRandomFloat(-1, 1),
+			getRandomFloat(-1, 1)
+		);
+
+
+	// normalize to make spherical
+	// 정규화한다 모두 일정한 속력으로 움직여야 해서
+	D3DXVec3Normalize(
+		&attribute.velocity,
+		&attribute.velocity);
+
+	attribute.velocity *= gateParticleSpeed;
+	attribute.lifeTime = getRandomFloat(gateParticleLifeTime/2.0f, gateParticleLifeTime);
+	attribute.age = 0.0f;
+
+	float temp = getRandomFloat(0.5f, 0.80f);
+	attribute.color = D3DXCOLOR(
+		getRandomFloat(9.0f, 1.00f),
+		getRandomFloat(5.0f, 1.00f),
+		getRandomFloat(0.0f, 1.00f),
+		1.0f);
+
+	temp = getRandomFloat(0.0f, .10f);
+	attribute.colorFade = D3DXCOLOR(
+		temp,//getRandomFloat(0.0f, .20f),
+		temp,//getRandomFloat(0.0f, .20f),
+		temp,//getRandomFloat(0.0f, .20f),
+		0.3f);
+
+
+
 }
 
 void GateEffect::update(float deltaTime)
 {
+	if (!device) return;
+	// 추후 수정
+
+	ParticleSystem::update(deltaTime);
+	//currentDuration += deltaTime;
+	//updateGate(deltaTime);
+
+	while (currentNumOfParticles < currentMaxNumOfParticles)
+	{
+		addParticle();
+	}
+
+	for (int i = 0; i < currentNumOfParticles; ++i)
+	{
+		// 살아있는 파티클에 대해서
+		particlesAttribute[i].position += particlesAttribute[i].velocity * deltaTime;
+		particlesAttribute[i].age += deltaTime;
+
+		if (particlesAttribute[i].age > particlesAttribute[i].lifeTime)
+		{
+			particlesAttribute[i].isAlive = false;
+
+			removeParticle(i);
+		}
+
+	}
+
+	// 쉐이더에서 사용할 버퍼 업데이트
+	ParticleSystem::Particle* v = 0;
+	vb->Lock(
+		0,
+		currentNumOfParticles * sizeof(Particle),
+		(void**)&v,
+		0/*_vbOffset ? D3DLOCK_NOOVERWRITE : D3DLOCK_DISCARD*/);
+
+	float lifeFactor = 0.0f;
+	for (int i = 0; i < currentNumOfParticles; ++i)
+	{
+		v[i].position = particlesAttribute[i].position;
+
+		// 보간해서 넣어준다.
+		lifeFactor = particlesAttribute[i].age / particlesAttribute[i].lifeTime;
+		v[i].color = D3DXCOLOR(particlesAttribute[i].color * (1 - lifeFactor) + particlesAttribute[i].colorFade * lifeFactor);
+
+	}
+
+	vb->Unlock();
+
 }
 
 void GateEffect::render()
 {
 
-}
+	if (!device) return;
 
+	// 쉐이더 지정 포함
+	preRender();
+
+	//if (texture)
+	//	device->SetTexture(0, texture);
+
+	//device->SetFVF(ParticleSystem::Particle::FVF);
+	device->SetStreamSource(0, vb, 0, sizeof(ParticleSystem::Particle));
+
+
+	// 먼저 카메라 부터 최신화
+	device->GetTransform(D3DTS_VIEW, &viewMatrix);
+	device->GetTransform(D3DTS_PROJECTION, &projectionMatrix);
+	// viewProjection 초기화
+	ShaderContainer::SetFireExplosionShaderParameters(texture, viewMatrix * projectionMatrix);
+
+	// 쉐이더를 설정해준다.
+	ShaderContainer::SetFireExplosionShader();
+	//constTable->SetMatrix(
+	//	device,
+	//	viewProjectionMatrixHandle,
+	//	&D3DXMATRIX(viewMatrix * projectionMatrix));
+
+
+	device->DrawPrimitive(
+		D3DPT_POINTLIST,
+		0,
+		currentNumOfParticles);
+
+	postRender();
+
+
+}
+/*
+{
+	// 쉐이더 지정 포함
+	preRender();
+
+	if (texture)
+		device->SetTexture(0, texture);
+
+	// 게이트부터 그리고
+	//device->SetRenderState(D3DRS_POINTSIZE, *((DWORD*)&currentGateSize));
+	//device->SetStreamSource(0, gateVb, 0, sizeof(ParticleSystem::Particle));
+
+	//// 먼저 카메라 부터 최신화
+	//device->GetTransform(D3DTS_VIEW, &viewMatrix);
+	//device->GetTransform(D3DTS_PROJECTION, &projectionMatrix);
+
+
+	//// viewProjection 초기화
+	//ShaderContainer::SetFireExplosionShaderParameters(texture, viewMatrix * projectionMatrix);
+
+	//// 쉐이더를 설정해준다.
+	//ShaderContainer::SetFireExplosionShader();
+
+
+	//device->DrawPrimitive(
+	//	D3DPT_POINTLIST,
+	//	0,
+	//	1);
+
+
+	//device->SetFVF(ParticleSystem::Particle::FVF);
+	// 주변 파티클을 그린다.
+	//device->SetRenderState(D3DRS_POINTSIZE, *((DWORD*)&particleSize));
+	device->SetStreamSource(0, vb, 0, sizeof(ParticleSystem::Particle));
+
+	// viewProjection 초기화
+	ShaderContainer::SetFireExplosionShaderParameters(texture, viewMatrix * projectionMatrix);
+
+	// 쉐이더를 설정해준다.
+	ShaderContainer::SetFireExplosionShader();
+
+	device->DrawPrimitive(
+		D3DPT_POINTLIST,
+		0,
+		currentNumOfParticles);
+
+	postRender();
+}
+*/
 void GateEffect::preRender()
 {
 	ParticleSystem::preRender();
 
 	device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+
+	device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 
 	device->SetRenderState(D3DRS_ZWRITEENABLE, false);
 }
@@ -514,6 +763,9 @@ void GateEffect::postRender()
 {
 	ParticleSystem::postRender();
 
+
+	device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 	device->SetRenderState(D3DRS_ZWRITEENABLE, true);
 	device->SetVertexShader(NULL);
 	device->SetVertexDeclaration(NULL);

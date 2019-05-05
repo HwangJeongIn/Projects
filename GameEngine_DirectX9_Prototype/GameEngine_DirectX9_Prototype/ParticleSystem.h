@@ -77,10 +77,18 @@ public:
 	}
 	float getDuration() const { return duration; }
 	float getCurrentDuraion() const { return currentDuration; }
+
+	void setOrigin(const D3DXVECTOR3 & origin)
+	{
+		this->origin = origin;
+		resetAllParticles();
+		currentDuration = 0.0f;
+	}
+	const D3DXVECTOR3 &  getOrigin() const { return origin; }
 	void resetAllParticles();
 
 	virtual void resetParticle(ParticleAttribute & attribute) = 0;
-	virtual void update(float deltaTime) = 0;
+	virtual void update(float deltaTime) { currentDuration += deltaTime; };
 	virtual void render() = 0;
 
 	virtual void preRender();
@@ -144,16 +152,34 @@ public:
 class GateEffect : public ParticleSystem
 {
 private:
+	// 게이트를 위한 변수
+	//IDirect3DVertexBuffer9* gateVb;
+	ParticleAttribute gateAttribute;
 
-	float preExplosionFactor;
+	float maxGateSize;
+	float minGateSize;
+
+	float currentGateSize;
+	float changeRateOfSize;
+
+	// 파티클을 위한 변수
+	float gateParticleSpeed;
+	float gateParticleLifeTime;
+
+
 
 public:
-	GateEffect(IDirect3DDevice9 * device, const char * textureFileName, int numOfParticles, int particleSize, const D3DXVECTOR3 & origin);
-	bool init();
+	GateEffect(IDirect3DDevice9 * device, const D3DXVECTOR3 & origin);
+	//bool init();
 	virtual ~GateEffect()
 	{
-
+		//if (gateVb)
+		//	gateVb->Release();
 	}
+
+	//void resetGate();
+	//void updateGate(float deltaTime);
+
 	virtual void resetParticle(ParticleAttribute & attribute);
 	virtual void update(float deltaTime);
 	virtual void render();

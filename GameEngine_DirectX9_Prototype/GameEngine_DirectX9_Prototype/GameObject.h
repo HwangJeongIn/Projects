@@ -22,6 +22,7 @@ private:
 	// 업데이트가 모두 완료된다음에 수행된다.
 	bool destroyed;
 	void setWhetherDestroyed(bool destroyed) { this->destroyed = destroyed; }
+
 	GameObject(const string & name = "default GO name", const string & tag = "default GO tag",
 		const Vector3 & position = Vector3::Zero, const Vector3 & rotation = Vector3::Zero, const Vector3 & scale = Vector3::One,
 		GameObject * parent = nullptr, vector<GameObject *> *children = nullptr,
@@ -55,6 +56,9 @@ private:
 				this->components.push_back((*components)[i]);
 			}
 		}
+
+
+		this->transform->rootTransformUpdate();
 	}
 
 

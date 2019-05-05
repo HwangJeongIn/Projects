@@ -46,7 +46,10 @@ void FbxModelMesh::processVertices(FbxModelSkeletonBones * skeletonBones)
 
 				if (!skin) continue;
 			}
-
+			else
+			{
+				continue;
+			}
 
 			unsigned int clusterCount = skin->GetClusterCount();
 

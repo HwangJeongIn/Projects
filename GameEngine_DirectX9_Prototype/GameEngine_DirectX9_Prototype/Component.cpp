@@ -482,11 +482,13 @@ void PlayerScript::update()
 
 	if (InputManager::GetKeyStay(0x33))
 	{
-		fbxModelRenderer->setIsTransparent(true);
+		if(fbxModelRenderer)
+			fbxModelRenderer->setIsTransparent(true);
 	}
 	else
 	{
-		fbxModelRenderer->setIsTransparent(false);
+		if (fbxModelRenderer)
+			fbxModelRenderer->setIsTransparent(false);
 	}
 
 	if (::GetAsyncKeyState('N') & 0x8000f)
@@ -2174,6 +2176,8 @@ void FbxModelRenderer::processAnimation(const string & animationFileName, FbxSce
 			FbxModelAnimation * animation = new FbxModelAnimation(animationFileName, animationName, keyFrames, frameRate);
 			animations->addAnimation(animation);
 
+			//Trace::Write("TAG_INFO2", animationFileName);
+			//Trace::Write("TAG_INFO2", "", "");
 			// 애니메이션을 추가했으면 각 본을 돌면서 추가한 애니메이션에 대한 키프레임 매트릭스를 모두 구해서 추가해준다.
 			processKeyFramesOfAllNodes(rootNode, animationFileName, animationName, frameRate, startTime, stopTime);
 
@@ -2197,6 +2201,7 @@ void FbxModelRenderer::processKeyFramesOfAllNodes(FbxNode * node, const string &
 		{
 			string boneName = node->GetName();
 			bone = skeletonBones->findBoneWithBoneName(boneName);
+			//Trace::Write("TAG_INFO2", boneName);
 		}
 
 		// 본마다 각 프레임별로 각각의 로컬 트랜스폼을 가진다.
@@ -3331,7 +3336,7 @@ void BasicEnemyAnimationFSM::start()
 	if (!fbxModelRenderer || !fbxModelAnimations) return;
 
 	registerAnimation("Mutant Idle.fbx");
-	registerAnimation("Mutant Swiping.fbx");
+	registerAnimation("Mutant Swipe.fbx");
 	registerAnimation("Mutant Run.fbx");
 	setDefaultState("Mutant Idle.fbx");
 
@@ -3353,15 +3358,15 @@ void BasicEnemyAnimationFSM::start()
 
 	// idle > run / attack
 	makeTransition("Mutant Idle.fbx", "Mutant Run.fbx", "isRunning", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-	makeTransition("Mutant Idle.fbx", "Mutant Swiping.fbx", "isAttacking", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Idle.fbx", "Mutant Swipe.fbx", "isAttacking", 0, AnimationFSM::ValueType::BOOLTYPE, true);
 
 	// run > idle / attack
 	makeTransition("Mutant Run.fbx", "Mutant Idle.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-	makeTransition("Mutant Run.fbx", "Mutant Swiping.fbx", "isAttacking", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Run.fbx", "Mutant Swipe.fbx", "isAttacking", 0, AnimationFSM::ValueType::BOOLTYPE, true);
 
 	// attack > idle / run
-	makeTransition("Mutant Swiping.fbx", "Mutant Run.fbx", "isRunning", 0, AnimationFSM::ValueType::BOOLTYPE, true);
-	makeTransition("Mutant Swiping.fbx", "Mutant Idle.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Swipe.fbx", "Mutant Run.fbx", "isRunning", 0, AnimationFSM::ValueType::BOOLTYPE, true);
+	makeTransition("Mutant Swipe.fbx", "Mutant Idle.fbx", "isIdle", 0, AnimationFSM::ValueType::BOOLTYPE, true);
 
 
 }
@@ -3474,7 +3479,7 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 		D3DXVECTOR3 origin{};
 		Vector3::ToD3DXVECTOR3(origin, transform->getWorldPosition());
 		bulletParticle->getTransform()->setWorldPosition(transform->getWorldPosition());
-		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare_alpha.dds", 2000, 70.5f, origin);
+		particleSystem->generateParticle(&gameObject->getDevice(), "../Fbx/Textures/flare_alpha.dds", 2000, 7.5f, origin);
 
 		// 불릿컨트롤러에 의해 관리되고 있다면 그 리스트에서 삭제한다.
 		if (bulletController)
@@ -4587,3 +4592,101 @@ void BillBoard::optimizeMesh()
 	);
 }
 
+void GateInScript::onDestroy()
+{
+	if (gateEffect)
+		delete gateEffect;
+}
+void GateInScript::start()
+{
+	// 시작하면서 리지드 바디가 없다면 추가해준다. // 게이트에 맞는 충돌체를 정의하기 위해서
+	RigidBody * gateRigidBody = gameObject->getComponent<RigidBody>();
+	if (!gateRigidBody)
+	{
+		gateRigidBody = gameObject->addComponent<RigidBody>();
+	}
+
+	gateRigidBody->turnOnStaticFlag();
+	gateRigidBody->turnOnIsTriggerFlag();
+	gateRigidBody->setSphereCollider(30);
+	// 게이트를 생성해준다.
+	D3DXVECTOR3 origin;
+	Vector3::ToD3DXVECTOR3(origin, transform->getWorldPosition());
+	gateEffect = new GateEffect(&(gameObject->getDevice()), origin);
+
+
+	// 따로 외부에서 지정을 하지 않는한 게이트의 목적지는 현재위치이다.
+	destination = transform->getWorldPosition();
+}
+
+void GateInScript::update()
+{
+	if (gateEffect)
+	{
+		gateEffect->update(((float)FrameTime::GetDeltaTime()/ 1000.0f));
+		gateEffect->render();
+	}
+}
+
+void GateInScript::onCollisionStay(GameObjectWithCollision & other)
+{
+	if (other.gameObject->getTag() == "Player")
+	{
+		// 최종적으로 플레이어를 옮길 위치에 도착게이트를 생성한다
+		// 이 도착게이트는 3초뒤에 자동적으로 소멸한다.
+		GameObject * gateOut = GameObject::Instantiate("gateOut", "GateOut", destination);
+		gateOut->addComponent<GateOutScript>();
+
+		// 플레이어를 운반하고 스스로 삭제한다.
+		other.gameObject->getTransform()->setWorldPosition(destination);
+
+		GameObject::Destroy(gameObject);
+	}
+}
+
+void GateInScript::setDestination(GameObject * other)
+{
+	if (!other) return;
+	destination = other->getTransform()->getWorldPosition();
+}
+
+void GateInScript::setOrigin(const Vector3 & origin)
+{
+	if (gateEffect)
+		gateEffect->setOrigin(D3DXVECTOR3(origin.getX(), origin.getY(), origin.getZ()));
+}
+
+void GateOutScript::onDestroy()
+{
+	if (gateEffect)
+		delete gateEffect;
+}
+
+void GateOutScript::start()
+{
+	// 게이트를 생성해준다.
+	D3DXVECTOR3 origin;
+	Vector3::ToD3DXVECTOR3(origin, transform->getWorldPosition());
+	gateEffect = new GateEffect(&(gameObject->getDevice()), origin);
+}
+
+void GateOutScript::update()
+{
+	lagTime += ((float)FrameTime::GetDeltaTime() / 1000.0f);
+	if (lagTime >= timeToDestroy)
+	{
+		GameObject::Destroy(gameObject);
+	}
+
+	if (gateEffect)
+	{
+		gateEffect->update(((float)FrameTime::GetDeltaTime() / 1000.0f));
+		gateEffect->render();
+	}
+}
+
+void GateOutScript::setOrigin(const Vector3 & origin)
+{
+	if (gateEffect)
+		gateEffect->setOrigin(D3DXVECTOR3(origin.getX(), origin.getY(), origin.getZ()));
+}

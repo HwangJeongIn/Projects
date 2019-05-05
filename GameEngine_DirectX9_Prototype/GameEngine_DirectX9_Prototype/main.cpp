@@ -76,8 +76,18 @@ int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSyste
 
 			}
 
+			if (InputManager::GetKeyDown(0x46))
+			{
+				objToAccessSystem.getDevice().SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+			}
+			else if (InputManager::GetKeyUp(0x46))
+			{
+				objToAccessSystem.getDevice().SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			}
+
 
 			scene = &(objToAccessSystem.getScene());
+
 
 			//float currTime  = (float)timeGetTime();
 			//float timeDelta = (currTime - lastTime);// *0.001f;
@@ -197,15 +207,30 @@ GameObject * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = fal
 
 
 	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
-	fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
+	if (isBoss)
+	{
+		fbxModelRendererEnemy->loadFbxFile("mutant.fbx");
+	}
+	else
+	{
+		fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
+	}
+
+
 	fbxModelRendererEnemy->setUpdateFlag(false);
-	if(isBoss)
-		enemy->getTransform()->setLocalScale(50, 50, 50);
+	if (isBoss)
+		enemy->getTransform()->setLocalScale(40, 40, 40);
 	else
 		enemy->getTransform()->setLocalScale(25, 25, 25);
 
 	enemy->getTransform()->setWorldPosition(startPosition);
-	//BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+	if (isBoss)
+	{
+		//enemy->getTransform()->setWorldRotation(-90, 0, 0);
+		BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+	}
+
+
 
 	// 스타트포인트 알아서 설정됨
 	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
@@ -213,11 +238,11 @@ GameObject * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = fal
 	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
 
 	if (isBoss)
-		enemyRigidBody->setSphereCollider(20);
+		enemyRigidBody->setSphereCollider(7);
 	else
 		enemyRigidBody->setSphereCollider(5);
-	//enemyRigidBody->setGravity(Vector3(0, 0.00001, 0));
-	enemyRigidBody->turnOnStaticFlag();
+	enemyRigidBody->setGravity(Vector3(0, 0, 0));
+	//enemyRigidBody->turnOnStaticFlag();
 	//enemyRigidBody->turnOnIsTriggerFlag();
 
 	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
@@ -235,7 +260,7 @@ GameObject * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = fal
 	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
 
 	if (isBoss)
-		enemyMoveOnTerrainScript->setObjectHeight(30.0f);
+		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
 	else
 		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
 
@@ -247,6 +272,8 @@ GameObject * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = fal
 
 	return enemy;
 }
+
+
 Terrain * GenerateTerrain()
 {
 	// ground
@@ -513,9 +540,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	player->addChild(bulletSpawner);
 
 	// player FbxModelRenderer
-	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
 
@@ -528,22 +555,24 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	player->addComponent<PlayerScript>();
 	RigidBody * playerRigidBody = player->addComponent<RigidBody>();
 	playerRigidBody->setSphereCollider(10);
-	playerRigidBody->setGravity(Vector3(0, 5, 0));
+	playerRigidBody->setGravity(Vector3(0, -5, 0));
+	playerRigidBody->turnOnIsTriggerFlag();
 	//playerRigidBody->turnOnStaticFlag();
 	//playerRigidBody->turnOnIsTriggerFlag();
 
+	playerMoveOnTerrainScript->setTerrain(groundTerrain);
 
-
-
-
-
-
-
+	GameObject * gateTutorialToStageOne = GameObject::Instantiate("gateTutorialToStageOne", "GateTutorialToStageOne", Vector3(425, 4, 106));
+	//gateTutorialToStageOne->getTransform()->setWorldPosition(Vector3(425, 4, 106));
+	gateTutorialToStageOne->addComponent<GateInScript>()->setDestination(Vector3(-544, 3, 374));
 
 	// Enemys
 
+	
+	
+
 	GameObject * enemy1 = GenerateBasicEnemy(Vector3(395, 3, -288));
-	GameObject * enemy2 = GenerateBasicEnemy(Vector3(425, 4, 106));
+	GameObject * enemy2 = GenerateBasicEnemy(Vector3(425, 4, 106),true);
 	GameObject * enemy3 = GenerateBasicEnemy(Vector3(457, 3, 450));
 
 
@@ -561,20 +590,11 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	MoveOnTerrainScript * enemy1MoveOnTerrainScript = enemy1->getComponent<MoveOnTerrainScript>();
 	MoveOnTerrainScript * enemy2MoveOnTerrainScript = enemy2->getComponent<MoveOnTerrainScript>();
 	MoveOnTerrainScript * enemy3MoveOnTerrainScript = enemy3->getComponent<MoveOnTerrainScript>();
-	// 2단계
-
-	/*GameObject * car1Child1Child1 = car1Child1->addChild("car3", "Car");
-	car1Child1Child1->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car1Child1Child1->getTransform()->setPosition(0, 5, 0);
-
-	GameObject * car1Child1Child2 = car1Child1->addChild("car4", "Car");
-	car1Child1Child2->addComponent<MeshRenderer>()->loadXFile("car.x");
-	car1Child1Child2->getTransform()->setPosition(7, 0, 0);*/
 
 
 	// 맵등록 + 맵을 사용할 Script 등록
 
-	playerMoveOnTerrainScript->setTerrain(groundTerrain);
+
 
 	if (enemy1MoveOnTerrainScript)
 		enemy1MoveOnTerrainScript->setTerrain(groundTerrain);
@@ -583,7 +603,7 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	if (enemy3MoveOnTerrainScript)
 		enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
 
-
+	
 
 	// 하드코딩 스타트지점 맞추기------------------------------------------------------------------------------
 	//float tempHeight = 0.0f;
@@ -592,9 +612,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	//enemyBasicEnemyScript->setStartPoint(Vector3{ startPoint.getX() , tempHeight ,startPoint.getZ() });
 	//---------------------------------------------------------------------------------------------------------
 	// 모든 스테이지를 초기화해주고
-	mainCameraGamePlayManager->resetAllStage();
+	//mainCameraGamePlayManager->resetAllStage();
 	// 튜토리얼 스테이지로 설정해준다.
-	mainCameraGamePlayManager->changeStage(GamePlayManager::StageType::STAGE_TUTORIAL);
+	//mainCameraGamePlayManager->changeStage(GamePlayManager::StageType::STAGE_TUTORIAL);
 
 
 	//device->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
