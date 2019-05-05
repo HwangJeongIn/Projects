@@ -177,7 +177,7 @@
     <CustomBuild Include="gameui.h">
       <Filter>QT</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\Administrator\Desktop\qt_test_final\qt_test_final\gameui.ui">
+    <CustomBuild Include="gameui.ui">
       <Filter>QT</Filter>
     </CustomBuild>
   </ItemGroup>

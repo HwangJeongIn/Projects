@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GameUIClass</class>
+ <widget class="QMainWindow" name="GameUIClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>2127</width>
+    <height>1222</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GameEngine_With_DirectX9__FMOD__BulletPhysics__FBX SDK__QT</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QLineEdit" name="lineEdit_1">
+    <property name="geometry">
+     <rect>
+      <x>1910</x>
+      <y>0</y>
+      <width>21</width>
+      <height>1081</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>1930</x>
+      <y>0</y>
+      <width>191</width>
+      <height>531</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QCheckBox" name="checkBox_sound">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+       </property>
+       <property name="text">
+        <string>Toggle Sound</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox_gizmos">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+       </property>
+       <property name="text">
+        <string>Toggle Gizmos</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="Line" name="main_line_hp">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>1000</y>
+      <width>1000</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(225, 0, 0);</string>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>20</number>
+    </property>
+    <property name="midLineWidth">
+     <number>10</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="start_label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1920</width>
+      <height>1080</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="end_label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1920</width>
+      <height>1080</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>1070</y>
+      <width>1931</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_3">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>0</y>
+      <width>20</width>
+      <height>1091</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_4">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>530</y>
+      <width>1931</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelForDX">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1920</width>
+      <height>1080</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="startEnd_label_title">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>150</y>
+      <width>901</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>맑은 고딕</family>
+      <pointsize>90</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color : rgb(255, 177, 21);
+font: 90pt &quot;맑은 고딕&quot;;</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;FOREST&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="main_label_score">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>631</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 129, 3);
+font: 75 20pt &quot;맑은 고딕&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SCORE : &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="main_label_bossImage">
+    <property name="geometry">
+     <rect>
+      <x>1810</x>
+      <y>0</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="start_pushButton_start">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>460</y>
+      <width>349</width>
+      <height>115</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 129, 3);
+font: 75 48pt &quot;맑은 고딕&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="start_pushButton_load">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>600</y>
+      <width>349</width>
+      <height>115</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 129, 3);
+font: 75 48pt &quot;맑은 고딕&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Load</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="end_pushButton_restart">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>530</y>
+      <width>349</width>
+      <height>115</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 129, 3);
+font: 75 48pt &quot;맑은 고딕&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Restart</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <zorder>labelForDX</zorder>
+   <zorder>start_label</zorder>
+   <zorder>end_label</zorder>
+   <zorder>lineEdit_1</zorder>
+   <zorder>layoutWidget</zorder>
+   <zorder>main_line_hp</zorder>
+   <zorder>lineEdit_2</zorder>
+   <zorder>lineEdit_3</zorder>
+   <zorder>lineEdit_4</zorder>
+   <zorder>main_label_score</zorder>
+   <zorder>main_label_bossImage</zorder>
+   <zorder>startEnd_label_title</zorder>
+   <zorder>start_pushButton_start</zorder>
+   <zorder>start_pushButton_load</zorder>
+   <zorder>end_pushButton_restart</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>2127</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="gameui.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>start_pushButton_start</sender>
+   <signal>clicked()</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>start_pushButton_start()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1054</x>
+     <y>563</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1120</x>
+     <y>1189</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>start_pushButton_load</sender>
+   <signal>clicked()</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>start_pushButton_load()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>928</x>
+     <y>719</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1295</x>
+     <y>1158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>end_pushButton_restart</sender>
+   <signal>clicked()</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>end_pushButton_restart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1014</x>
+     <y>633</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1395</x>
+     <y>1169</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_sound</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>checkBox_sound(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1999</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2004</x>
+     <y>145</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_gizmos</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>checkBox_gizmos(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>2027</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2015</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>slot1()</slot>
+  <slot>slot2()</slot>
+  <slot>start_pushButton_start()</slot>
+  <slot>start_pushButton_load()</slot>
+  <slot>end_pushButton_restart()</slot>
+  <slot>checkBox_gizmos(bool)</slot>
+  <slot>checkBox_sound(bool)</slot>
+ </slots>
+</ui>
