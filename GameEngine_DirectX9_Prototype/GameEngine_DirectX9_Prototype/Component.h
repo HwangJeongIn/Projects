@@ -839,8 +839,8 @@ public :
 		STAGE_NONE,
 		STAGE_TUTORIAL,
 		STAGE_BOSS,
-		STAGE_ONE,
-		STAGE_TWO
+		STAGE_ONE/*,
+		STAGE_TWO*/
 	};
 private:
 	// 스테이지의 이름과 오브젝트의 이름경로를 통해서 등록한다.
@@ -856,8 +856,11 @@ private:
 	// 스테이지 기준으로 초기 플레이어가 바라볼 방향과 회전값을 넣어준다.
 	// start함수에서 하드코딩으로 넣어준다. // 나중에 json파일읽어서 넣어줄예정
 	map<StageType, pair<Vector3, Vector3>> stageStartPoints;
+	map<StageType, pair<Vector3, Vector3>> stageEndPoints;
 
 
+
+	
 	void removeObjectsIfNotExist(StageType stageType);
 
 	void resetCurrentStage();
@@ -870,7 +873,7 @@ private:
 	void setFbxModelRenderer(StageType stageType);
 
 
-	void changePlayerPosition(StageType stageType);
+	void movePlayerToStageStartPoint(StageType stageType);
 
 protected:
 	virtual void start();
@@ -892,6 +895,12 @@ public:
 	void unregisterStageObject(StageType stageType, const string & namePath);
 
 	void changeStage(StageType stageType);
+
+	void createGateFromTutorialToOne();
+	void createGateFromOneToBoss();
+
+	GameObject * generateBasicEnemy(const Vector3 & startPosition, const Vector3 & startRotation, StageType stageType, bool isBoss = false);
+
 
 	void setPlayer(GameObject * player) { this->player = player; }
 	GameObject * getPlayer() { return player; }
@@ -1712,7 +1721,10 @@ class GateInScript : public Component
 {
 private:
 	GateEffect * gateEffect;
-	Vector3 destination;
+	Vector3 destinationPosition;
+	Vector3 destinationRotation;
+
+	GamePlayManager::StageType destinationStage;
 protected:
 	virtual void onDestroy();
 	virtual void start();
@@ -1720,7 +1732,7 @@ protected:
 	virtual void onCollisionStay(GameObjectWithCollision & other);
 public:
 	GateInScript(GameObject * go, Transform * tf)
-		: Component(go, tf), gateEffect(nullptr)
+		: Component(go, tf), gateEffect(nullptr), destinationStage(GamePlayManager::StageType::STAGE_NONE)
 	{
 
 		start();
@@ -1731,13 +1743,14 @@ public:
 		onDestroy();
 	}
 
-	void setDestination(const Vector3 & destination)
+	void setDestination(const Vector3 & destinationPosition, const Vector3 & destinationRotation = Vector3(0,0,0))
 	{
-		this->destination = destination;
+		this->destinationPosition = destinationPosition;
+		this->destinationRotation = destinationRotation;
 	}
 
 	void setDestination(GameObject * other);
-
+	void setDestinationStage(GamePlayManager::StageType stageType);
 	void setOrigin(const Vector3 & origin);
 	//fireExplosion = new FireExplosion(device, textureFileName, numOfParticles, particleSize, origin);
 };

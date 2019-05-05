@@ -195,84 +195,6 @@ void SetEndScene()
 	mainCamera->getTransform()->setWorldRotation(15, 0, 0);
 }
 
-GameObject * GenerateBasicEnemy(const Vector3 & startPosition, bool isBoss = false)
-{
-	// enemy
-	GameObject * enemy = nullptr;
-
-	if (isBoss)
-		enemy = GameObject::Instantiate("enemyBoss", "EnemyBoss");
-	else
-		enemy = GameObject::Instantiate("enemy", "Enemy");
-
-
-	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
-	if (isBoss)
-	{
-		fbxModelRendererEnemy->loadFbxFile("mutant.fbx");
-	}
-	else
-	{
-		fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
-	}
-
-
-	fbxModelRendererEnemy->setUpdateFlag(false);
-	if (isBoss)
-		enemy->getTransform()->setLocalScale(40, 40, 40);
-	else
-		enemy->getTransform()->setLocalScale(25, 25, 25);
-
-	enemy->getTransform()->setWorldPosition(startPosition);
-	if (isBoss)
-	{
-		//enemy->getTransform()->setWorldRotation(-90, 0, 0);
-		BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
-	}
-
-
-
-	// 스타트포인트 알아서 설정됨
-	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
-
-	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
-
-	if (isBoss)
-		enemyRigidBody->setSphereCollider(7);
-	else
-		enemyRigidBody->setSphereCollider(5);
-	enemyRigidBody->setGravity(Vector3(0, 0, 0));
-	//enemyRigidBody->turnOnStaticFlag();
-	//enemyRigidBody->turnOnIsTriggerFlag();
-
-	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
-	//enemyRangeCollider->getTransform()->setLocalPosition(0, 0, 0);
-	//enemyRangeCollider->addComponent<MeshRenderer>()->loadXFile("car.x");
-
-	RigidBody * enemyRangeColliderRigidBody = enemyRangeCollider->addComponent<RigidBody>();
-	// 탐색 범위 40 // 안움직여야 하기 때문에 static객체 설정 + 뚫어야 하기 때문에 trigger객체 설정
-	enemyRangeColliderRigidBody->setSphereCollider(150.0f);
-	enemyRangeColliderRigidBody->turnOnIsTriggerFlag();
-	//enemyRangeColliderRigidBody->setGravity(Vector3(0, 0, 0));
-	enemyRangeColliderRigidBody->turnOnStaticFlag();
-	enemyRangeCollider->addComponent<BasicEnemySearchRangeScript>();
-
-	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
-
-	if (isBoss)
-		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
-	else
-		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
-
-
-	if (isBoss)
-		enemy->addComponent<DamageableScript>()->setMaxHp(100.0f);
-	else
-		enemy->addComponent<DamageableScript>()->setMaxHp(30.0f);
-
-	return enemy;
-}
-
 
 Terrain * GenerateTerrain()
 {
@@ -562,47 +484,33 @@ int WINAPI WinMain(HINSTANCE hinstance,
 
 	playerMoveOnTerrainScript->setTerrain(groundTerrain);
 
-	GameObject * gateTutorialToStageOne = GameObject::Instantiate("gateTutorialToStageOne", "GateTutorialToStageOne", Vector3(425, 4, 106));
-	//gateTutorialToStageOne->getTransform()->setWorldPosition(Vector3(425, 4, 106));
-	gateTutorialToStageOne->addComponent<GateInScript>()->setDestination(Vector3(-544, 3, 374));
+	//GameObject * gateTutorialToStageOne = GameObject::Instantiate("gateTutorialToStageOne", "GateTutorialToStageOne", Vector3(425, 4, 106));
+	////gateTutorialToStageOne->getTransform()->setWorldPosition(Vector3(425, 4, 106));
+	//gateTutorialToStageOne->addComponent<GateInScript>()->setDestination(Vector3(-544, 3, 374));
 
 	// Enemys
 
 	
-	
+	mainCameraGamePlayManager->createGateFromOneToBoss();
+	mainCameraGamePlayManager->createGateFromTutorialToOne();
 
-	GameObject * enemy1 = GenerateBasicEnemy(Vector3(395, 3, -288));
-	GameObject * enemy2 = GenerateBasicEnemy(Vector3(425, 4, 106),true);
-	GameObject * enemy3 = GenerateBasicEnemy(Vector3(457, 3, 450));
-
-
-	// 어떤스테이지인지 등록
-	string path;
-	enemy1->getPath(path);
-	mainCameraGamePlayManager->registerStageObject(GamePlayManager::StageType::STAGE_TUTORIAL, path);
-	enemy2->getPath(path);
-	mainCameraGamePlayManager->registerStageObject(GamePlayManager::StageType::STAGE_ONE, path);
-	enemy3->getPath(path);
-	mainCameraGamePlayManager->registerStageObject(GamePlayManager::StageType::STAGE_TWO, path);
+	GameObject * stageTutorialTarget1 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-276, 3, 479), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	GameObject * stageTutorialTarget2 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-276, 3, 383), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	GameObject * stageTutorialEnemyDummy = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-304, 3, 418), Vector3(0,-90,0), GamePlayManager::StageType::STAGE_TUTORIAL);
 
 
+	GameObject * stageOneEnemy1 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-511, 3, 59), Vector3(0, 147, 0), GamePlayManager::StageType::STAGE_ONE);
+	GameObject * stageOneEnemy2 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-294, 3, -291), Vector3(0, -121, 0), GamePlayManager::StageType::STAGE_ONE);
+	GameObject * stageOneEnemy3 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-500, 3, -470), Vector3(0, 24, 0), GamePlayManager::StageType::STAGE_ONE);
+	// 중보스
+	GameObject * stageOneEnemy4 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(384, 3, -349), Vector3(0, -102, 0), GamePlayManager::StageType::STAGE_ONE);
 
-	MoveOnTerrainScript * enemy1MoveOnTerrainScript = enemy1->getComponent<MoveOnTerrainScript>();
-	MoveOnTerrainScript * enemy2MoveOnTerrainScript = enemy2->getComponent<MoveOnTerrainScript>();
-	MoveOnTerrainScript * enemy3MoveOnTerrainScript = enemy3->getComponent<MoveOnTerrainScript>();
+	// 보스
+	GameObject * stageBossEnmeyBoss = mainCameraGamePlayManager->generateBasicEnemy(Vector3(265, 3, 280), Vector3(0, -113, 0), GamePlayManager::StageType::STAGE_BOSS,true);
 
 
-	// 맵등록 + 맵을 사용할 Script 등록
-
-
-
-	if (enemy1MoveOnTerrainScript)
-		enemy1MoveOnTerrainScript->setTerrain(groundTerrain);
-	if (enemy2MoveOnTerrainScript)
-		enemy2MoveOnTerrainScript->setTerrain(groundTerrain);
-	if (enemy3MoveOnTerrainScript)
-		enemy3MoveOnTerrainScript->setTerrain(groundTerrain);
-
+	mainCameraGamePlayManager->resetAllStage();
+	mainCameraGamePlayManager->changeStage(GamePlayManager::StageType::STAGE_TUTORIAL);
 	
 
 	// 하드코딩 스타트지점 맞추기------------------------------------------------------------------------------

@@ -414,7 +414,13 @@ void Transform::setLocalRotation(float x, float y, float z)
 void PlayerScript::update()
 {
 	Vector3 temp = transform->getWorldPosition();
-	Trace::Write("TAG_DEBUG", "player", "");
+	Trace::Write("TAG_DEBUG", "playerPosition", "");
+	Trace::Write("TAG_DEBUG", "x", temp.getX());
+	Trace::Write("TAG_DEBUG", "y", temp.getY());
+	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+
+	temp = transform->getWorldRotation();
+	Trace::Write("TAG_DEBUG", "playerRotation", "");
 	Trace::Write("TAG_DEBUG", "x", temp.getX());
 	Trace::Write("TAG_DEBUG", "y", temp.getY());
 	Trace::Write("TAG_DEBUG", "z", temp.getZ());
@@ -1120,6 +1126,145 @@ void MainCamera::getViewMatrix(D3DXMATRIX* v)
 
 }
 
+void GamePlayManager::createGateFromTutorialToOne()
+{
+	map<StageType, pair<Vector3, Vector3>>::iterator it1 = stageEndPoints.find(StageType::STAGE_TUTORIAL);
+	// 만약 등록된 시작위치가 없다면 리턴
+	if (it1 == stageEndPoints.end()) return;
+
+	map<StageType, pair<Vector3, Vector3>>::iterator it2 = stageStartPoints.find(StageType::STAGE_ONE);
+	// 만약 등록된 끝위치가 없다면 리턴
+	if (it2 == stageStartPoints.end()) return;
+
+	// 스타트 포인트를 객체생성과 동시에 정해준다. 
+	// 게이트가 생성되면서 그 게임오브젝트의 위치와 회전값을 따라가기 때문에 별도로 설정해주지 않아도 된다.
+	GameObject * startPointGate = GameObject::Instantiate("gateFromTutorialToOne", "GateFromTutorialToOne",(*it1).second.first,(*it1).second.second );
+	GateInScript * gateInScript = startPointGate->addComponent<GateInScript>();
+
+	gateInScript->setDestination((*it2).second.first, (*it2).second.second);
+	gateInScript->setDestinationStage(StageType::STAGE_ONE);
+
+}
+
+void GamePlayManager::createGateFromOneToBoss()
+{
+	map<StageType, pair<Vector3, Vector3>>::iterator it1 = stageEndPoints.find(StageType::STAGE_ONE);
+	// 만약 등록된 시작위치가 없다면 리턴
+	if (it1 == stageEndPoints.end()) return;
+
+	map<StageType, pair<Vector3, Vector3>>::iterator it2 = stageStartPoints.find(StageType::STAGE_BOSS);
+	// 만약 등록된 끝위치가 없다면 리턴
+	if (it2 == stageStartPoints.end()) return;
+
+	// 스타트 포인트를 객체생성과 동시에 정해준다. 
+	// 게이트가 생성되면서 그 게임오브젝트의 위치와 회전값을 따라가기 때문에 별도로 설정해주지 않아도 된다.
+	GameObject * startPointGate = GameObject::Instantiate("gateFromOneToBoss", "GateFromOneToBoss", (*it1).second.first, (*it1).second.second);
+
+	GateInScript * gateInScript = startPointGate->addComponent<GateInScript>();
+
+	gateInScript->setDestination((*it2).second.first, (*it2).second.second);
+	gateInScript->setDestinationStage(StageType::STAGE_BOSS);
+}
+
+GameObject * GamePlayManager::generateBasicEnemy(const Vector3 & startPosition, const Vector3 & startRotation, StageType stageType, bool isBoss)
+
+{
+	// enemy
+	GameObject * enemy = nullptr;
+
+	if (isBoss)
+		enemy = GameObject::Instantiate("enemyBoss", "EnemyBoss", startPosition, startRotation);
+	else
+		enemy = GameObject::Instantiate("enemy", "Enemy", startPosition, startRotation);
+
+
+	// 생성했으니 스테이지에 등록한다.
+	string path;
+	enemy->getPath(path);
+	registerStageObject(stageType, path);
+
+
+	FbxModelRenderer * fbxModelRendererEnemy = enemy->addComponent<FbxModelRenderer>();
+	if (isBoss)
+	{
+		fbxModelRendererEnemy->loadFbxFile("mutant.fbx");
+	}
+	else
+	{
+		fbxModelRendererEnemy->loadFbxFile("mummy_rig.fbx");
+	}
+
+
+	fbxModelRendererEnemy->setUpdateFlag(false);
+	if (isBoss)
+		enemy->getTransform()->setLocalScale(40, 40, 40);
+	else
+		enemy->getTransform()->setLocalScale(25, 25, 25);
+
+	if (isBoss)
+	{
+		//enemy->getTransform()->setWorldRotation(-90, 0, 0);
+		BasicEnemyAnimationFSM * basicEnemyAnimationFSM = enemy->addComponent<BasicEnemyAnimationFSM>();
+	}
+
+	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
+
+	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
+
+	if (isBoss)
+		enemyRigidBody->setSphereCollider(7);
+	else
+		enemyRigidBody->setSphereCollider(5);
+	enemyRigidBody->setGravity(Vector3(0, 0, 0));
+	//enemyRigidBody->turnOnStaticFlag();
+	//enemyRigidBody->turnOnIsTriggerFlag();
+
+	GameObject * enemyRangeCollider = enemy->addChild("enemyRangeCollider", "EnemyRangeCollider");
+
+
+	RigidBody * enemyRangeColliderRigidBody = enemyRangeCollider->addComponent<RigidBody>();
+	// 탐색 범위 40 // 안움직여야 하기 때문에 static객체 설정 + 뚫어야 하기 때문에 trigger객체 설정
+
+	if (isBoss)
+		enemyRangeColliderRigidBody->setSphereCollider(150.0f);
+	else
+		enemyRangeColliderRigidBody->setSphereCollider(50.0f);
+
+	enemyRangeColliderRigidBody->turnOnIsTriggerFlag();
+	//enemyRangeColliderRigidBody->setGravity(Vector3(0, 0, 0));
+	enemyRangeColliderRigidBody->turnOnStaticFlag();
+	enemyRangeCollider->addComponent<BasicEnemySearchRangeScript>();
+
+	MoveOnTerrainScript * enemyMoveOnTerrainScript = enemy->addComponent<MoveOnTerrainScript>();
+
+	// 터레인을 찾아서 MoveOnTerrainScript에 등록해준다.
+	GameObject * ground = gameObject->getScene().findWithNamePath("/ground");
+
+	if (ground)
+	{
+		Terrain * terrain = ground->getComponent<Terrain>();
+		if (terrain)
+			enemyMoveOnTerrainScript->setTerrain(terrain);
+	}
+
+
+	if (isBoss)
+		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
+	else
+		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
+
+
+	if (isBoss)
+		enemy->addComponent<DamageableScript>()->setMaxHp(50.0f);
+	else
+		enemy->addComponent<DamageableScript>()->setMaxHp(10.0f);
+
+	return enemy;
+}
+
+
+
+
 void GamePlayManager::removeObjectsIfNotExist(StageType stageType)
 {
 	GameObject * object = nullptr;
@@ -1204,7 +1349,7 @@ void GamePlayManager::setFbxModelRenderer(StageType stageType)
 	}
 }
 
-void GamePlayManager::changePlayerPosition(StageType stageType)
+void GamePlayManager::movePlayerToStageStartPoint(StageType stageType)
 {
 	if (!player) return;
 
@@ -1216,8 +1361,8 @@ void GamePlayManager::changePlayerPosition(StageType stageType)
 	player->getTransform()->setWorldPosition((*it).second.first);
 	// 로테이션 지정
 	player->getTransform()->setWorldRotation((*it).second.second);
-
 }
+
 
 void GamePlayManager::start()
 {
@@ -1228,26 +1373,31 @@ void GamePlayManager::start()
 	}
 
 	// 각스테이지의 시작지점을 정해준다 // 월드좌표기준
-	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TUTORIAL, pair<Vector3, Vector3>(Vector3(0, 0, 0), Vector3(0, 0, 0))));
-	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_ONE, pair<Vector3, Vector3>(Vector3(50, 0, 50), Vector3(0, 0, 0))));
-	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TWO, pair<Vector3, Vector3>(Vector3(100, 0, 100), Vector3(0, 0, 0))));
-	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_BOSS, pair<Vector3, Vector3>(Vector3(150, 0, 150), Vector3(0, 0, 0))));
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TUTORIAL, pair<Vector3, Vector3>(Vector3(-527, 3, 401), Vector3(0, 93, 0))));
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_ONE, pair<Vector3, Vector3>(Vector3(-319, 3, 62), Vector3(0, -88, 0))));
+	//stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TWO, pair<Vector3, Vector3>(Vector3(100, 0, 100), Vector3(0, 0, 0))));
+	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_BOSS, pair<Vector3, Vector3>(Vector3(17, 3, -20), Vector3(0, 35, 0))));
+
+	stageEndPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TUTORIAL, pair<Vector3, Vector3>(Vector3(-216, 3, 417), Vector3(0, -84, 0))));
+	stageEndPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_ONE, pair<Vector3, Vector3>(Vector3(459, 3, -226), Vector3(0, -142, 0))));
+	//stageEndPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TWO, pair<Vector3, Vector3>(Vector3(100, 0, 100), Vector3(0, 0, 0))));
+	stageEndPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_BOSS, pair<Vector3, Vector3>(Vector3(35, 3, 4), Vector3(0, 35, 0))));
 }
 
 void GamePlayManager::update()
 {
-	if (InputManager::GetKeyDown(0x37))
+	if (InputManager::GetKeyDown(0x34))
 	{
 		changeStage(StageType::STAGE_TUTORIAL);
 	}
-	else if (InputManager::GetKeyDown(0x34))
+	else if (InputManager::GetKeyDown(0x35))
 	{
 		changeStage(StageType::STAGE_ONE);
 	}
-	else if (InputManager::GetKeyDown(0x35))
-	{
-		changeStage(StageType::STAGE_TWO);
-	}
+	//else if (InputManager::GetKeyDown(0x35))
+	//{
+	//	changeStage(StageType::STAGE_TWO);
+	//}
 	else if (InputManager::GetKeyDown(0x36))
 	{
 		changeStage(StageType::STAGE_BOSS);
@@ -1259,7 +1409,7 @@ void GamePlayManager::resetAllStage()
 {
 	resetStage(StageType::STAGE_TUTORIAL);
 	resetStage(StageType::STAGE_ONE);
-	resetStage(StageType::STAGE_TWO);
+	//resetStage(StageType::STAGE_TWO);
 	resetStage(StageType::STAGE_BOSS);
 }
 
@@ -1301,7 +1451,7 @@ void GamePlayManager::changeStage(StageType stageType)
 	setStage(stageType);
 
 	// 플레이어 위치를 바꿔준다.
-	changePlayerPosition(stageType);
+	// changePlayerPosition(stageType);
 }
 
 
@@ -4616,7 +4766,8 @@ void GateInScript::start()
 
 
 	// 따로 외부에서 지정을 하지 않는한 게이트의 목적지는 현재위치이다.
-	destination = transform->getWorldPosition();
+	destinationPosition = transform->getWorldPosition();
+	destinationRotation = transform->getWorldRotation();
 }
 
 void GateInScript::update()
@@ -4634,20 +4785,33 @@ void GateInScript::onCollisionStay(GameObjectWithCollision & other)
 	{
 		// 최종적으로 플레이어를 옮길 위치에 도착게이트를 생성한다
 		// 이 도착게이트는 3초뒤에 자동적으로 소멸한다.
-		GameObject * gateOut = GameObject::Instantiate("gateOut", "GateOut", destination);
+		GameObject * gateOut = GameObject::Instantiate("gateOut", "GateOut", destinationPosition, destinationRotation);
 		gateOut->addComponent<GateOutScript>();
 
 		// 플레이어를 운반하고 스스로 삭제한다.
-		other.gameObject->getTransform()->setWorldPosition(destination);
-
+		other.gameObject->getTransform()->setWorldPosition(destinationPosition);
+		other.gameObject->getTransform()->setWorldRotation(destinationRotation);
 		GameObject::Destroy(gameObject);
+
+		// 최종적으로 게임플레이 매니저에 도착스테이지를 알려준다.
+		GameObject * mainCamera = gameObject->getScene().getMainCamera();
+		if (!mainCamera) return;
+		GamePlayManager * mainCameraGamePlayManager = mainCamera->getComponent<GamePlayManager>();
+		if (!mainCameraGamePlayManager) return;
+		mainCameraGamePlayManager->changeStage(destinationStage);
 	}
 }
 
 void GateInScript::setDestination(GameObject * other)
 {
 	if (!other) return;
-	destination = other->getTransform()->getWorldPosition();
+	destinationPosition = other->getTransform()->getWorldPosition();
+	destinationRotation = other->getTransform()->getWorldRotation();
+}
+
+void GateInScript::setDestinationStage(GamePlayManager::StageType stageType)
+{
+	destinationStage = stageType;
 }
 
 void GateInScript::setOrigin(const Vector3 & origin)
