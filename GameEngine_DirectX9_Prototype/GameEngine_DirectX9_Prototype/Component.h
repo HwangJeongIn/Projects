@@ -523,6 +523,11 @@ private:
 
 	float moveSpeed;
 
+	//const pair<Vector3, Vector3> startPoint;
+	// 플레이어를 블록하기 위한 변수들
+	unsigned char blockKey;
+	bool isBlocked;
+
 	BulletController * bulletController;
 	FbxModelRenderer * fbxModelRenderer;
 
@@ -534,7 +539,7 @@ protected:
 public:
 	PlayerScript(GameObject * go, Transform * tf)
 		: Component(go, tf), shootingPower(0.0f), chargingSpeed(50.0f), defaultShootingPower(200), maxShootingPower(800), bulletController(nullptr), moveSpeed(0.85f),
-		fbxModelRenderer(nullptr)
+		fbxModelRenderer(nullptr), blockKey(0), isBlocked(false)//, startPoint({Vector3(),Vector3()})
 	{
 		start();
 	}
@@ -542,6 +547,12 @@ public:
 	virtual ~PlayerScript()
 	{
 		onDestroy();
+	}
+
+	void blockedUntilPressKey(unsigned char blockKey)
+	{
+		this->blockKey = blockKey;
+		isBlocked = true;
 	}
 
 };
@@ -557,6 +568,8 @@ private:
 	BT::Root * basicEnemyBT;
 	Vector3 startPoint;
 	float power;
+	float enemyFactor;
+
 protected:
 	virtual void fixedUpdate();
 	virtual void update();
@@ -566,7 +579,8 @@ protected:
 
 public:
 	BasicEnemyScript(GameObject * go, Transform * tf)
-		: Component(go, tf), target(nullptr), basicEnemyBT(nullptr), power(10.0f), basicEnemyAnimationFSM(nullptr)
+		: Component(go, tf), target(nullptr), basicEnemyBT(nullptr), power(10.0f), basicEnemyAnimationFSM(nullptr),
+		enemyFactor(1.0f)
 	{
 		start();
 	}
@@ -614,6 +628,14 @@ public:
 	const Vector3 & getStartPoint() { return startPoint; }
 
 
+	void setEnemyFactor(float enemyFactor)
+	{
+		if (enemyFactor <= 0)
+			enemyFactor = 1;
+		this->enemyFactor = enemyFactor;
+	}
+
+	float getEnemyFactor() const { return enemyFactor; }
 
 };
 
@@ -660,6 +682,14 @@ public :
 		onDestroy();
 	}
 
+	void setFull()
+	{
+		currentHp = maxHp;
+	}
+	float getHpFactor()
+	{
+		return currentHp / maxHp;
+	}
 	void setMaxHp(float maxHp);
 
 	void setCurrentHp(float hp);
@@ -765,8 +795,9 @@ public:
 class BulletController : public Component
 {
 private:
-	vector<pair<GameObject *, Vector3 >> bullets;
+	vector<pair<GameObject *, float >> bullets;
 	float lagTime;
+	float maxLagTime;
 	float creationInterval;
 	float maxNumOfBullets;
 
@@ -785,7 +816,7 @@ protected:
 	virtual void onDestroy();
 public:
 	BulletController(GameObject * go, Transform * tf)
-		: Component(go, tf), lagTime(0.0f), maxNumOfBullets(3), bulletSpaceRadius(10), creationInterval(2), bulletSpeed(0.1f), valueFactor(1.0f)
+		: Component(go, tf), lagTime(0.0f), maxNumOfBullets(3), bulletSpaceRadius(13), creationInterval(2), bulletSpeed(0.80f), valueFactor(1.0f), maxLagTime(0.0f)
 	{
 		start();
 	}
@@ -803,6 +834,7 @@ public:
 	float getCreationInterval() const { return creationInterval; }
 
 	void removeBullet(GameObject * bullet);
+	void removeRealBullet(GameObject * realBullet);
 	bool addBullet();
 	bool shootBullet(float power);
 
@@ -814,7 +846,7 @@ public:
 };
 
 
-//class Scene;
+class Scene;
 //enum MainObjTag;
 // 메인 카메라 오브젝트가 가지는 컴포넌트로 생성과 삭제시 메인 오브젝트 테이블에 등록 삭제를 해준다.
 class MainCamera : public Component
@@ -843,6 +875,9 @@ public :
 		STAGE_TWO*/
 	};
 private:
+	Scene * scene;
+
+
 	// 스테이지의 이름과 오브젝트의 이름경로를 통해서 등록한다.
 	// 만약에 스테이지가 바뀐다면 여기서도 다른 스테이지에 있는 것들을 더이상 렌더링하지 않도록 최적화를 시켜준다.
 	// 가장 문제가되는 것들은 FbxModelRenderer안 render함수인데 이를 켜고 끌수 있기 때문에 그 처리를 해준다.
@@ -858,12 +893,12 @@ private:
 	map<StageType, pair<Vector3, Vector3>> stageStartPoints;
 	map<StageType, pair<Vector3, Vector3>> stageEndPoints;
 
-
-
+	bool clearTutorial;
+	bool beginTutorial;
+	bool existUnreadMessage;
 	
 	void removeObjectsIfNotExist(StageType stageType);
 
-	void resetCurrentStage();
 	void resetStage(StageType stageType);
 	void setStage(StageType stageType);
 	
@@ -873,14 +908,14 @@ private:
 	void setFbxModelRenderer(StageType stageType);
 
 
-	void movePlayerToStageStartPoint(StageType stageType);
 
 protected:
 	virtual void start();
 	virtual void update();
 public:
 	GamePlayManager(GameObject * go, Transform * tf)
-		: Component(go, tf), currentStage(STAGE_NONE), player(nullptr)
+		: Component(go, tf), currentStage(STAGE_NONE), player(nullptr), clearTutorial(false), beginTutorial(false), existUnreadMessage(false),
+		scene(nullptr)
 	{
 		start();
 	}
@@ -891,10 +926,20 @@ public:
 	}
 
 	void resetAllStage();
+	void setAllStage();
+
+	void resetCurrentStage();
+	void setCurrentStage();
+
+	void  setActivePlayerRendering(bool flag);
+
 	void registerStageObject(StageType stageType, const string & namePath);
 	void unregisterStageObject(StageType stageType, const string & namePath);
 
 	void changeStage(StageType stageType);
+	void movePlayerToStageStartPoint(StageType stageType);
+
+	void setUnreadMessage(bool flag) { existUnreadMessage = flag; }
 
 	void createGateFromTutorialToOne();
 	void createGateFromOneToBoss();
@@ -904,6 +949,11 @@ public:
 
 	void setPlayer(GameObject * player) { this->player = player; }
 	GameObject * getPlayer() { return player; }
+
+	void resetPlayerHp();
+	void generateAllStages();
+	void removeAllStages();
+	void regenerateAllStages();
 };
 
 

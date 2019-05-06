@@ -114,6 +114,12 @@ void GameObject::setParent(GameObject * parent)
 		parent->children.push_back(this);
 	}
 
+	if (parent == nullptr && this->parent == nullptr)
+	{
+		getScene().baseDestroy(this, true);
+		getScene().baseInstantiate(this, true);
+	}
+
 
 }
 

@@ -413,18 +413,24 @@ void Transform::setLocalRotation(float x, float y, float z)
 
 void PlayerScript::update()
 {
-	Vector3 temp = transform->getWorldPosition();
-	Trace::Write("TAG_DEBUG", "playerPosition", "");
-	Trace::Write("TAG_DEBUG", "x", temp.getX());
-	Trace::Write("TAG_DEBUG", "y", temp.getY());
-	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	//Vector3 temp = transform->getWorldPosition();
+	//Trace::Write("TAG_DEBUG", "playerPosition", "");
+	//Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
 
-	temp = transform->getWorldRotation();
-	Trace::Write("TAG_DEBUG", "playerRotation", "");
-	Trace::Write("TAG_DEBUG", "x", temp.getX());
-	Trace::Write("TAG_DEBUG", "y", temp.getY());
-	Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	//temp = transform->getWorldRotation();
+	//Trace::Write("TAG_DEBUG", "playerRotation", "");
+	//Trace::Write("TAG_DEBUG", "x", temp.getX());
+	//Trace::Write("TAG_DEBUG", "y", temp.getY());
+	//Trace::Write("TAG_DEBUG", "z", temp.getZ());
+	if (isBlocked)
+	{
+		if (InputManager::GetKeyStay(blockKey))
+			isBlocked = false;
 
+		return;
+	}
 
 
 	if (InputManager::GetKeyStay(0x57))
@@ -497,11 +503,11 @@ void PlayerScript::update()
 			fbxModelRenderer->setIsTransparent(false);
 	}
 
-	if (::GetAsyncKeyState('N') & 0x8000f)
-			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,-1,0 });
+	if (InputManager::GetKeyStay('N'))
+			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,-0.5,0 });
 
-	if (::GetAsyncKeyState('M') & 0x8000f)
-			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,1,0 });
+	if (InputManager::GetKeyStay('M'))
+			transform->setWorldRotation(transform->getWorldRotation() + FrameTime::GetDeltaTime() *.1f * Vector3{ 0,0.5,0 });
 }
 
 void PlayerScript::start()
@@ -662,27 +668,27 @@ bool BasicEnemyScript::isOutOfRange()
 {
 
 	// 타겟과 시작점과의 거리가 300이상이면 
-	return Vector3::Distance(target->getTransform()->getWorldPosition(), startPoint)  > 200.0f;
+	return Vector3::Distance(target->getTransform()->getWorldPosition(), startPoint)  > (200.0f * enemyFactor);
 }
 
 bool BasicEnemyScript::isInRange()
 {
-	return Vector3::Distance(transform->getWorldPosition(), startPoint) <= 160.0f;
+	return Vector3::Distance(transform->getWorldPosition(), startPoint) <= (160.0f* enemyFactor);
 }
 
 bool BasicEnemyScript::isInRange1()
 {
-	return getTargetDistance() <= 5.0f;
+	return getTargetDistance() <= (5.0f* enemyFactor);
 }
 
 bool BasicEnemyScript::isInRange2()
 {
-	return getTargetDistance() <= 30.0f;
+	return getTargetDistance() <= (30.0f* enemyFactor);
 }
 
 bool BasicEnemyScript::isInRange3()
 {
-	return getTargetDistance() <= 200.0f;
+	return getTargetDistance() <= (200.0f* enemyFactor);
 }
 
 bool BasicEnemyScript::isTargeting()
@@ -697,7 +703,7 @@ bool BasicEnemyScript::isNotTargeting()
 
 bool BasicEnemyScript::haveToReturn()
 {
-	return (Vector3::Distance(transform->getWorldPosition(), startPoint) > 10);
+	return (Vector3::Distance(transform->getWorldPosition(), startPoint) > (10 * enemyFactor));
 }
 
 void BasicEnemyScript::returnToStartPoint()
@@ -737,7 +743,7 @@ void BasicEnemyScript::idle()
 
 void BasicEnemyScript::resetTarget()
 {
-	gameObject->getAudio().playBackGroundSound("BS_BackGround_MainScene.mp3");
+	gameObject->getGameUI().removeEnemyThatIsNotTargetingPlayer();
 	target = nullptr;
 }
 
@@ -870,24 +876,38 @@ void BasicEnemySearchRangeScript::start()
 void BasicEnemySearchRangeScript::onCollisionStay(GameObjectWithCollision & other)
 {
 	if (basicEnemyScript == nullptr) return;
+	// 타겟팅을 하고 있다면 다른 것들을 보지않는다.
+	if (basicEnemyScript->isTargeting()) return;
 
 	// 들어온 오브젝트 태그가 플레이어일때
 	if (other.gameObject->getTag() == "Player")
 	{
-		gameObject->getParent()->getComponent<FbxModelRenderer>()->setUpdateFlag(true);
-		// 타겟이 없을때
-		if (basicEnemyScript->isNotTargeting())
+		// 만약 플레이어가 투명한 상태라면 식별하지 못한다.
+		FbxModelRenderer * playerFbxModelRenderer = other.gameObject->getComponent<FbxModelRenderer>();
+		if (playerFbxModelRenderer)
 		{
-			if (gameObject->getParent()->getTag() == "Enemy")
-			{
-				gameObject->getAudio().playBackGroundSound("BS_BackGround_Monster.mp3");
-			}
-			else // if(gameObject->getTag() == "EnemyBoss")
-			{
-				gameObject->getAudio().playBackGroundSound("BS_BackGround_BossMonster.mp3");
-			}
-			basicEnemyScript->setTarget(other.gameObject);
+			if (playerFbxModelRenderer->getIsTransparent() == true)
+				return;
 		}
+
+		basicEnemyScript->setTarget(other.gameObject);
+		gameObject->getGameUI().addEnemyThatIsTargetingPlayer();
+
+		//FbxModelRenderer * fbxModelRenderer = gameObject->getParent()->getComponent<FbxModelRenderer>();
+		//if (fbxModelRenderer)
+		//	fbxModelRenderer->setUpdateFlag(true);
+
+
+		if (gameObject->getParent()->getTag() == "Enemy")
+		{
+			gameObject->getAudio().playBackGroundSound("BS_BackGround_Monster.mp3");
+		}
+		else // if(gameObject->getTag() == "EnemyBoss")
+		{
+			gameObject->getAudio().playBackGroundSound("BS_BackGround_BossMonster.mp3");
+		}
+
+
 	}
 }
 
@@ -937,21 +957,71 @@ void DamageableScript::getDamaged(float power)
 	{
 		if (gameObject->getTag() == "Player")
 		{
-			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
-			gameObject->getGameUI().setEndSceneUI();
 			// 리셋
+			// 플레이어 피 회복 UI반영 / 몬스터 재생성 / 플레이어 위치변경 등등
+			GameObject * mainCamera = gameObject->getScene().getMainCamera();
+			if (mainCamera)
+			{
+				GamePlayManager * mainCameraGamePlayManager = mainCamera->getComponent<GamePlayManager>();
+				if (mainCameraGamePlayManager)
+					mainCameraGamePlayManager->regenerateAllStages();
+			}
+
+			//씬을 바꾸는일은 내부업데이트에서 해주면안된다.
+			// 게임루프가 모두끝난다음에 처리를 해줘야한다. // 중간에 삭제처리등 여러가지 문제가많다.
+			// 즉 다음으로 변경할씬을 등록해주면 게임루프 마지막에서 변경해준다.
+			//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+			//gameObject->getGameUI().setEndSceneUI();
+			gameObject->getScene().registerOtherSceneToChange(Locator::SceneType::END);
 			return;
 		}
 		else if (gameObject->getTag() == "Enemy")
 		{
 			gameObject->getGameUI().addScore(100);
+			// 만약 플레이어를 타겟팅 하고 있던 적이라면 지우기전에 카운트를 줄여준다.
+			BasicEnemyScript * basicEnemyScript = gameObject->getComponent<BasicEnemyScript>();
+			if (basicEnemyScript)
+			{
+				if (basicEnemyScript->isTargeting())
+				{
+					if (basicEnemyScript->getTarget()->getTag() == "Player")
+						gameObject->getGameUI().removeEnemyThatIsNotTargetingPlayer();
+				}
+
+			}
+
 		}
 		else if (gameObject->getTag() == "EnemyBoss")
 		{
 			gameObject->getGameUI().addScore(1000);
-			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
-			gameObject->getGameUI().setEndSceneUI();
+			// 만약 플레이어를 타겟팅 하고 있던 적이라면 지우기전에 카운트를 줄여준다.
+			BasicEnemyScript * basicEnemyScript = gameObject->getComponent<BasicEnemyScript>();
+			if (basicEnemyScript)
+			{
+				if (basicEnemyScript->isTargeting())
+				{
+					if (basicEnemyScript->getTarget()->getTag() == "Player")
+						gameObject->getGameUI().removeEnemyThatIsNotTargetingPlayer();
+				}
+			}
+
 			// 리셋
+			// 플레이어 피 회복 UI반영 / 몬스터 재생성 / 플레이어 위치변경 등등
+			GameObject * mainCamera = gameObject->getScene().getMainCamera();
+			if (mainCamera)
+			{
+				GamePlayManager * mainCameraGamePlayManager = mainCamera->getComponent<GamePlayManager>();
+				if (mainCameraGamePlayManager)
+					mainCameraGamePlayManager->regenerateAllStages();
+			}
+
+			//씬을 바꾸는일은 내부업데이트에서 해주면안된다.
+			// 게임루프가 모두끝난다음에 처리를 해줘야한다. // 중간에 삭제처리등 여러가지 문제가많다.
+			// 즉 다음으로 변경할씬을 등록해주면 게임루프 마지막에서 변경해준다.
+			//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+			//gameObject->getGameUI().setEndSceneUI();
+			gameObject->getScene().registerOtherSceneToChange(Locator::SceneType::END);
+
 			return;
 		}
 		currentHp = 0.0f;
@@ -1013,18 +1083,18 @@ void MainCamera::update()
 	// 메인카메라에서 오디오를 최신화 시킨다.
 	setViewSpace();
 
-	if (::GetAsyncKeyState('E') & 0x8000f)
-		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 0,1.005f,0 });
-	if (::GetAsyncKeyState('Q') & 0x8000f)
-		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 0,-1.005f,0 });
+	//if (::GetAsyncKeyState('E') & 0x8000f)
+	//	transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 0,1.005f,0 });
+	//if (::GetAsyncKeyState('Q') & 0x8000f)
+	//	transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 0,-1.005f,0 });
 
-	if (::GetAsyncKeyState('Z') & 0x8000f)
+	if (InputManager::GetKeyStay('Z'))
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,.05f,.05f });
 		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ 1.05f,0,0 });
 	}
 
-	if (::GetAsyncKeyState('C') & 0x8000f)
+	if (InputManager::GetKeyStay('C'))
 	{
 		//transform->setRotation(transform->getRotation() + Vector3{ 0,-.05f,-.05f });
 		transform->setLocalRotation(transform->getLocalRotation() + Vector3{ -1.05f,0,0 });
@@ -1197,7 +1267,7 @@ GameObject * GamePlayManager::generateBasicEnemy(const Vector3 & startPosition, 
 
 	fbxModelRendererEnemy->setUpdateFlag(false);
 	if (isBoss)
-		enemy->getTransform()->setLocalScale(40, 40, 40);
+		enemy->getTransform()->setLocalScale(3, 3, 3);
 	else
 		enemy->getTransform()->setLocalScale(25, 25, 25);
 
@@ -1208,11 +1278,15 @@ GameObject * GamePlayManager::generateBasicEnemy(const Vector3 & startPosition, 
 	}
 
 	BasicEnemyScript * enemyBasicEnemyScript = enemy->addComponent<BasicEnemyScript>();
-
+	if (isBoss)
+	{
+		enemyBasicEnemyScript->setEnemyFactor(3.0f);
+		enemyBasicEnemyScript->setPower(30.0f);
+	}
 	RigidBody * enemyRigidBody = enemy->addComponent<RigidBody>();
 
 	if (isBoss)
-		enemyRigidBody->setSphereCollider(7);
+		enemyRigidBody->setSphereCollider(13);
 	else
 		enemyRigidBody->setSphereCollider(5);
 	enemyRigidBody->setGravity(Vector3(0, 0, 0));
@@ -1249,7 +1323,7 @@ GameObject * GamePlayManager::generateBasicEnemy(const Vector3 & startPosition, 
 
 
 	if (isBoss)
-		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
+		enemyMoveOnTerrainScript->setObjectHeight(3.0f);
 	else
 		enemyMoveOnTerrainScript->setObjectHeight(10.0f);
 
@@ -1260,6 +1334,68 @@ GameObject * GamePlayManager::generateBasicEnemy(const Vector3 & startPosition, 
 		enemy->addComponent<DamageableScript>()->setMaxHp(10.0f);
 
 	return enemy;
+}
+
+void GamePlayManager::resetPlayerHp()
+{
+	if (!player) return;
+	DamageableScript * playerDamageableScript = player->getComponent<DamageableScript>();
+	if (!playerDamageableScript) return;
+
+	playerDamageableScript->setFull();
+	gameObject->getGameUI().setCurrentPlayerHpFactor(playerDamageableScript->getHpFactor());
+}
+
+void GamePlayManager::generateAllStages()
+{
+	GameObject * stageTutorialTarget1 = generateBasicEnemy(Vector3(-276, 3, 479), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	stageTutorialTarget1->getComponent<BasicEnemyScript>()->setPower(1.0f);
+	GameObject * stageTutorialTarget2 = generateBasicEnemy(Vector3(-276, 3, 383), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	stageTutorialTarget2->getComponent<BasicEnemyScript>()->setPower(1.0f);
+	GameObject * stageTutorialEnemyDummy = generateBasicEnemy(Vector3(-304, 3, 418), Vector3(0,-90,0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	stageTutorialEnemyDummy->getComponent<BasicEnemyScript>()->setPower(1.0f);
+	
+	
+	GameObject * stageOneEnemy1 = generateBasicEnemy(Vector3(-511, 3, 59), Vector3(0, 147, 0), GamePlayManager::StageType::STAGE_ONE);
+	GameObject * stageOneEnemy2 = generateBasicEnemy(Vector3(-294, 3, -291), Vector3(0, -121, 0), GamePlayManager::StageType::STAGE_ONE);
+	GameObject * stageOneEnemy3 = generateBasicEnemy(Vector3(-500, 3, -470), Vector3(0, 24, 0), GamePlayManager::StageType::STAGE_ONE);
+	// 중보스
+	GameObject * stageOneEnemy4 = generateBasicEnemy(Vector3(384, 3, -349), Vector3(0, -102, 0), GamePlayManager::StageType::STAGE_ONE);
+	
+	// 보스
+	GameObject * stageBossEnmeyBoss = generateBasicEnemy(Vector3(265, 3, 280), Vector3(0, -113, 0), GamePlayManager::StageType::STAGE_BOSS,true);
+	//stageBossEnmeyBoss->getComponent<DamageableScript>()->setCurrentHp(3);
+	resetAllStage();
+}
+
+void GamePlayManager::removeAllStages()
+{
+	 // 순회하면서모두 지워준다.
+	GameObject * object = nullptr;
+	for(auto it = gameObjectsOfStages.begin(); it != gameObjectsOfStages.end();)
+	{
+		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
+		object = scene->findWithNamePath((*it).second);;// gameObject->getScene().findWithNamePath((*it).second);
+		if (object)
+		{
+			GameObject::Destroy(object);
+		}
+		it = gameObjectsOfStages.erase(it);
+	}
+}
+
+void GamePlayManager::regenerateAllStages()
+{
+	if (player)
+	{
+		// 피를 가득채워준다.
+		resetPlayerHp();
+		// 튜토리얼 위치로 옮긴다.
+		movePlayerToStageStartPoint(StageType::STAGE_TUTORIAL);
+
+	}
+	removeAllStages();
+	generateAllStages();
 }
 
 
@@ -1273,7 +1409,7 @@ void GamePlayManager::removeObjectsIfNotExist(StageType stageType)
 	while (it != equalRange.second)
 	{
 		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
-		object = gameObject->getScene().findWithNamePath((*it).second);
+		object = scene->findWithNamePath((*it).second);;// gameObject->getScene().findWithNamePath((*it).second);
 		// 오브젝트가 없으면 등록해제한다
 		if (!object)
 		{
@@ -1289,6 +1425,11 @@ void GamePlayManager::removeObjectsIfNotExist(StageType stageType)
 void GamePlayManager::resetCurrentStage()
 {
 	resetStage(currentStage);
+}
+
+void GamePlayManager::setCurrentStage()
+{
+	setStage(currentStage);
 }
 
 void GamePlayManager::resetStage(StageType stageType)
@@ -1313,7 +1454,7 @@ void GamePlayManager::resetFbxModelRenderer(StageType stageType)
 	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
 	{
 		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
-		object = gameObject->getScene().findWithNamePath((*it).second);
+		object = scene->findWithNamePath((*it).second);;// gameObject->getScene().findWithNamePath((*it).second);
 		// 오브젝트가 없으면 다음 객체를 찾아본다
 		if (!object) continue;
 
@@ -1335,7 +1476,7 @@ void GamePlayManager::setFbxModelRenderer(StageType stageType)
 	for (multimap<StageType, string>::iterator it = equalRange.first; it != equalRange.second; ++it)
 	{
 		// 일단 namePath로 찾아본다. // 시간복잡도 O(1)
-		object = gameObject->getScene().findWithNamePath((*it).second);
+		object = scene->findWithNamePath((*it).second);;// gameObject->getScene().findWithNamePath((*it).second);
 		// 오브젝트가 없으면 다음 객체를 찾아본다
 		if (!object) continue;
 
@@ -1372,6 +1513,9 @@ void GamePlayManager::start()
 		player = gameObject->getScene().findWithNamePath("/player");
 	}
 
+	Locator::provideGamePlayerManagerToGameUI(this);
+	scene = &(gameObject->getScene());
+
 	// 각스테이지의 시작지점을 정해준다 // 월드좌표기준
 	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_TUTORIAL, pair<Vector3, Vector3>(Vector3(-527, 3, 401), Vector3(0, 93, 0))));
 	stageStartPoints.insert(pair<StageType, pair<Vector3, Vector3>>(STAGE_ONE, pair<Vector3, Vector3>(Vector3(-319, 3, 62), Vector3(0, -88, 0))));
@@ -1386,13 +1530,85 @@ void GamePlayManager::start()
 
 void GamePlayManager::update()
 {
+	if (currentStage == StageType::STAGE_TUTORIAL && !clearTutorial && !existUnreadMessage)
+	{
+		GameUI::EventType eventType = GameUI::EventType::EVENT_NONE;
+
+		// 현재스테이지가 튜토리얼이고, 튜토리얼을 클리어하지 않았다면 튜토리얼을 진행한다.
+
+		if (!beginTutorial)
+		{
+			eventType = gameObject->getGameUI().readTextFile(GameUI::TextFileType::TEXTFILE_TUTORIAL, true);
+			resetCurrentStage();
+			beginTutorial = true;
+		}
+		else
+		{
+			eventType = gameObject->getGameUI().readTextFile(GameUI::TextFileType::TEXTFILE_TUTORIAL);
+		}
+
+		switch (eventType)
+		{
+		 case GameUI::EventType::EVENT_NONE :
+			 // 아무것도해주지않는다.
+			 break;
+
+		 case GameUI::EventType::EVENT_T_ENDEVENT :
+			 // 튜토리얼 텍스트파일의 마지막부분이다
+			 // 튜토리얼을 클리어 하였다.
+			 clearTutorial = true;
+			 setCurrentStage();
+			 createGateFromTutorialToOne();
+
+		 case GameUI::EventType::EVENT_T_HAVETOMOVE:
+			 // 플레이어스크립트의 업데이트를 블록해준다. w키를 누를때까지 블록한다.
+			 if (player)
+			 {
+				 PlayerScript * playerPlayerScript = player->getComponent<PlayerScript>();
+				 if (playerPlayerScript)
+				 {
+					 playerPlayerScript->blockedUntilPressKey('W');
+				 }
+			 }
+			 break;
+		 case GameUI::EventType::EVENT_T_HAVETOSHOOT:
+			 // 플레이어스크립트의 업데이트를 블록해준다. 1키를 누를때까지 블록한다.
+			 if (player)
+			 {
+				 PlayerScript * playerPlayerScript = player->getComponent<PlayerScript>();
+				 if (playerPlayerScript)
+				 {
+					 playerPlayerScript->blockedUntilPressKey(0x31);
+				 }
+			 }
+			 break;
+
+		 case GameUI::EventType::EVENT_T_HAVETOBETRANSPARENT:
+			 // 플레이어스크립트의 업데이트를 블록해준다. 3키를 누를때까지 블록한다.
+			 if (player)
+			 {
+				 PlayerScript * playerPlayerScript = player->getComponent<PlayerScript>();
+				 if (playerPlayerScript)
+				 {
+					 playerPlayerScript->blockedUntilPressKey(0x33);
+				 }
+			 }
+			 break;
+
+
+		}
+
+	}
+
 	if (InputManager::GetKeyDown(0x34))
 	{
 		changeStage(StageType::STAGE_TUTORIAL);
+		movePlayerToStageStartPoint(StageType::STAGE_TUTORIAL);
 	}
 	else if (InputManager::GetKeyDown(0x35))
 	{
 		changeStage(StageType::STAGE_ONE);
+		movePlayerToStageStartPoint(StageType::STAGE_ONE);
 	}
 	//else if (InputManager::GetKeyDown(0x35))
 	//{
@@ -1401,6 +1617,7 @@ void GamePlayManager::update()
 	else if (InputManager::GetKeyDown(0x36))
 	{
 		changeStage(StageType::STAGE_BOSS);
+		movePlayerToStageStartPoint(StageType::STAGE_BOSS);
 	}
 }
 
@@ -1411,6 +1628,22 @@ void GamePlayManager::resetAllStage()
 	resetStage(StageType::STAGE_ONE);
 	//resetStage(StageType::STAGE_TWO);
 	resetStage(StageType::STAGE_BOSS);
+}
+
+void GamePlayManager::setAllStage()
+{
+	setStage(StageType::STAGE_TUTORIAL);
+	setStage(StageType::STAGE_ONE);
+	//setStage(StageType::STAGE_TWO);
+	setStage(StageType::STAGE_BOSS);
+}
+
+void GamePlayManager::setActivePlayerRendering(bool flag)
+{
+	if (!player) return;
+	FbxModelRenderer * playerFbxModelRenderer = player->getComponent<FbxModelRenderer>();
+	if (!playerFbxModelRenderer) return;
+	playerFbxModelRenderer->setUpdateFlag(flag);
 }
 
 void GamePlayManager::registerStageObject(StageType stageType, const string & namePath)
@@ -1442,9 +1675,19 @@ void GamePlayManager::unregisterStageObject(StageType stageType, const string & 
 
 void GamePlayManager::changeStage(StageType stageType)
 {
+	clearTutorial = false;
+	beginTutorial = false;
 	// 현재스테이지를 먼저 reset해준다 
 	// reset / set 내부적으로 현재존재하지않는 오브젝트들을 멀티맵에서 삭제한다.
 	resetCurrentStage();
+
+	if (stageType == StageType::STAGE_ONE)
+		createGateFromOneToBoss();
+
+	if (stageType == StageType::STAGE_BOSS)
+		gameObject->getGameUI().setBossImage(true);
+	else
+		gameObject->getGameUI().setBossImage(false);
 
 	// 현재 스테이지를 설정
 	currentStage = stageType;
@@ -1453,6 +1696,8 @@ void GamePlayManager::changeStage(StageType stageType)
 	// 플레이어 위치를 바꿔준다.
 	// changePlayerPosition(stageType);
 }
+
+
 
 
 MeshRenderer::MeshRenderer(GameObject * go, Transform * tf)
@@ -3540,10 +3785,11 @@ void BasicEnemyAnimationFSM::update()
 void BulletScript::start()
 {
 	device = &(gameObject->getDevice());
-	// 부모객체가 불릿을 관리하는 컨트롤러 컴포넌트를 가지고 있다고 가정한다.
+	// 부모객체가 불릿로테이터이고 로테이터의 부모객체가 불릿을 관리하는 컨트롤러 컴포넌트를 가지고 있다고 가정한다.
 	if (gameObject->getParent() != nullptr)
 	{
-		bulletController = gameObject->getParent()->getComponent<BulletController>();
+		if (gameObject->getParent()->getParent() != nullptr)
+			bulletController = gameObject->getParent()->getParent()->getComponent<BulletController>();
 	}
 
 	D3DXCreateSphere(device, 1.0f, 10, 10, &bulletMesh, 0);
@@ -3633,9 +3879,17 @@ void BulletScript::onCollisionStay(GameObjectWithCollision & other)
 
 		// 불릿컨트롤러에 의해 관리되고 있다면 그 리스트에서 삭제한다.
 		if (bulletController)
-			bulletController->removeBullet(gameObject);
-		GameObject::Destroy(gameObject);
+			bulletController->removeRealBullet(gameObject);
+		else
+		{
+			gameObject->setParent(nullptr);
+			GameObject::Destroy(gameObject);
+		}
+		//// 부모쪽에서도 처리할수있게 nullptr로 정해준다.
+		//gameObject->setParent(nullptr);
+		//GameObject::Destroy(gameObject);
 	}
+
 }
 
 void BulletParticle::update()
@@ -3686,13 +3940,18 @@ void BulletParticle::setDuration(float duration)
 void BulletController::start()
 {
 	srand((unsigned int)time(0));
+	// maxNumOfBullets의 3배만큼 바로생성할 수 있게 시간을 쌓아둘 수 있다.
+	maxLagTime = creationInterval * maxNumOfBullets * 3;
 }
 
 void BulletController::update()
 {
-	lagTime += ((float)FrameTime::GetDeltaTime() / 1000.0f) * valueFactor;
+	if (lagTime < maxLagTime)
+	{
+		lagTime += ((float)FrameTime::GetDeltaTime() / 1000.0f) * valueFactor;
+	}
 
-	if (lagTime >= creationInterval)
+	if (lagTime >= creationInterval && bullets.size() < maxNumOfBullets)
 	{
 		lagTime -= creationInterval;
 		addBullet();
@@ -3704,44 +3963,39 @@ void BulletController::update()
 	for (int i = 0; i < bullets.size(); ++i)
 	{
 		currentBullet = bullets[i].first;
-		currentBullet->getTransform()->setLocalPosition(currentBullet->getTransform()->getLocalPosition() + bullets[i].second * FrameTime::GetDeltaTime() * .1f * bulletSpeed * valueFactor);
-		
-		const Vector3 & currentBulletLocalPosition = currentBullet->getTransform()->getLocalPosition();
+		float finalSpeed = bullets[i].second * FrameTime::GetDeltaTime() * .1f  * valueFactor;
+		const Vector3 & currentBulletLocalRotation = currentBullet->getTransform()->getLocalRotation();
+		// 로컬 y축기준으로 돌려준다 // 자식오브젝트이기 때문에 로컬으로 바뀐다
+		currentBullet->getTransform()->setLocalRotation(currentBulletLocalRotation.getX(),
+			currentBulletLocalRotation.getY() + finalSpeed, currentBulletLocalRotation.getZ());
 
-		//if (abs(currentBulletLocalPosition.getX()) > bulletSpaceRadius || abs(currentBulletLocalPosition.getY()) > bulletSpaceRadius
-		//	|| abs(currentBulletLocalPosition.getZ()) > bulletSpaceRadius)
+		//currentBullet = bullets[i].first;
+		//currentBullet->getTransform()->setLocalPosition(currentBullet->getTransform()->getLocalPosition() + bullets[i].second * FrameTime::GetDeltaTime() * .1f * bulletSpeed * valueFactor);
+		//
+		//const Vector3 & currentBulletLocalPosition = currentBullet->getTransform()->getLocalPosition();
+
+
+		//bool flag = false;
+		//if (abs(currentBulletLocalPosition.getX()) > bulletSpaceRadius)
 		//{
-		//	Vector3 randomVelocity
-		//	(
-		//		ParticleSystem::getRandomFloat(-1.0, 1.0),
-		//		ParticleSystem::getRandomFloat(-1.0, 1.0),
-		//		ParticleSystem::getRandomFloat(-1.0, 1.0)
-		//	);
-		//	bullets[i].second = randomVelocity;
+		//	flag = true;
+		//	bullets[i].second.setX(-bullets[i].second.getX());
 		//}
-		// 경계밖으로 나가려고하면 반대방향으로 속도를 지정해준다.
 
-		bool flag = false;
-		if (abs(currentBulletLocalPosition.getX()) > bulletSpaceRadius)
-		{
-			flag = true;
-			bullets[i].second.setX(-bullets[i].second.getX());
-		}
+		//if (abs(currentBulletLocalPosition.getY()) > bulletSpaceRadius)
+		//{
+		//	flag = true;
+		//	bullets[i].second.setY(-bullets[i].second.getY());
+		//}
 
-		if (abs(currentBulletLocalPosition.getY()) > bulletSpaceRadius)
-		{
-			flag = true;
-			bullets[i].second.setY(-bullets[i].second.getY());
-		}
+		//if (abs(currentBulletLocalPosition.getZ()) > bulletSpaceRadius)
+		//{
+		//	flag = true;
+		//	bullets[i].second.setZ(-bullets[i].second.getZ());
+		//}
 
-		if (abs(currentBulletLocalPosition.getZ()) > bulletSpaceRadius)
-		{
-			flag = true;
-			bullets[i].second.setZ(-bullets[i].second.getZ());
-		}
-
-		if(flag)
-			currentBullet->getTransform()->setLocalPosition(currentBulletLocalPosition * .95f);
+		//if(flag)
+		//	currentBullet->getTransform()->setLocalPosition(currentBulletLocalPosition * .95f);
 		
 	}
 }
@@ -3763,6 +4017,15 @@ void BulletController::removeBullet(GameObject * bullet)
 	{
 		if ((*it).first == bullet)
 		{
+			GameObject * tempRealBullet = (*it).first->getChildren()[0];
+			if (tempRealBullet)
+			{
+				tempRealBullet->setParent(nullptr);
+				GameObject::Destroy(tempRealBullet);
+			}
+
+			(*it).first->setParent(nullptr);
+			GameObject::Destroy((*it).first);
 			bullets.erase(it);
 			return;
 		}
@@ -3770,36 +4033,71 @@ void BulletController::removeBullet(GameObject * bullet)
 	}
 }
 
+void BulletController::removeRealBullet(GameObject * realBullet)
+{
+	if (!realBullet) return;
+	for (auto it = bullets.begin(); it != bullets.end(); ++it)
+	{
+		GameObject * tempRealBullet = (*it).first->getChildren()[0];
+		if (tempRealBullet == realBullet)
+		{
+			// 먼저 불릿로테이터의 자식에서 삭제해준다.
+			tempRealBullet->setParent(nullptr);
+			GameObject::Destroy(tempRealBullet);
+
+			(*it).first->setParent(nullptr);
+			// 불릿로테이터도 더이상 필요없기 때문에 삭제해주고
+			GameObject::Destroy((*it).first);
+			// 불릿로테이터도 리스트에서 지워준다.
+			bullets.erase(it);
+			return;
+		}
+
+	}
+}
+
+
 bool BulletController::addBullet()
 {
 	if (bullets.size() >= maxNumOfBullets) return false;
 
 
 	// 랜덤위치 랜덤속도를 갖는다 // position velocity
-	Vector3 randomVelocity
-	(
-		ParticleSystem::getRandomFloat(-1.0, 1.0),
-		ParticleSystem::getRandomFloat(-1.0, 1.0),
-		ParticleSystem::getRandomFloat(-1.0, 1.0)
-	);
-	Vector3::Normalized(randomVelocity, randomVelocity);
+	//Vector3 randomVelocity
+	//(
+	//	ParticleSystem::getRandomFloat(-1.0, 1.0),
+	//	ParticleSystem::getRandomFloat(-1.0, 1.0),
+	//	ParticleSystem::getRandomFloat(-1.0, 1.0)
+	//);
 
-	GameObject * bullet = GameObject::Instantiate("bullet", "Bullet", Vector3::Zero, Vector3::Zero, Vector3::One, gameObject);
-	bullet->addComponent<BulletScript>();
-	RigidBody * bulletRigidBody = bullet->addComponent<RigidBody>();
+	Vector3 randomRotation
+	(
+		ParticleSystem::getRandomFloat(0.0, 180.0),
+		ParticleSystem::getRandomFloat(0.0, 180.0),
+		ParticleSystem::getRandomFloat(0.0, 180.0)
+	);
+	// 불릿을 돌려주는 bullet객체는 위치는 0(부모위치랑 동일) / 로테이션은 각각 -180 ~ 180이다
+	GameObject * bullet = GameObject::Instantiate("bullet", "Bullet", Vector3::Zero, randomRotation, Vector3::One, gameObject);
+	// 실제 위치는 그 불릿로테이터기준 양의 x방향 * bulletSpaceRadius 이다
+	GameObject * realBullet = GameObject::Instantiate("realBullet", "RealBullet", Vector3(bulletSpaceRadius,0,0), Vector3::Zero, Vector3::One, bullet); //bulletSpaceRadius
+
+	realBullet->addComponent<BulletScript>();
+	RigidBody * bulletRigidBody = realBullet->addComponent<RigidBody>();
 	bulletRigidBody->setSphereCollider(1);
 	bulletRigidBody->turnOnIsTriggerFlag();
 
-	bullet->getTransform()->setLocalPosition
-	(
-		ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius),
-		ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius),
-		ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius)
-	);
+	//bullet->getTransform()->setLocalPosition
+	//(
+	//	ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius),
+	//	ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius),
+	//	ParticleSystem::getRandomFloat(-bulletSpaceRadius, bulletSpaceRadius)
+	//);
 	// 현재 객체를 부모로 등록한다 // 나중에 삭제될때 알아서 자식들 목록에서 삭제됨
 	//bullet->setParent(this->gameObject);
 	// 부모를 빠져나온다고해도 자식들 목록에서 삭제됨 // 자식객체에서 setParent(nullptr) / 부모객체에서 removeChild() 사용
-	bullets.push_back(pair<GameObject *, Vector3>{bullet, randomVelocity});
+
+	float randomBulletSpeed = ParticleSystem::getRandomFloat(bulletSpeed * 0.8, bulletSpeed);
+	bullets.push_back(pair<GameObject *, float>{bullet, randomBulletSpeed});
 
 	return true;
 }
@@ -3810,21 +4108,35 @@ bool BulletController::shootBullet(float power)
 
 	const Vector3 & forwardDirection = gameObject->getTransform()->getForward();
 	const Vector3 & upDirection = gameObject->getTransform()->getUp();
-	Vector3 direction = (forwardDirection + upDirection*0.02f);
+	Vector3 direction = (forwardDirection + upDirection*0.03f);
 
 	auto bulletToShoot = bullets.begin();
 	GameObject * bulletObj = (*bulletToShoot).first;
+
+	// 불릿을 벡터에서 지워주고
+	bullets.erase(bulletToShoot);
+
+
+	if (!bulletObj) return false;
+	// 삭제등록
 	bulletObj->setParent(nullptr);
+	GameObject::Destroy(bulletObj);
+
+	// 실제 불릿은 자식오브젝트 1번에 등록해놓았다.
+	GameObject * realBulletObj = bulletObj->getChildren()[0];
+	
+
+	if (!realBulletObj)  return false;
+
+	realBulletObj->setParent(nullptr);
 
 	// 삭제될때 BulletController의 bullets를 순회하지 않도록 해준다.
-	bulletObj->getComponent<BulletScript>()->setBulletController(nullptr);
+	realBulletObj->getComponent<BulletScript>()->setBulletController(nullptr);
 
-	// 초기 위치를 잡고 쏜다
-	bulletObj->getTransform()->setLocalPosition(gameObject->getTransform()->getWorldPosition() + direction + Vector3(0,1,0));
-	bulletObj->getComponent<RigidBody>()->addForce(power /** 1.0f/(float)FrameTime::GetDeltaTime()*/ * direction);
+	// 초기 위치를 잡고 쏜다 // 결국 월드포지션으로 설정하는 것과같다 
+	realBulletObj->getTransform()->setLocalPosition(gameObject->getTransform()->getWorldPosition() + direction + Vector3(0,1,0));
+	realBulletObj->getComponent<RigidBody>()->addForce(power /** 1.0f/(float)FrameTime::GetDeltaTime()*/ * direction);
 
-	// 최종적으로 삭제
-	bullets.erase(bulletToShoot);
 
 	return true;
 

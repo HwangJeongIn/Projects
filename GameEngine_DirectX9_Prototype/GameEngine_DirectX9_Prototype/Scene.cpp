@@ -1,24 +1,40 @@
 #include "Scene.h"
 #include "Audio.h"
 #include "Physics.h"
+#include "gameui.h"
 
-	Scene::Scene(const string & sceneName)
-		: sceneName(sceneName), previousTime(0), currentTime(0), lagTime(0)
-	{
-		// Instantiate함수는 Scene이 완전히 초기화 된 다음에 가능하다.
-		//rootGameObjects.push_back(GameObject::Instantiate("player name", "player"));
-		//rootGameObjects[0]->addComponent<MoveScript>();
+//Scene::Scene(const string & sceneName)
+//	: sceneName(sceneName), previousTime(0), currentTime(0), lagTime(0), sceneTypeToChange(Locator::SceneType::NONE)
+//	{
+//		// Instantiate함수는 Scene이 완전히 초기화 된 다음에 가능하다.
+//		//rootGameObjects.push_back(GameObject::Instantiate("player name", "player"));
+//		//rootGameObjects[0]->addComponent<MoveScript>();
+//
+//		// 계속 반복되는 현상
+//		// 이 함수는(addChild) 내부적으로 getInstance()함수를 포함하고 있는데
+//		// 이는아직 생성이 완료된 상황이 아니여서 nullptr이기 때문에
+//		// Scene객체를 또 생성하게 되고, 재귀적으로 무한루프에 빠지게 된다.
+//		// gameObjects[0]->addChild("player name1", "player1");
+//
+//	}
 
-		// 계속 반복되는 현상
-		// 이 함수는(addChild) 내부적으로 getInstance()함수를 포함하고 있는데
-		// 이는아직 생성이 완료된 상황이 아니여서 nullptr이기 때문에
-		// Scene객체를 또 생성하게 되고, 재귀적으로 무한루프에 빠지게 된다.
-		// gameObjects[0]->addChild("player name1", "player1");
 
-	}
+Scene::Scene(const string & sceneName, Locator::SceneType sceneType)
+	: sceneName(sceneName), sceneType(sceneType), previousTime(0), currentTime(0), lagTime(0), sceneTypeToChange(Locator::SceneType::NONE)
+{
+	// Instantiate함수는 Scene이 완전히 초기화 된 다음에 가능하다.
+	//rootGameObjects.push_back(GameObject::Instantiate("player name", "player"));
+	//rootGameObjects[0]->addComponent<MoveScript>();
 
+	// 계속 반복되는 현상
+	// 이 함수는(addChild) 내부적으로 getInstance()함수를 포함하고 있는데
+	// 이는아직 생성이 완료된 상황이 아니여서 nullptr이기 때문에
+	// Scene객체를 또 생성하게 되고, 재귀적으로 무한루프에 빠지게 된다.
+	// gameObjects[0]->addChild("player name1", "player1");
 
-	void Scene::gameLoop()
+}
+
+void Scene::gameLoop()
 	{
 
 		// 카메라는 씬이 시작하기 전에 등록해주었다.
@@ -91,6 +107,15 @@
 		프레임의 끝단계 일정시간을 딜레이 시키기 전에 여러가지 작업을 해준다.
 		*/
 
+		//*************************************잘못된방법***********************************************
+		// 삭제처리를 하기 전에 현재 씬과 중개자가 제공하는 씬이 같은지 확인한다.
+		// 메인카메라는 삭제되지 않았다고 보장할수있다.
+		// 삭제되는 시점은 무조건 destroyUpdate를 지나야한다.
+		// 제공하는 씬과 현재씬이 다르다면 리턴한다. // 어차피 destroy플래그는 켜져있기 때문에 나중에 삭제된다.
+		//if (&(mainCamera->getScene()) != this)
+		//	return;
+		//*************************************잘못된방법***********************************************
+
 		// 업데이트 되고난후 삭제처리
 		destroyUpdate();
 
@@ -100,6 +125,26 @@
 
 
 
+		//바꿔야할 씬이등록되어있으면 바꿔준다. // atomic Operation 보장
+		//메인카메라는 삭제되지않았다고 가정한다.
+		switch (sceneTypeToChange)
+		{
+		case Locator::MAIN:
+			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
+			mainCamera->getGameUI().setMainSceneUI();
+			sceneTypeToChange = Locator::SceneType::NONE;
+			break;
+		case Locator::START:
+			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+			mainCamera->getGameUI().setStartSceneUI();
+			sceneTypeToChange = Locator::SceneType::NONE;
+			break;
+		case Locator::END:
+			Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+			mainCamera->getGameUI().setEndSceneUI();
+			sceneTypeToChange = Locator::SceneType::NONE;
+			break;
+		}
 
 		//if(MS_PER_FRAME - FrameTime::GetDeltaTime()>0)
 		//	Sleep(MS_PER_FRAME - FrameTime::GetDeltaTime());
@@ -407,5 +452,10 @@
 			Trace::Write("TAG_INFO2", (*it).first);
 		}
 
+	}
+
+	void Scene::registerOtherSceneToChange(Locator::SceneType sceneType)
+	{
+		sceneTypeToChange = sceneType;
 	}
 

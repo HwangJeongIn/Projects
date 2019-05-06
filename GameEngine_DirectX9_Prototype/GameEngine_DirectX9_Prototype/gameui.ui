@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2127</width>
-    <height>1222</height>
+    <width>1920</width>
+    <height>1112</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,71 +23,6 @@
       <height>1081</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>1930</x>
-      <y>0</y>
-      <width>191</width>
-      <height>531</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QCheckBox" name="checkBox_sound">
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
-       </property>
-       <property name="text">
-        <string>Toggle Sound</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_gizmos">
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
-       </property>
-       <property name="text">
-        <string>Toggle Gizmos</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
    <widget class="Line" name="main_line_hp">
     <property name="geometry">
@@ -232,13 +167,14 @@ font: 90pt &quot;맑은 고딕&quot;;</string>
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>631</width>
-      <height>71</height>
+      <width>251</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">color: rgb(255, 129, 3);
-font: 75 20pt &quot;맑은 고딕&quot;;</string>
+font: 75 20pt &quot;맑은 고딕&quot;;
+font-weight: bold;</string>
     </property>
     <property name="text">
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SCORE : &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -247,10 +183,10 @@ font: 75 20pt &quot;맑은 고딕&quot;;</string>
    <widget class="QLabel" name="main_label_bossImage">
     <property name="geometry">
      <rect>
-      <x>1810</x>
-      <y>0</y>
-      <width>100</width>
-      <height>100</height>
+      <x>1760</x>
+      <y>920</y>
+      <width>150</width>
+      <height>150</height>
      </rect>
     </property>
     <property name="text">
@@ -277,7 +213,7 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="start_pushButton_load">
+   <widget class="QPushButton" name="start_pushButton_tutorial">
     <property name="geometry">
      <rect>
       <x>790</x>
@@ -291,7 +227,7 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
 font: 75 48pt &quot;맑은 고딕&quot;;</string>
     </property>
     <property name="text">
-     <string>Load</string>
+     <string>Tutorial</string>
     </property>
     <property name="flat">
      <bool>true</bool>
@@ -317,28 +253,271 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QWidget" name="main_widget_UIWindow" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1620</x>
+      <y>0</y>
+      <width>281</width>
+      <height>521</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>267</width>
+       <height>501</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="checkBox_sound">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Toggle Sound</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_gizmos">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Toggle Gizmos</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_wireFrame">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Toggle WireFrame</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_playerRendering">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Toggle PlayerRendering</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_currentStage">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Toggle CurrentStage</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_fbxRendering">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 13pt &quot;맑은 고딕&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Toggle FbxRendering</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="main_widget_textWindow" native="true">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>40</y>
+      <width>991</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <widget class="QPushButton" name="pushButton_text">
+     <property name="geometry">
+      <rect>
+       <x>940</x>
+       <y>10</y>
+       <width>41</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 87 20pt &quot;Arial Black&quot;;</string>
+     </property>
+     <property name="text">
+      <string>X</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_text">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>901</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 75 18pt &quot;맑은 고딕&quot;;
+font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>test</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="start_pushButton_info">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>730</y>
+      <width>349</width>
+      <height>115</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 129, 3);
+font: 75 48pt &quot;맑은 고딕&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Info</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QWidget" name="start_widget_infoWindow" native="true">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>340</y>
+      <width>531</width>
+      <height>641</height>
+     </rect>
+    </property>
+    <widget class="QLabel" name="start_label_info">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>531</width>
+       <height>641</height>
+      </rect>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>731</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="whatsThis">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 75 13.5pt &quot;맑은 고딕&quot;;
+background-color: rgb(180, 180, 180);
+font-weight: bold;</string>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;클라이언트&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;황정인&lt;span style=&quot; font-size:16pt;&quot;&gt;&lt;br/&gt;&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;SDK&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;DIRECTX9 SDK / FBX SDK&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;QT SDK / FMOD SDK&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;BULLET PHYSICS SDK&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;리소스&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;Unity AssetStore / Mixamo&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;BlackDesert BGM&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;** 좋은 방향으로 지도해주신 교수님들 정말 감사드립니다. **&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="start_pushButton_infoExit">
+     <property name="geometry">
+      <rect>
+       <x>462</x>
+       <y>10</y>
+       <width>61</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
    <zorder>labelForDX</zorder>
    <zorder>start_label</zorder>
    <zorder>end_label</zorder>
    <zorder>lineEdit_1</zorder>
-   <zorder>layoutWidget</zorder>
    <zorder>main_line_hp</zorder>
    <zorder>lineEdit_2</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>lineEdit_4</zorder>
    <zorder>main_label_score</zorder>
-   <zorder>main_label_bossImage</zorder>
    <zorder>startEnd_label_title</zorder>
    <zorder>start_pushButton_start</zorder>
-   <zorder>start_pushButton_load</zorder>
+   <zorder>start_pushButton_tutorial</zorder>
    <zorder>end_pushButton_restart</zorder>
+   <zorder>main_widget_UIWindow</zorder>
+   <zorder>main_label_bossImage</zorder>
+   <zorder>main_widget_textWindow</zorder>
+   <zorder>start_pushButton_info</zorder>
+   <zorder>start_widget_infoWindow</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2127</width>
+     <width>1920</width>
      <height>26</height>
     </rect>
    </property>
@@ -377,15 +556,15 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
     </hint>
     <hint type="destinationlabel">
      <x>1120</x>
-     <y>1189</y>
+     <y>1129</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>start_pushButton_load</sender>
+   <sender>start_pushButton_tutorial</sender>
    <signal>clicked()</signal>
    <receiver>GameUIClass</receiver>
-   <slot>start_pushButton_load()</slot>
+   <slot>start_pushButton_tutorial()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>928</x>
@@ -393,7 +572,7 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
     </hint>
     <hint type="destinationlabel">
      <x>1295</x>
-     <y>1158</y>
+     <y>1129</y>
     </hint>
    </hints>
   </connection>
@@ -409,7 +588,7 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
     </hint>
     <hint type="destinationlabel">
      <x>1395</x>
-     <y>1169</y>
+     <y>1129</y>
     </hint>
    </hints>
   </connection>
@@ -420,11 +599,11 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
    <slot>checkBox_sound(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1999</x>
-     <y>112</y>
+     <x>1895</x>
+     <y>105</y>
     </hint>
     <hint type="destinationlabel">
-     <x>2004</x>
+     <x>1963</x>
      <y>145</y>
     </hint>
    </hints>
@@ -436,23 +615,140 @@ font: 75 48pt &quot;맑은 고딕&quot;;</string>
    <slot>checkBox_gizmos(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>2027</x>
-     <y>219</y>
+     <x>1895</x>
+     <y>167</y>
     </hint>
     <hint type="destinationlabel">
-     <x>2015</x>
+     <x>1963</x>
      <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_wireFrame</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>checkBox_wireFrame(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1788</x>
+     <y>229</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1955</x>
+     <y>300</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_fbxRendering</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>checkBox_fbxRendering(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1788</x>
+     <y>415</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1956</x>
+     <y>345</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_playerRendering</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>checkBox_playerRendering(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1801</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1949</x>
+     <y>397</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_currentStage</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>checkBox_currentStage(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1747</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1953</x>
+     <y>196</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_text</sender>
+   <signal>clicked()</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>pushButton_text()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1449</x>
+     <y>143</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1956</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>start_pushButton_info</sender>
+   <signal>clicked()</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>start_pushButton_info()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>989</x>
+     <y>827</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1591</x>
+     <y>1144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>start_pushButton_infoExit</sender>
+   <signal>clicked()</signal>
+   <receiver>GameUIClass</receiver>
+   <slot>start_pushButton_infoExit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1190</x>
+     <y>434</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1788</x>
+     <y>1159</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
-  <slot>slot1()</slot>
-  <slot>slot2()</slot>
   <slot>start_pushButton_start()</slot>
-  <slot>start_pushButton_load()</slot>
+  <slot>start_pushButton_tutorial()</slot>
   <slot>end_pushButton_restart()</slot>
   <slot>checkBox_gizmos(bool)</slot>
   <slot>checkBox_sound(bool)</slot>
+  <slot>checkBox_wireFrame(bool)</slot>
+  <slot>checkBox_fbxRendering(bool)</slot>
+  <slot>checkBox_playerRendering(bool)</slot>
+  <slot>checkBox_currentStage(bool)</slot>
+  <slot>pushButton_text()</slot>
+  <slot>start_pushButton_info()</slot>
+  <slot>start_pushButton_infoExit()</slot>
  </slots>
 </ui>

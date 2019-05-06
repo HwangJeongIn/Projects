@@ -36,6 +36,8 @@ class NullFbxParser;
 class GameUI;
 class GameObject;
 
+class GamePlayManager;
+
 class Locator
 {
 public:
@@ -49,6 +51,7 @@ public:
 
 	enum SceneType
 	{
+		NONE,
 		START,
 		END,
 		MAIN
@@ -97,7 +100,11 @@ protected :
 		return *device;
 	}
 
-	static GameUI& getGameUI(){	return *gameUI;}
+	static GameUI& getGameUI()
+	{ 
+		assert(Locator::device);
+		return *gameUI;
+	}
 
 public :
 
@@ -113,7 +120,7 @@ public :
 	static void provideFbxParser(SystemType type = SystemType::RELEASETYPE);
 
 	static void provideGameUI(IDirect3DDevice9 ** device, GameObject * objToAccessSystem);
-
+	static void provideGamePlayerManagerToGameUI(GamePlayManager * gamePlayManager);
 
 	static void release();
 

@@ -11,9 +11,9 @@
 */
 NullScene Locator::nullScene{};
 Scene * Locator::scene = &nullScene;
-Scene Locator::mainScene("MainScene");
-Scene Locator::startScene("StartScene");
-Scene Locator::endScene("EndScene");
+Scene Locator::mainScene("MainScene",SceneType::MAIN);
+Scene Locator::startScene("StartScene", SceneType::START);
+Scene Locator::endScene("EndScene", SceneType::END);
 
 NullAudio Locator::nullAudio{};
 Audio * Locator::audio = &nullAudio;
@@ -91,11 +91,11 @@ void Locator::provideScene(SystemType systemType, SceneType sceneType)
 		// 현재 가지고 있는 Scene이 NullScene이거나 nullptr이면 바로적용시켜준다.
 		if (scene == nullptr)
 		{
-			scene = new DebuggingScene(nullScene);
+			scene = new DebuggingScene(nullScene,Locator::SceneType::NONE);
 			return;
 		}
 
-		scene = new DebuggingScene(*scene);
+		scene = new DebuggingScene(*scene, scene->getSceneType());
 		return;
 	}
 
@@ -249,6 +249,13 @@ void Locator::provideGameUI(IDirect3DDevice9 ** device, GameObject * objToAccess
 	gameUI->show();
 }
 
+
+void Locator::provideGamePlayerManagerToGameUI(GamePlayManager * gamePlayManager)
+{
+	if (!gameUI) return;
+	if (gamePlayManager)
+		gameUI->mainSceneGamePlayManager = gamePlayManager;
+}
 
 void Locator::release()
 {

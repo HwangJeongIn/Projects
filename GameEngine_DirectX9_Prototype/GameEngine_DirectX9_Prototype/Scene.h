@@ -29,6 +29,7 @@ public :
 	};
 
 private :
+	Locator::SceneType sceneType;
 	string sceneName;
 	vector<GameObject *> rootGameObjects;
 	// 같은 부모객체를 가진 것들은 무조건 중복된 값을 가지지 못한다.
@@ -59,14 +60,15 @@ private :
 
 protected :
 
-	Scene(const string & sceneName);
+	Scene(const string & sceneName, Locator::SceneType sceneType);
 	virtual ~Scene(){}
 
 public :
+	friend class Locator;
 
 	const string & getSceneName() const { return sceneName; }
+	Locator::SceneType getSceneType() const { return sceneType; }
 
-	friend class Locator;
 	virtual void gameLoop();
 	virtual void update();
 	virtual void fixedUpdate();
@@ -94,6 +96,10 @@ public :
 
 	void dumpAllGameObjects();
 
+	// 내부에서씬전환를 위해 만들어준 함수
+	// 게임루프 마지막에서 등록된 씬으로 이동한다.
+	Locator::SceneType sceneTypeToChange;
+	void registerOtherSceneToChange(Locator::SceneType sceneType);
 
 
 };
@@ -103,7 +109,7 @@ class NullScene : public Scene
 private:
 
 	NullScene()
-		: Scene("NullScene") {}
+		: Scene("NullScene",Locator::SceneType::NONE) {}
 	virtual ~NullScene() {}
 
 public :
@@ -123,8 +129,8 @@ class DebuggingScene : public Scene
 {
 private :
 	Scene & wrapped;
-	DebuggingScene(Scene & scene)
-		: wrapped(scene), Scene(scene.getSceneName()+"DebuggingScene") {}
+	DebuggingScene(Scene & scene, Locator::SceneType sceneType)
+		: wrapped(scene), Scene(scene.getSceneName()+"DebuggingScene", sceneType) {}
 	virtual ~DebuggingScene() {}
 
 	void log(const char * message)

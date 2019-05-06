@@ -27,8 +27,15 @@ public :
 			string line, tag, fileName;
 			string temp;
 
+		//	auto temp1 = namesListFile.tellg();
 			while (getline(namesListFile, line))
 			{
+				// 다음 읽을 위치 받기
+				//temp1 = namesListFile.tellg();
+				// 맨처음
+				//namesListFile.seekg(0, ios::beg);
+				//namesListFile.seekg(0);
+
 				// 일단 태그와 텍스트 파일명이 나오는 라인까지 이동해야한다.
 				// 그 라인은 TAG_로 시작하는 라인이다
 				temp = line.substr(0, 4);
@@ -45,6 +52,7 @@ public :
 				fileName = line.substr(tabkeyPos + 1, line.size()-(tabkeyPos + 1));
 
 				TextFileTable[tag] = fileName;
+
 			}
 			namesListFile.close();
 		}

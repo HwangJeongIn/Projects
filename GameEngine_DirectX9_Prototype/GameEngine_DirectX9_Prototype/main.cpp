@@ -23,9 +23,10 @@ int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSyste
 	::ZeroMemory(&msg, sizeof(MSG));
 
 	//static float lastTime = (float)timeGetTime(); 
+	objToAccessSystem.getScene().registerOtherSceneToChange(Locator::SceneType::START);
 	//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
-	//objToAccessSystem.getGameUI().setStartSceneUI();
-	Scene * scene = &objToAccessSystem.getScene();
+	objToAccessSystem.getGameUI().setStartSceneUI();
+	Scene * scene = nullptr;// &objToAccessSystem.getScene();
 
 
 	while (msg.message != WM_QUIT)
@@ -59,31 +60,34 @@ int EnterMsgLoop(void(Scene::* ptr_display)(void), GameObject & objToAccessSyste
 			// 3키 : end
 			if (InputManager::GetKeyDown(0x30))
 			{
-				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
+				objToAccessSystem.getScene().registerOtherSceneToChange(Locator::SceneType::MAIN);
+				//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::MAIN);
 				objToAccessSystem.getGameUI().setMainSceneUI();
 
 			}
 			else if (InputManager::GetKeyDown(0x38))
 			{
-				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
+				objToAccessSystem.getScene().registerOtherSceneToChange(Locator::SceneType::START);
+				//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::START);
 				objToAccessSystem.getGameUI().setStartSceneUI();
 
 			}
 			else if (InputManager::GetKeyDown(0x39))
 			{
-				Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
+				objToAccessSystem.getScene().registerOtherSceneToChange(Locator::SceneType::END);
+				//Locator::provideScene(Locator::SystemType::RELEASETYPE, Locator::SceneType::END);
 				objToAccessSystem.getGameUI().setEndSceneUI();
 
 			}
 
-			if (InputManager::GetKeyDown(0x46))
+			if (InputManager::GetKeyDown(0xC0))
 			{
-				objToAccessSystem.getDevice().SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+				objToAccessSystem.getGameUI().toggleMainWidgetUIWindow();
 			}
-			else if (InputManager::GetKeyUp(0x46))
-			{
-				objToAccessSystem.getDevice().SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-			}
+
+
+
+
 
 
 			scene = &(objToAccessSystem.getScene());
@@ -353,7 +357,8 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	GameObject * dummy = GameObject::Instantiate("dummy", "Dummy");
 	Locator::provideGameUI(&device, dummy);
 
-	Locator::provideAudio(Locator::SystemType::NULLTYPE);
+	//Locator::provideAudio(Locator::SystemType::NULLTYPE);
+	Locator::provideAudio(Locator::SystemType::RELEASETYPE);
 	Locator::providePhysics(Locator::SystemType::RELEASETYPE);
 	Locator::provideFbxParser(Locator::SystemType::RELEASETYPE);
 	Locator::provideDevice(device);
@@ -462,9 +467,9 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	player->addChild(bulletSpawner);
 
 	// player FbxModelRenderer
-	//FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
-	//fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
-	//PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
+	FbxModelRenderer * fbxModelRendererPlayer = player->addComponent<FbxModelRenderer>();
+	fbxModelRendererPlayer->loadFbxFile("akai_e_espiritu.fbx");
+	PlayerAnimationFSM * playerAnimationFSM = player->addComponent<PlayerAnimationFSM>();
 
 	player->addComponent<DamageableScript>()->setMaxHp(30000.0f);
 
@@ -491,27 +496,28 @@ int WINAPI WinMain(HINSTANCE hinstance,
 	// Enemys
 
 	
-	mainCameraGamePlayManager->createGateFromOneToBoss();
-	mainCameraGamePlayManager->createGateFromTutorialToOne();
+	//mainCameraGamePlayManager->createGateFromOneToBoss();
+	//mainCameraGamePlayManager->createGateFromTutorialToOne();
 
-	GameObject * stageTutorialTarget1 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-276, 3, 479), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
-	GameObject * stageTutorialTarget2 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-276, 3, 383), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
-	GameObject * stageTutorialEnemyDummy = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-304, 3, 418), Vector3(0,-90,0), GamePlayManager::StageType::STAGE_TUTORIAL);
-
-
-	GameObject * stageOneEnemy1 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-511, 3, 59), Vector3(0, 147, 0), GamePlayManager::StageType::STAGE_ONE);
-	GameObject * stageOneEnemy2 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-294, 3, -291), Vector3(0, -121, 0), GamePlayManager::StageType::STAGE_ONE);
-	GameObject * stageOneEnemy3 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-500, 3, -470), Vector3(0, 24, 0), GamePlayManager::StageType::STAGE_ONE);
-	// 중보스
-	GameObject * stageOneEnemy4 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(384, 3, -349), Vector3(0, -102, 0), GamePlayManager::StageType::STAGE_ONE);
-
-	// 보스
-	GameObject * stageBossEnmeyBoss = mainCameraGamePlayManager->generateBasicEnemy(Vector3(265, 3, 280), Vector3(0, -113, 0), GamePlayManager::StageType::STAGE_BOSS,true);
-
-
-	mainCameraGamePlayManager->resetAllStage();
-	mainCameraGamePlayManager->changeStage(GamePlayManager::StageType::STAGE_TUTORIAL);
+	//GameObject * stageTutorialTarget1 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-276, 3, 479), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	//GameObject * stageTutorialTarget2 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-276, 3, 383), Vector3(0, -90, 0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	//GameObject * stageTutorialEnemyDummy = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-304, 3, 418), Vector3(0,-90,0), GamePlayManager::StageType::STAGE_TUTORIAL);
+	//
+	//
+	//GameObject * stageOneEnemy1 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-511, 3, 59), Vector3(0, 147, 0), GamePlayManager::StageType::STAGE_ONE);
+	//GameObject * stageOneEnemy2 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-294, 3, -291), Vector3(0, -121, 0), GamePlayManager::StageType::STAGE_ONE);
+	//GameObject * stageOneEnemy3 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(-500, 3, -470), Vector3(0, 24, 0), GamePlayManager::StageType::STAGE_ONE);
+	//// 중보스
+	//GameObject * stageOneEnemy4 = mainCameraGamePlayManager->generateBasicEnemy(Vector3(384, 3, -349), Vector3(0, -102, 0), GamePlayManager::StageType::STAGE_ONE);
+	//
+	//// 보스
+	//GameObject * stageBossEnmeyBoss = mainCameraGamePlayManager->generateBasicEnemy(Vector3(265, 3, 280), Vector3(0, -113, 0), GamePlayManager::StageType::STAGE_BOSS,true);
 	
+	mainCameraGamePlayManager->generateAllStages();
+	mainCameraGamePlayManager->resetAllStage();
+
+	mainCameraGamePlayManager->changeStage(GamePlayManager::StageType::STAGE_TUTORIAL);
+	mainCameraGamePlayManager->movePlayerToStageStartPoint(GamePlayManager::StageType::STAGE_TUTORIAL);
 
 	// 하드코딩 스타트지점 맞추기------------------------------------------------------------------------------
 	//float tempHeight = 0.0f;

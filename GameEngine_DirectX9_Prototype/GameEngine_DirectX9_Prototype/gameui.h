@@ -6,16 +6,41 @@
 
 #include <d3dx9.h>
 #include <string>
+#include <map>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
 
 class GameObject;
+class GamePlayManager;
 
 class GameUI : public QMainWindow
 {
 	Q_OBJECT
 
+public :
+	enum TextFileType
+	{
+		TEXTFILE_NONE,
+		TEXTFILE_TUTORIAL,
+		TEXTFILE_ONE,
+		TEXTFILE_BOSS
+	};
+
+	// 플레이어에게 이벤트가 발생했을때 처리하기 위해서 타입을 정해주었다.
+	enum EventType
+	{
+		EVENT_NONE,
+		// 튜토리얼 이벤트
+		/*1*/EVENT_T_HAVETOMOVE,
+		/*2*/EVENT_T_HAVETOSHOOT, 
+		/*3*/EVENT_T_HAVETOBETRANSPARENT,
+		/*4*/EVENT_T_HAVETODESTROYTARGET,
+		/*5*/EVENT_T_HAVETODESTROYDUMMY,
+		/*6*/EVENT_T_ENDEVENT
+	};
 private :
 	Ui::GameUIClass ui;
 	QPixmap m_img[3];
@@ -24,9 +49,31 @@ private :
 	float score;
 	
 	GameObject * objToAccessSystem;
+	GamePlayManager * mainSceneGamePlayManager;
 
+	bool currentMain_widget_UIWindowFlag;
+	int countOfenemiesThatAreTargetingPlayer;
 
 	static const string filePathToLoadImageFiles;
+
+
+	// 파일스트림을 위한 변수들
+	pair<TextFileType,int> currentTextFileAndPos;
+
+	// 파일을 읽기 위한 TextFileType / textFileName 테이블
+	map<TextFileType, string> fileNameTable;
+
+	ifstream textFileStream;
+
+	// 라인을 읽기위한 tag
+	const int tagLength;
+	const string lineTag;
+	const string eventTag;
+	const string endTag;
+
+	const int numOfEvents;
+
+
 
 public:
 
@@ -48,14 +95,34 @@ public:
 
 	}
 
+	//GamePlayManager * getGamePlayManager();
+
+	EventType readTextFile(TextFileType textFileType, bool isBeginning = false);
+
+	void setTextWindowText(const char * info);
+
 	float getCurrentPlayerHpFactor();
 	void setCurrentPlayerHpFactor(float factor);
 
 	void addScore(float value);
+	void resetScore();
 
 	void setMainSceneUI();
 	void setStartSceneUI();
 	void setEndSceneUI();
+
+	void setBossImage(bool flag);
+
+	void setActiveMainWidgetUIWindow(bool flag);	
+	void toggleMainWidgetUIWindow();
+
+	void setActiveMainWidgetTextWindow(bool flag);
+
+	void setActiveStartWidgetInfoWindow(bool flag);
+	
+
+	void addEnemyThatIsTargetingPlayer();
+	void removeEnemyThatIsNotTargetingPlayer();
 
 	void showUI()
 	{
@@ -126,10 +193,21 @@ public:
 private slots:
 
 void start_pushButton_start();
-void start_pushButton_load();
+//void start_pushButton_load();
+void start_pushButton_tutorial();
+
 void end_pushButton_restart();
 void checkBox_sound(bool value);
 void checkBox_gizmos(bool value);
+
+void checkBox_wireFrame(bool value);
+void checkBox_fbxRendering(bool value);
+void checkBox_playerRendering(bool value);
+void checkBox_currentStage(bool value);
+
+void pushButton_text();
+void start_pushButton_info();
+void start_pushButton_infoExit();
 
 
 
