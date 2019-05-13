@@ -1,0 +1,4 @@
+﻿  main.cpp
+main.cpp(343): error C2065: 'gameUI': 선언되지 않은 식별자입니다.
+main.cpp(343): error C2228: '.show' 왼쪽에는 클래스/구조체/공용 구조체가 있어야 합니다.
+  main.cpp(343): note: 'unknown-type' 형식입니다.
