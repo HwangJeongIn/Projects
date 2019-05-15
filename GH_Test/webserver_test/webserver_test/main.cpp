@@ -1,6 +1,6 @@
 #define CURL_STATICLIB
 
-#include <stdio.h>
+#include <cstdio>
 #include <curl/curl.h>
 #include <iostream>
 #include <windows.h>

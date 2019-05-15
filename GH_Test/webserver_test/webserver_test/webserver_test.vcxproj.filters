@@ -36,11 +36,11 @@
     <ClCompile Include="GeneratedFiles\qrc_gameui.cpp">
       <Filter>Qt\GeneratedFiles</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_gameui.cpp">
-      <Filter>Qt\GeneratedFiles\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_gameui.cpp">
       <Filter>Qt\GeneratedFiles\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_gameui.cpp">
+      <Filter>Qt\GeneratedFiles\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,11 +52,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="gameui.qrc">
-      <Filter>Qt</Filter>
-    </None>
     <None Include="gameui.ui">
       <Filter>Qt</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="gameui.qrc">
+      <Filter>Qt</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
