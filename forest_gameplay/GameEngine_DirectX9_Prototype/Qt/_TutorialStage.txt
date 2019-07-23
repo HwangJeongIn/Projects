@@ -1,16 +1,16 @@
-ENT_1 // EVENT_T_HAVETOMOVE
-LNE_WASDÅ°¸¦ ÀÌ¿ëÇØ¼­ ¿òÁ÷¿©º¸¼¼¿ä.
-LNE_NMÅ°¸¦ ÀÌ¿ëÇØ¼­ È¸ÀüÇØº¸¼¼¿ä.
-LNE_¿¡³ÊÁöº¼Àº ÀÏÁ¤½Ã°£¸¶´Ù »ý¼ºµË´Ï´Ù.
-LNE_ÃÖ´ë 3°³±îÁö »ý¼ºµÇ¸ç 2¹øÅ°·Î ´õ »¡¸® »ý¼ºÇÒ ¼ö ÀÖ½À´Ï´Ù.
-LNE_»ý¼ºµÈ ¿¡³ÊÁöº¼Àº 1¹øÅ°¸¦ ÀÌ¿ëÇÏ¿© ¾ÕÀ¸·Î ³¯¸± ¼ö ÀÖ½À´Ï´Ù.
+ï»¿ENT_1 // EVENT_T_HAVETOMOVE
+LNE_WASDí‚¤ë¥¼ ì´ìš©í•´ì„œ ì›€ì§ì—¬ë³´ì„¸ìš”.
+LNE_NMí‚¤ë¥¼ ì´ìš©í•´ì„œ íšŒì „í•´ë³´ì„¸ìš”.
+LNE_ì—ë„ˆì§€ë³¼ì€ ì¼ì •ì‹œê°„ë§ˆë‹¤ ìƒì„±ë©ë‹ˆë‹¤.
+LNE_ìµœëŒ€ 3ê°œê¹Œì§€ ìƒì„±ë˜ë©° 2ë²ˆí‚¤ë¡œ ë” ë¹¨ë¦¬ ìƒì„±í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
+LNE_ìƒì„±ëœ ì—ë„ˆì§€ë³¼ì€ 1ë²ˆí‚¤ë¥¼ ì´ìš©í•˜ì—¬ ì•žìœ¼ë¡œ ë‚ ë¦´ ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
 ENT_2 // EVENT_T_HAVETOSHOOT
-LNE_1¹øÅ°¸¦ ´­·¶´Ù ¶¼¼­ ¿¡³ÊÁöº¼À» ³¯·Áº¸¼¼¿ä.
-LNE_1¹øÅ°¸¦ ±æ°Ô ´©¸£¸é ´õ ¸Ö¸®³¯¸± ¼ö ÀÖ½À´Ï´Ù.
-LNE_3¹øÅ°¸¦ ´©¸£°í ÀÖÀ¸¸é Åõ¸í»óÅÂ°¡ Áö¼ÓµË´Ï´Ù.
-LNE_Åõ¸í»óÅÂ¿¡¼­´Â ÀûµéÀÌ ÇÃ·¹ÀÌ¾î¸¦ ÀÎ½ÄÇÏÁö ¸øÇÕ´Ï´Ù.
+LNE_1ë²ˆí‚¤ë¥¼ ëˆŒë €ë‹¤ ë–¼ì„œ ì—ë„ˆì§€ë³¼ì„ ë‚ ë ¤ë³´ì„¸ìš”.
+LNE_1ë²ˆí‚¤ë¥¼ ê¸¸ê²Œ ëˆ„ë¥´ë©´ ë” ë©€ë¦¬ë‚ ë¦´ ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
+LNE_3ë²ˆí‚¤ë¥¼ ëˆ„ë¥´ê³  ìžˆìœ¼ë©´ íˆ¬ëª…ìƒíƒœê°€ ì§€ì†ë©ë‹ˆë‹¤.
+LNE_íˆ¬ëª…ìƒíƒœì—ì„œëŠ” ì ë“¤ì´ í”Œë ˆì´ì–´ë¥¼ ì¸ì‹í•˜ì§€ ëª»í•©ë‹ˆë‹¤.
 ENT_3 // EVENT_T_HAVETOBETRANSPARENT
-LNE_3¹øÅ°¸¦ ´­·¯¼­ Åõ¸í»óÅÂ¸¦ À¯ÁöÇØº¸¼¼¿ä.
-LNE_¿¬½À¿ë »ó´ë¸¦ ¼ÒÈ¯ÇÏ°Ú½À´Ï´Ù.
-LNE_»ó´ëÇÏÁö¾Ê°í ´ÙÀ½½ºÅ×ÀÌÁö·Î ÁøÇà°¡´ÉÇÕ´Ï´Ù.
+LNE_3ë²ˆí‚¤ë¥¼ ëˆŒëŸ¬ì„œ íˆ¬ëª…ìƒíƒœë¥¼ ìœ ì§€í•´ë³´ì„¸ìš”.
+LNE_ì—°ìŠµìš© ìƒëŒ€ë¥¼ ì†Œí™˜í•˜ê² ìŠµë‹ˆë‹¤.
+LNE_ìƒëŒ€í•˜ì§€ì•Šê³  ë‹¤ìŒìŠ¤í…Œì´ì§€ë¡œ ì§„í–‰ê°€ëŠ¥í•©ë‹ˆë‹¤.
 END_
