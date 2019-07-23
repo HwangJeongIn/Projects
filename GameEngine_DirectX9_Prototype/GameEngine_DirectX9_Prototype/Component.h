@@ -1763,8 +1763,9 @@ public:
 	// 그렇기 때문에 모든 과정을 묶어주는 함수를 하나 정의했다. 
 	// 이함수호출후 loadTextureFromFile로 텍스처를 로딩하면 된다.
 	void generateBillBoard();
-};
 
+
+};
 class GateEffect;
 class GateInScript : public Component
 {
