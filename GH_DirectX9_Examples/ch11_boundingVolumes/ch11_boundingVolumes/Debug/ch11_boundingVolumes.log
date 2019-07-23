@@ -1,6 +1,0 @@
-﻿  boundingvolumes.cpp
-c:\users\user\documents\github\projects\gh_directx9_examples\ch11_boundingvolumes\ch11_boundingvolumes\boundingvolumes.cpp(81): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch11_boundingvolumes\ch11_boundingvolumes\boundingvolumes.cpp(215): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch11_boundingvolumes\ch11_boundingvolumes\boundingvolumes.cpp(250): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-  ch11_boundingVolumes.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch11_boundingVolumes\Debug\ch11_boundingVolumes.exe
-  ch11_boundingVolumes.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch11_boundingVolumes\Debug\ch11_boundingVolumes.pdb (Full PDB)

@@ -1,0 +1,5 @@
+hello
+my
+name
+is
+Init_Scene class :: jeongin

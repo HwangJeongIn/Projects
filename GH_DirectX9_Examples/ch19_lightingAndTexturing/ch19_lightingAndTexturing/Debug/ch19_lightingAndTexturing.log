@@ -1,7 +1,0 @@
-﻿  light_tex_effect.cpp
-c:\users\user\documents\github\projects\gh_directx9_examples\ch19_lightingandtexturing\ch19_lightingandtexturing\light_tex_effect.cpp(77): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch19_lightingandtexturing\ch19_lightingandtexturing\light_tex_effect.cpp(181): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch19_lightingandtexturing\ch19_lightingandtexturing\light_tex_effect.cpp(231): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch19_lightingandtexturing\ch19_lightingandtexturing\light_tex_effect.cpp(236): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-  ch19_lightingAndTexturing.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch19_lightingAndTexturing\Debug\ch19_lightingAndTexturing.exe
-  ch19_lightingAndTexturing.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch19_lightingAndTexturing\Debug\ch19_lightingAndTexturing.pdb (Full PDB)

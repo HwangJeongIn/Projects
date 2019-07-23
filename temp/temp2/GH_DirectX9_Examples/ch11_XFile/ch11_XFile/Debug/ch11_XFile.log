@@ -1,0 +1,6 @@
+﻿  xfile.cpp
+d:\github\projects\gh_directx9_examples\ch11_xfile\ch11_xfile\xfile.cpp(84): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\ch11_xfile\ch11_xfile\xfile.cpp(203): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+d:\github\projects\gh_directx9_examples\ch11_xfile\ch11_xfile\xfile.cpp(234): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  ch11_XFile.vcxproj -> D:\GitHub\Projects\GH_DirectX9_Examples\ch11_XFile\Debug\ch11_XFile.exe
+  ch11_XFile.vcxproj -> D:\GitHub\Projects\GH_DirectX9_Examples\ch11_XFile\Debug\ch11_XFile.pdb (Full PDB)

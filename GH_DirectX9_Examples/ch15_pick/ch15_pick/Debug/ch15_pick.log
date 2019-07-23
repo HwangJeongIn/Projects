@@ -1,6 +1,0 @@
-﻿  pickSample.cpp
-c:\users\user\documents\github\projects\gh_directx9_examples\ch15_pick\ch15_pick\picksample.cpp(90): warning C4244: '=': 'DWORD'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch15_pick\ch15_pick\picksample.cpp(107): warning C4244: '=': 'unsigned long'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\user\documents\github\projects\gh_directx9_examples\ch15_pick\ch15_pick\picksample.cpp(108): warning C4244: '=': 'unsigned long'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  ch15_pick.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch15_pick\Debug\ch15_pick.exe
-  ch15_pick.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch15_pick\Debug\ch15_pick.pdb (Full PDB)
