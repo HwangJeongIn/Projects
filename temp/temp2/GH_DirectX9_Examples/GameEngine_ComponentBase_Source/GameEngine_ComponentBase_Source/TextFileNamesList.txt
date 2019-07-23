@@ -1,5 +1,0 @@
-Tag		TextFileName
---------------------------------
-TAG_DEBUG	DEBUG.txt
-TAG_INFO1	INFO1.txt
-TAG_INFO2	INFO2.txt
