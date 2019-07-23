@@ -1,0 +1,117 @@
+////////////////////////////////////////////////////////////////////////////
+// 
+// File: transform.txt
+// 
+// Author: Frank Luna (C) All Rights Reserved
+//
+// System: AMD Athlon 1800+ XP, 512 DDR, Geforce 3, Windows XP, MSVC++ 7.0 
+//
+
+// 결합된 뷰와 투명 변환으로 버텍스를 변환하고 버텍스 컬러를 파란색으로 지정
+// Desc: Vertex shader that transforms a vertex by the view and 
+//       projection transformation, and sets the vertex color to blue.
+//          
+////////////////////////////////////////////////////////////////////////////
+
+// HLSL : High-Level Shading Language
+
+//
+// Globals
+//
+
+// Global variable to store a combined view and projection
+// transformation matrix.  We initialize this variable
+// from the application.
+
+// 이 변수는 결합된 뷰와 투영행렬을 보관한다.
+// 두번의 벡터 행렬 곱을 하나의 작업으로 해결할 수 있다.
+// 셰이더 소스코드에서는 이 변수의 초기화 흔적을 찾을 수 없다. 애플리케이션 소스코드에서 초기화 되었기 때문
+matrix ViewProjMatrix;
+
+// Initialize a global blue color vector.
+// 파란색으로 지정
+vector Blue = {0.0f, 0.0f, 1.0f, 1.0f};
+
+//
+// Structures
+//
+
+// Input structure describes the vertex that is input
+// into the shader.  Here the input vertex contains
+// a position component only.
+
+
+// 입력 구조체는 셰이더에 입력으로 이용될 구조체 정의
+// 여기서는 위치성분만
+struct VS_INPUT
+{
+	// : POSITION 구문은 입력 버텍스의 POSITION를 나타내는 데 벡터 position을 이용할 것임을 지정
+	// 이는 버텍스 구조체의 유연한 버텍스 포맷과 매우 비슷하다.
+    vector position  : POSITION;
+};
+
+// Output structure describes the vertex that is
+// output from the shader.  Here the output
+// vertex contains a position and color component.
+
+// 출력 구조체는 셰이더가 출력으로 이용할 구조체를 정의
+// 여기서는 출력버텍스는 위치와 컬러 성분을 포함
+struct VS_OUTPUT
+{
+    vector position : POSITION;
+    vector diffuse  : COLOR;
+};
+
+//
+// Main Entry Point, observe the main function 
+// receives a copy of the input vertex through
+// its parameter and returns a copy of the output
+// vertex it computes.
+//
+
+// 메인 진입점, 메인함수는 인자를 통해 입력 버텍스의 복사본을 받으며
+// 출력 버텍스를 리턴한다.
+// 참고로 함수의 이름은 고정된 것이 아니다.
+
+// 다른형식의 입력과 출력이 있을 수도 있다.
+// ex)
+// float4 Main(in float2 base : TEXCOORD0, in float2 spot : TEXCOORD1, in float2 text : TEXCOORD2) : COLOR
+/*
+struct INPUT
+{
+	float2 base : TEXCOORD0;
+	float2 sopt : TEXCOORD1;
+	float2 text : TEXCOORD2;
+}
+
+struct OUTPUT
+{
+	float4 c : COLOR;
+}
+
+OUTPUT Main(INPUT input) // 이런식으로 써도된다.
+*/
+
+
+VS_OUTPUT Main(VS_INPUT input)
+{
+    // zero out members of output
+	// 처음 출력할 자료형을 선언하고 0으로 초기화한다.
+    VS_OUTPUT output = (VS_OUTPUT)0;
+ 
+    // transform to view space and project
+	// 뷰 스페이스와 투영으로 변환
+    output.position  = mul(input.position, ViewProjMatrix);
+
+	/*
+	여기서 ViewProjMatrix는 HLSL에 내장된 4 * 4 행렬형이다.
+	이 변수는 결합된 뷰와 투영 행렬을 보관하며 두가지의 변환을 하나의 행렬로 해결하기 위한행렬
+	*/
+
+
+    // set vertex diffuse color to blue
+    // 버텍스 난반사 색을 앞에 정의했던 파란색으로 지정
+	output.diffuse = Blue;
+
+    return output;
+}

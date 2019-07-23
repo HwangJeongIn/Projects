@@ -1,0 +1,8 @@
+﻿  d3dxcreatemeshfvf.cpp
+c:\users\user\documents\github\projects\gh_directx9_examples\ch10_d3dxcreatemeshfvf\ch10_d3dxcreatemeshfvf\d3dxcreatemeshfvf.cpp(468): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch10_d3dxcreatemeshfvf\ch10_d3dxcreatemeshfvf\d3dxcreatemeshfvf.cpp(488): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch10_d3dxcreatemeshfvf\ch10_d3dxcreatemeshfvf\d3dxcreatemeshfvf.cpp(509): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch10_d3dxcreatemeshfvf\ch10_d3dxcreatemeshfvf\d3dxcreatemeshfvf.cpp(529): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\user\documents\github\projects\gh_directx9_examples\ch10_d3dxcreatemeshfvf\ch10_d3dxcreatemeshfvf\d3dxcreatemeshfvf.cpp(554): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  ch10_D3DXCreateMeshFVF.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch10_D3DXCreateMeshFVF\Debug\ch10_D3DXCreateMeshFVF.exe
+  ch10_D3DXCreateMeshFVF.vcxproj -> C:\Users\user\Documents\GitHub\Projects\GH_DirectX9_Examples\ch10_D3DXCreateMeshFVF\Debug\ch10_D3DXCreateMeshFVF.pdb (Full PDB)

@@ -1,0 +1,116 @@
+////////////////////////////////////////////////////////////////////////////
+// 
+// File: diffuse.txt
+// 
+// Author: Frank Luna (C) All Rights Reserved
+//
+// System: AMD Athlon 1800+ XP, 512 DDR, Geforce 3, Windows XP, MSVC++ 7.0 
+//
+// Desc: Vertex shader that draws the silhouette edges of a mesh.
+//          
+////////////////////////////////////////////////////////////////////////////
+
+//
+// Globals
+//
+
+extern matrix WorldViewMatrix;
+extern matrix ProjMatrix;
+
+static vector Black = {0.0f, 0.0f, 0.0f, 0.0f};
+
+//
+// Structures
+//
+
+// 애플리케이션내 버텍스정보 선언과 매칭시켜줘야 한다.
+struct VS_INPUT
+{
+    vector position    : POSITION;
+    vector normal      : NORMAL0;
+    vector faceNormal1 : NORMAL1; 
+    vector faceNormal2 : NORMAL2;
+};
+
+// 반환 구조체 선언
+struct VS_OUTPUT
+{
+    vector position : POSITION;
+    vector diffuse  : COLOR;
+};
+
+//
+// Main
+//
+
+VS_OUTPUT Main(VS_INPUT input)
+{
+    // zero out each member in output
+    VS_OUTPUT output = (VS_OUTPUT)0;
+
+    // transform position to view space
+
+	// 뷰 스페이스로 position을 변환한다.
+    input.position = mul(input.position, WorldViewMatrix);
+
+    // Compute a vector in the direction of the vertex
+    // from the eye.  Recall the eye is at the origin
+    // in view space - eye is just camera position.
+
+	// 시점에서 버텍스로의 방향 벡터를 계산한다.
+	// 시점은 뷰 스페이스의 원점이며, 카메라의 위치이다.
+    vector eyeToVertex = input.position;
+
+    // transform normals to view space.  Set w
+    // components to zero since we're transforming vectors.
+    // Assume there are no scalings in the world
+    // matrix as well.
+
+	// 벡터를 변환하는 것이므로 w를 0으로 지정
+	// 월드 행렬에서의 크기 변형X
+    input.normal.w      = 0.0f;
+    input.faceNormal1.w = 0.0f;
+    input.faceNormal2.w = 0.0f;
+
+	// 법선을 뷰 스페이스로 변환한다.
+	input.normal      = mul(input.normal,      WorldViewMatrix);
+    input.faceNormal1 = mul(input.faceNormal1, WorldViewMatrix);
+    input.faceNormal2 = mul(input.faceNormal2, WorldViewMatrix);
+
+    // compute the cosine of the angles between
+    // the eyeToVertex vector and the face normals.
+    
+	// 버텍스로의 방향벡터 기준으로 각 법선벡터에 대한 내적을 구해본다
+	float dot0 = dot(eyeToVertex, input.faceNormal1);
+    float dot1 = dot(eyeToVertex, input.faceNormal2);
+
+    // if cosines are different signs (positive/negative)
+    // than we are on a silhouette edge.  Do the signs
+    // differ?
+
+	// 내적의 곱이 음수라는 것은 외곽선기준으로 전면과 후면이 동시에 존재한다는 뜻이 된다.
+	// 즉 실루엣 외곽선이다.
+    if( (dot0 * dot1) < 0.0f )
+    {
+         // yes, then this vertex is on a silhouette edge, 
+         // offset the vertex position by some scalar in the
+         // direction of the vertex normal.
+
+		 // 실루엣 외곽선일때 법선벡터 방향으로 조금 늘려준다.
+		 // 여기서 법선벡터가 0인 버텍스도 존재한다. 그러면 움직이지 않게 되는데
+		 // 이런식으로 설계한 이유는 4개의 버텍스로 사각형을 만들기 위해서는 각 끝점에 있는 2개의 점만 이동해야 하기 때문이다.
+		 //
+         input.position += 0.05f * input.normal;
+    }
+
+    // transform to homogeneous clip space
+	// 투영은 제일 마지막에 다 계산해준 후에 해주어야 한다. z값이 고정되기 때문이다.
+    output.position = mul(input.position, ProjMatrix);
+
+    // set outline color
+    output.diffuse = Black;
+    
+    return output;
+	// 반환되면 이제 리턴된값기준으로 그려주기만 하면된다.
+	// 내부적으로 여기서 해준 연산을 해줄 필요가 없다. 여기서 투영행렬까지 적용시켜놨기 때문
+}
